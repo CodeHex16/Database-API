@@ -1,0 +1,6 @@
+# required packages
+flask_sqlalchemy
+flask
+pytest
+flask-testing
+psycopg2

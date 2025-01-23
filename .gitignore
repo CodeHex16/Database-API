@@ -1,0 +1,78 @@
+# Byte-compiled / optimized / compiled Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment directories
+venv/
+.env/
+.venv/
+env/
+
+# Flask instance and config files
+instance/
+*.cfg
+*.env
+
+# Log files
+*.log
+*.out
+*.err
+
+# Cache and debug files
+*.swp
+*.swo
+*.tmp
+.cache/
+*.bak
+
+# Flask extensions cache
+*.db
+*.sqlite3
+
+# Static and media generated files
+staticfiles/
+mediafiles/
+
+# Testing-related
+.coverage
+htmlcov/
+*.pytest_cache/
+.nox/
+.tox/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Python packages and dependencies
+*.egg
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+
+# Deployment files
+*.tar.gz
+*.zip
+*.pem
+*.key
+
+# Flask-Migrate migration scripts
+migrations/
+
+# Ignore compiled translations
+*.mo
+
+# Celery beat and task queues
+celerybeat-schedule
+celerybeat.pid
+
+# Custom ignore (add your specific paths here)
+# /example_folder/
