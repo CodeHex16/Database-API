@@ -1,0 +1,23 @@
+{
+  "_id": ObjectId("..."),
+  "user_email": "utente@esempio.com",  // riferimento all'utente proprietario
+  "name": "Conversazione su Python",    // nome/titolo della chat
+  "created_at": ISODate("2024-02-26T10:30:00Z"),
+  "updated_at": ISODate("2024-02-26T11:45:00Z"),
+  "messages": [
+    {
+      "sender": "user",   // può essere "user" o "bot"
+      "content": "Come posso usare FastAPI?",
+      "timestamp": ISODate("2024-02-26T10:30:00Z")
+    },
+    {
+      "sender": "bot",
+      "content": "FastAPI è un framework moderno per API...",
+      "timestamp": ISODate("2024-02-26T10:30:15Z")
+    }
+    // altri messaggi
+  ],
+  "is_active": true,  // flag per conversazioni archiviate/attive
+  "context": "FastAPI Python development"  // contesto opzionale della chat
+}
+
