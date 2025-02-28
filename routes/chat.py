@@ -179,7 +179,7 @@ async def create_chat_message(
     # Aggiungi il messaggio alla chat
     existing_chat["messages"].append(message_data)
     await chat_repository.update(
-        message.chat_id, {"messages": existing_chat["messages"]}
+        chat_id, {"messages": existing_chat["messages"]}
     )
 
     return message_data
