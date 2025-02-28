@@ -18,7 +18,7 @@ async def get_db():
     global _app
     if _app is None:
         # Durante l'inizializzazione, l'app potrebbe non essere ancora impostata
-        from main import app
+        from .main import app
 
         _app = app
 

@@ -10,6 +10,8 @@ from .. import schemas
 from .auth import verify_token, oauth2_scheme
 from typing_extensions import Annotated
 
+import uuid
+
 router = APIRouter(
     prefix="/chats",
     tags=["chats"],
@@ -35,6 +37,7 @@ async def get_chats(
     chats = await chat_repository.get_by_user_email(user_email)
 
     result = []
+
     for chat in chats:
         result.append(
             {
@@ -128,3 +131,70 @@ async def delete_chat(
 
     await chat_repository.delete(chat_id, user_email)
     return None
+
+
+@router.get("/{chat_id}/messages")  # response_model=List[schemas.MessageResponse]
+async def get_chat_messages(
+    chat_id: str,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    chat_repository=Depends(get_chat_repository),
+):
+    payload = verify_token(token=token)
+    user_email = payload.get("sub")
+
+    # Verifica che la chat esista e appartenga all'utente
+    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    if not existing_chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    result = {
+        "name": existing_chat.get("name", "Chat senza nome"),
+        "messages": existing_chat.get("messages", []),
+    }
+
+    return result
+
+
+@router.post("/{chat_id}/messages")  # response_model=schemas.MessageResponse
+async def create_chat_message(
+    message: schemas.MessageCreate,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    chat_repository=Depends(get_chat_repository),
+):
+    payload = verify_token(token=token)
+    user_email = payload.get("sub")
+
+    # Verifica che la chat esista e appartenga all'utente
+    existing_chat = await chat_repository.get_by_id(message.chat_id, user_email)
+    if not existing_chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    message_data = {
+        "sender": user_email,
+        "content": message.content,
+        "timestamp": datetime.now(),
+    }
+
+    # Aggiungi il messaggio alla chat
+    existing_chat["messages"].append(message_data)
+    await chat_repository.update(message.chat_id, {"messages": existing_chat["messages"]})
+
+    return message_data
+
+
+@router.get("/new_chat")  # response_model=List[schemas.ChatResponse]
+async def get_new_chat(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    chat_repository=Depends(get_chat_repository),
+):
+    payload = verify_token(token=token)
+    user_email = payload.get("sub")
+
+    if not user_email:
+        raise HTTPException(status_code=400, detail="Invalid user information in token")
+
+    chats = await chat_repository.create(user_email)
+
+    # get chat id
+    chat_id = chats["_id"]
+    return chat_id

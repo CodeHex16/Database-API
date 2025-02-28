@@ -1,4 +1,6 @@
 from bson import ObjectId
+from datetime import datetime
+import uuid
 
 
 class ChatRepository:
@@ -16,9 +18,22 @@ class ChatRepository:
             {"_id": ObjectId(chat_id), "user_email": user_email}
         )
 
-    async def create(self, chat_data):
+    async def create(self, user_email):
+        chat_data = {
+            "name": "Chat senza nome",
+            "user_email": user_email,
+            "created_at": datetime.now(),
+            "messages": [
+                {
+                    "sender": "bot",
+                    "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                    "timestamp": datetime.now(),
+                }
+            ],
+        }
+
         result = await self.collection.insert_one(chat_data)
-        return result.inserted_id
+        return await self.collection.find_one({"_id": result.inserted_id})
 
     async def update(self, chat_id, data):
         return await self.collection.update_one(

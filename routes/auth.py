@@ -7,6 +7,7 @@ from logging import info, debug, error
 from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
+import bcrypt
 import os
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -22,19 +23,12 @@ router = APIRouter(
 )
 
 
-# Variabili globali per memorizzare l'app e altre risorse
-app = None
-
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def init_router(app_instance):
-    global app
-    app = app_instance
-    print("Auth router initialized with app:", app_instance)
-    print("App in db:", app.database)
+    yield
 
 
 # Dipendenza per ottenere il repository utenti
@@ -112,14 +106,15 @@ async def login_for_access_token(
     access_token = create_access_token(
         data={"sub": user["email"]}, expires_delta=access_token_expires
     )
-
+    print("Access token", access_token)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-def verify_token(token: str = Depends(oauth2_scheme)):
+def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
+        print("Username", username)
         if username is None:
             raise HTTPException(status_code=403, detail="Token is invalid or expired")
         return payload
@@ -127,16 +122,21 @@ def verify_token(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=403, detail="Token is invalid or expired")
 
 
-@router.post("/verify")
+@router.get("/verify")
 async def verify_user_token(token: str):
     verify_token(token=token)
     return {"status": "valid"}
 
 
-# Aggiungiamo le funzioni mancanti per la gestione delle password
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+def verify_password(plain_password, hashed_password):
+    return bcrypt.checkpw(
+        bytes(plain_password, encoding="utf-8"),
+        bytes(hashed_password, encoding="utf-8"),
+    )
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+def get_password_hash(password):
+    return bcrypt.hashpw(
+        bytes(password, encoding="utf-8"),
+        bcrypt.gensalt(),
+    )
