@@ -1,20 +1,28 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
-from typing_extensions import Annotated
+import os
+from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from logging import info, debug, error
 from jose import JWTError, jwt
-from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 import bcrypt
-import os
-
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from dotenv import load_dotenv
+
 
 from ..repositories.user_repository import UserRepository
 from ..database import get_db
 from .. import schemas
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY non impostata nelle variabili d'ambiente")
+
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 router = APIRouter(
@@ -55,12 +63,6 @@ async def register_user(
 
     await user_repository.create(user_data)
     return {"message": "User created successfully"}
-
-
-# ----------------- AUTHENTICATION -----------------
-SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(16))
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 # Authenticate the user

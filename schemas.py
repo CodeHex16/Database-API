@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, UUID4, Field
+from pydantic import BaseModel, EmailStr, UUID4, Field, field_validator
 from typing import Union, Optional, List
 from datetime import datetime
 
@@ -6,6 +6,12 @@ from datetime import datetime
 class UserRegister(BaseModel):
     email: EmailStr
     password: str
+
+    @field_validator("password")
+    def check_password(value: str):
+        if len(value) < 8:
+            raise ValueError("La password deve essere lunga almeno 8 caratteri")
+        return value
 
 
 class UserDB(BaseModel):
@@ -19,14 +25,6 @@ class Token(BaseModel):
     token_type: str
 
 
-class ChatCreate(BaseModel):
-    name: str = "Nuova chat"
-
-
-class ChatUpdate(BaseModel):
-    name: Optional[str] = None
-
-
 class ChatResponse(BaseModel):
     id: str
     name: str
@@ -37,6 +35,17 @@ class ChatResponse(BaseModel):
 class ChatList(BaseModel):
     chats: List[ChatResponse]
 
+
+class Message(BaseModel):
+    sender: EmailStr
+    content: str
+    timestamp: datetime
+
+
+class ChatMessages(BaseModel):
+    name: str
+    messages: List[Message]
+
+
 class MessageCreate(BaseModel):
     content: str
-     

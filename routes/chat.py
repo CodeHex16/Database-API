@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from datetime import datetime
-from bson import ObjectId
-from pydantic import EmailStr
 
 from ..database import get_db
 from ..repositories.chat_repository import ChatRepository
@@ -47,36 +45,6 @@ async def get_chats(
         )
 
     return result
-
-
-@router.post(
-    "", response_model=schemas.ChatResponse, status_code=status.HTTP_201_CREATED
-)
-async def create_chat(
-    chat: schemas.ChatCreate,
-    token: Annotated[str, Depends(oauth2_scheme)],
-    chat_repository=Depends(get_chat_repository),
-):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
-
-    if not user_email:
-        raise HTTPException(status_code=400, detail="Invalid user information in token")
-
-    chat_data = {
-        "name": chat.name,
-        "user_email": user_email,
-        "created_at": datetime.now(),
-    }
-
-    chat_id = await chat_repository.initialize_chat(chat_data)
-
-    return {
-        "id": str(chat_id),
-        "name": chat.name,
-        "user_email": user_email,
-        "created_at": chat_data["created_at"],
-    }
 
 
 @router.put("/{chat_id}", response_model=schemas.ChatResponse)
@@ -131,7 +99,7 @@ async def delete_chat(
     return None
 
 
-@router.get("/{chat_id}/messages")  # response_model=List[schemas.MessageResponse]
+@router.get("/{chat_id}/messages", response_model=schemas.ChatMessages)
 async def get_chat_messages(
     chat_id: str,
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -146,14 +114,14 @@ async def get_chat_messages(
         raise HTTPException(status_code=404, detail="Chat not found")
 
     result = {
-        "name": existing_chat.get("name", "Chat senza nome"),
-        "messages": existing_chat.get("messages", []),
+        "name": existing_chat.get("name"),
+        "messages": existing_chat.get("messages"),
     }
 
     return result
 
 
-@router.post("/{chat_id}/messages")  # response_model=schemas.MessageResponse
+@router.post("/{chat_id}/messages", response_model=schemas.Message)
 async def create_chat_message(
     chat_id: str,
     message: schemas.MessageCreate,
@@ -176,9 +144,7 @@ async def create_chat_message(
 
     # Aggiungi il messaggio alla chat
     existing_chat["messages"].append(message_data)
-    await chat_repository.update(
-        chat_id, {"messages": existing_chat["messages"]}
-    )
+    await chat_repository.update(chat_id, {"messages": existing_chat["messages"]})
 
     return message_data
 
@@ -196,6 +162,4 @@ async def get_new_chat(
 
     chats = await chat_repository.create(user_email)
 
-    # get chat id
-    chat_id = chats["_id"]
-    return {"chat_id": str(chat_id)}
+    return {"chat_id": str(chats["_id"])}

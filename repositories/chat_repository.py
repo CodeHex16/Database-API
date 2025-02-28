@@ -19,6 +19,7 @@ class ChatRepository:
         )
 
     async def initialize_chat(self, user_email):
+        """Inizializza una nuova chat con il messaggio iniziale del bot"""
         chat_data = {
             "name": "Chat senza nome",
             "user_email": user_email,
