@@ -10,8 +10,6 @@ from .. import schemas
 from .auth import verify_token, oauth2_scheme
 from typing_extensions import Annotated
 
-import uuid
-
 router = APIRouter(
     prefix="/chats",
     tags=["chats"],
@@ -71,7 +69,7 @@ async def create_chat(
         "created_at": datetime.now(),
     }
 
-    chat_id = await chat_repository.create(chat_data)
+    chat_id = await chat_repository.initialize_chat(chat_data)
 
     return {
         "id": str(chat_id),

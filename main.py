@@ -1,22 +1,12 @@
-from typing import Union, Optional
-from typing_extensions import Annotated
-from fastapi import FastAPI, Depends, HTTPException, status
-from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel, EmailStr, Field
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
 from motor.motor_asyncio import AsyncIOMotorClient
-from contextlib import asynccontextmanager
 from logging import info
-from jose import JWTError, jwt
 
 import os
 from dotenv import load_dotenv
 
-from . import schemas
-from .database import get_db
-from .repositories.user_repository import UserRepository
+from .database import init_db, get_db
 
 from .routes import auth, chat
 
@@ -31,6 +21,7 @@ async def lifespan(app: FastAPI):
     app.mongodb_client = AsyncIOMotorClient(MONGODB_URL)
     app.database = app.mongodb_client.get_default_database()
     info("Connected to the MongoDB database!")
+    init_db(app.database)
 
     yield
 
@@ -41,9 +32,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
-    title="Suppl-AI MongoDB API",
-    description="This is the API for the Suppl-AI MongoDB project",
-    version="0.1",
+    title="Suppl-AI API",
+    description="API for the Suppl-AI project",
+    version="0.2",
 )
 
 origins = ["http://localhost:3001", "http://localhost:8000"]

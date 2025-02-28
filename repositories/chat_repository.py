@@ -18,7 +18,7 @@ class ChatRepository:
             {"_id": ObjectId(chat_id), "user_email": user_email}
         )
 
-    async def create(self, user_email):
+    async def initialize_chat(self, user_email):
         chat_data = {
             "name": "Chat senza nome",
             "user_email": user_email,
