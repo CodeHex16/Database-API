@@ -56,12 +56,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Aggiungi:
-print("App:", app)
-print("Auth module:", auth)
-print("Init router exists:", hasattr(auth, "init_router"))
-
-# Passa il database al router di autenticazione
 auth.init_router(app)
 app.include_router(auth.router)
 app.include_router(chat.router)

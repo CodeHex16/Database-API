@@ -106,7 +106,6 @@ async def login_for_access_token(
     access_token = create_access_token(
         data={"sub": user["email"]}, expires_delta=access_token_expires
     )
-    print("Access token", access_token)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -114,7 +113,6 @@ def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        print("Username", username)
         if username is None:
             raise HTTPException(status_code=403, detail="Token is invalid or expired")
         return payload
