@@ -58,7 +58,7 @@ async def register_user(
 
 
 # ----------------- AUTHENTICATION -----------------
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
+SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(16))
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
