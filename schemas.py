@@ -38,6 +38,5 @@ class ChatList(BaseModel):
     chats: List[ChatResponse]
 
 class MessageCreate(BaseModel):
-    chat_id: str
     content: str
      

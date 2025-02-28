@@ -157,6 +157,7 @@ async def get_chat_messages(
 
 @router.post("/{chat_id}/messages")  # response_model=schemas.MessageResponse
 async def create_chat_message(
+    chat_id: str,
     message: schemas.MessageCreate,
     token: Annotated[str, Depends(oauth2_scheme)],
     chat_repository=Depends(get_chat_repository),
@@ -165,19 +166,21 @@ async def create_chat_message(
     user_email = payload.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_by_id(message.chat_id, user_email)
+    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
     message_data = {
-        "sender": user_email,
+        "sender": "user",
         "content": message.content,
         "timestamp": datetime.now(),
     }
 
     # Aggiungi il messaggio alla chat
     existing_chat["messages"].append(message_data)
-    await chat_repository.update(message.chat_id, {"messages": existing_chat["messages"]})
+    await chat_repository.update(
+        message.chat_id, {"messages": existing_chat["messages"]}
+    )
 
     return message_data
 
@@ -197,4 +200,4 @@ async def get_new_chat(
 
     # get chat id
     chat_id = chats["_id"]
-    return chat_id
+    return {"chat_id": str(chat_id)}
