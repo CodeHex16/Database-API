@@ -77,7 +77,7 @@ def postgres_fetchspecific_time(query):
 ###### MAIN #######################################################
 ###################################################################
 # load data
-with open("data_new.json") as data_file:
+with open("data.json") as data_file:
     chats = json.load(data_file)
 
 # mongodb connection
@@ -114,7 +114,7 @@ for i in range(100):
 
     # fetchspecific in json column time test
     mongo_fetchspecific_injsoncol_times.append(
-        mongo_fetchspecific_time({"messages": {"$elemMatch": {"sender": "bot"}}})
+        mongo_fetchspecific_time({"messages": {"$elemMatch": {"secender": "bot"}}})
     )
     postgres_fetchspecific_injsoncol_times.append(
         postgres_fetchspecific_time(
@@ -138,14 +138,14 @@ for i in range(100):
 print(
     "MongoDB Create Time: ",
     sum([i[0] for i in mongo_create_times]) / len(mongo_create_times),
-    " for ",
+    "sec for ",
     mongo_create_times[0][1],
     " rows",
 )
 print(
     "PostgreSQL Create Time: ",
     sum([i[0] for i in postgres_create_times]) / len(postgres_create_times),
-    " for ",
+    "sec for ",
     postgres_create_times[0][1],
     " rows \n",
 )
@@ -153,14 +153,14 @@ print(
 print(
     "MongoDB Fetchall Time: ",
     sum([i[0] for i in mongo_fetchall_times]) / len(mongo_fetchall_times),
-    " for ",
+    "sec for ",
     mongo_fetchall_times[0][1],
     " rows",
 )
 print(
     "PostgreSQL Fetchall Time: ",
     sum([i[0] for i in postgres_fetchall_times]) / len(postgres_fetchall_times),
-    " for ",
+    "sec for ",
     postgres_fetchall_times[0][1],
     " rows \n",
 )
@@ -168,7 +168,7 @@ print(
     "MongoDB Fetchspecific Time in json column: ",
     sum([i[0] for i in mongo_fetchspecific_injsoncol_times])
     / len(mongo_fetchspecific_injsoncol_times),
-    " for ",
+    "sec for ",
     mongo_fetchspecific_injsoncol_times[0][1],
     " rows",
 )
@@ -176,7 +176,7 @@ print(
     "PostgreSQL Fetchspecific Time in json column: ",
     sum([i[0] for i in postgres_fetchspecific_injsoncol_times])
     / len(postgres_fetchspecific_injsoncol_times),
-    " for ",
+    "sec for ",
     postgres_fetchspecific_injsoncol_times[0][1],
     " rows \n",
 )
@@ -184,7 +184,7 @@ print(
     "MongoDB Fetchspecific Time no json column: ",
     sum([i[0] for i in mongo_fetchspecific_nojsoncol_times])
     / len(mongo_fetchspecific_nojsoncol_times),
-    " for ",
+    "sec for ",
     mongo_fetchspecific_nojsoncol_times[0][1],
     " rows",
 )
@@ -192,7 +192,7 @@ print(
     "PostgreSQL Fetchspecific Time no json column: ",
     sum([i[0] for i in postgres_fetchspecific_nojsoncol_times])
     / len(postgres_fetchspecific_nojsoncol_times),
-    " for ",
+    "sec for ",
     postgres_fetchspecific_nojsoncol_times[0][1],
     " rows \n",
 )
