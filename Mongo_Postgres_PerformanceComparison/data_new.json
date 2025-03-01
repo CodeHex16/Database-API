@@ -1,0 +1,1152 @@
+[
+    {
+        "_id": "67c220151f890f23980a91cf",
+        "name": "Chath senzaa nome",
+        "user_email": "test@test.it",
+        "created_at": "2025-02-28T21:44:05.953Z",
+        "messages": [ 
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-02-28T21:44:05.953Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Hey hey amico",
+                "timestamp": "2025-02-28T22:33:53.098Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Ciaooo",
+                "timestamp": "2025-02-28T22:39:46.587Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "ma come fa a refresharsi fast",
+                "timestamp": "2025-02-28T22:39:56.578Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "hey",
+                "timestamp": "2025-02-28T22:41:23.880Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "perchè non mi rispondi supply!!!!",
+                "timestamp": "2025-02-28T22:42:03.004Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d0",
+        "name": "Chat smartphone",
+        "user_email": "mario.rossi@gmail.com",
+        "created_at": "2025-03-01T10:15:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-01T10:15:22.123Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Cerco un nuovo smartphone",
+                "timestamp": "2025-03-01T10:15:45.556Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Posso aiutarti a trovare lo smartphone perfetto per te! Hai in mente un budget specifico?",
+                "timestamp": "2025-03-01T10:16:02.789Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Massimo 400 euro",
+                "timestamp": "2025-03-01T10:16:35.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d1",
+        "name": "Acquisto laptop",
+        "user_email": "giulia87@hotmail.com",
+        "created_at": "2025-03-02T14:22:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-02T14:22:33.456Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Mi serve un laptop per lavoro, principalmente uso Excel e PowerPoint",
+                "timestamp": "2025-03-02T14:23:10.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottimo! Per l'uso che ne farai ti consiglio un laptop con almeno 8GB di RAM e un processore i5 o equivalente. Hai preferenze sulla dimensione dello schermo?",
+                "timestamp": "2025-03-02T14:23:45.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d2",
+        "name": "Televisore nuovo",
+        "user_email": "alessandro.verdi@outlook.com",
+        "created_at": "2025-03-03T09:45:12.345Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-03T09:45:12.345Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Vorrei comprare una TV nuova per il salotto",
+                "timestamp": "2025-03-03T09:46:05.678Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottima scelta! Che dimensioni stai considerando per il tuo salotto?",
+                "timestamp": "2025-03-03T09:46:35.901Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Direi 55 pollici, non troppo grande",
+                "timestamp": "2025-03-03T09:47:15.234Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d3",
+        "name": "Consiglio frigorifero",
+        "user_email": "francesca.bianchi@yahoo.com",
+        "created_at": "2025-03-04T16:30:45.678Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-04T16:30:45.678Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Devo sostituire il mio vecchio frigorifero",
+                "timestamp": "2025-03-04T16:31:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Mi dispiace per il tuo frigorifero! Posso aiutarti a trovarne uno nuovo. Preferisci un modello combinato o side-by-side?",
+                "timestamp": "2025-03-04T16:32:01.234Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d4",
+        "name": "Info tablet",
+        "user_email": "luca.ferrari@gmail.com",
+        "created_at": "2025-03-05T11:20:33.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-05T11:20:33.789Z"
+            },
+            {
+                "sender": "luca.ferrari@gmail.com",
+                "content": "Sto cercando un tablet economico per mio figlio di 10 anni",
+                "timestamp": "2025-03-05T11:21:15.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Per un bambino di 10 anni, ti consiglio un tablet robusto con controllo parentale. Hai un budget specifico in mente?",
+                "timestamp": "2025-03-05T11:22:05.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d5",
+        "name": "Aspirapolvere robot",
+        "user_email": "sofia.romano@libero.it",
+        "created_at": "2025-03-06T18:05:22.345Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-06T18:05:22.345Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Mi consigli un aspirapolvere robot?",
+                "timestamp": "2025-03-06T18:06:10.678Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Certamente! Gli aspirapolvere robot sono molto comodi. Hai animali domestici o esigenze particolari?",
+                "timestamp": "2025-03-06T18:07:01.234Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Sì, ho un gatto che perde molto pelo",
+                "timestamp": "2025-03-06T18:07:45.678Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d6",
+        "name": "Macchina fotografica",
+        "user_email": "marco.esposito@gmail.com",
+        "created_at": "2025-03-07T09:10:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-07T09:10:15.789Z"
+            },
+            {
+                "sender": "marco.esposito@gmail.com",
+                "content": "Sto cercando una macchina fotografica sotto i 500 euro",
+                "timestamp": "2025-03-07T09:11:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottimo budget per iniziare! Stai pensando a una compatta, mirrorless o reflex?",
+                "timestamp": "2025-03-07T09:11:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d7",
+        "name": "Cuffie bluetooth",
+        "user_email": "valentina.russo@outlook.com",
+        "created_at": "2025-03-08T14:25:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-08T14:25:33.456Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Voglio acquistare delle cuffie bluetooth di qualità",
+                "timestamp": "2025-03-08T14:26:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le cuffie bluetooth sono un ottimo investimento! Preferisci un modello in-ear, on-ear o over-ear?",
+                "timestamp": "2025-03-08T14:27:05.123Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Preferisco le over-ear per il comfort",
+                "timestamp": "2025-03-08T14:27:55.456Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d8",
+        "name": "Monitor per lavoro",
+        "user_email": "davide.colombo@yahoo.com",
+        "created_at": "2025-03-09T10:40:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-09T10:40:22.123Z"
+            },
+            {
+                "sender": "davide.colombo@yahoo.com",
+                "content": "Mi serve un monitor per lo smart working",
+                "timestamp": "2025-03-09T10:41:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Per lo smart working, un buon monitor è essenziale! Che dimensione preferisci e che tipo di attività svolgi principalmente?",
+                "timestamp": "2025-03-09T10:41:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91d9",
+        "name": "Stampante ufficio",
+        "user_email": "test@test.it",
+        "created_at": "2025-03-10T15:33:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-10T15:33:44.567Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Che stampante mi consigli per l'ufficio?",
+                "timestamp": "2025-03-10T15:34:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Per un ufficio, ti consiglio una stampante laser multifunzione. Hai bisogno di stampa a colori o va bene in bianco e nero?",
+                "timestamp": "2025-03-10T15:35:05.678Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91da",
+        "name": "Consiglio smartwatch",
+        "user_email": "mario.rossi@gmail.com",
+        "created_at": "2025-03-11T09:20:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-11T09:20:15.789Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Vorrei un consiglio su quale smartwatch comprare",
+                "timestamp": "2025-03-11T09:21:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Gli smartwatch sono molto utili! Utilizzerai il dispositivo principalmente per sport, notifiche, o monitoraggio della salute?",
+                "timestamp": "2025-03-11T09:21:55.789Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Principalmente per monitorare l'attività sportiva",
+                "timestamp": "2025-03-11T09:22:33.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91db",
+        "name": "Console gaming",
+        "user_email": "giulia87@hotmail.com",
+        "created_at": "2025-03-12T16:45:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-12T16:45:33.456Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Cerco una console per gaming",
+                "timestamp": "2025-03-12T16:46:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le console sono un ottimo intrattenimento! Preferisci PlayStation, Xbox o Nintendo Switch?",
+                "timestamp": "2025-03-12T16:47:05.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91dc",
+        "name": "Ferro da stiro",
+        "user_email": "alessandro.verdi@outlook.com",
+        "created_at": "2025-03-13T11:10:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-13T11:10:22.123Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Mi puoi consigliare un buon ferro da stiro?",
+                "timestamp": "2025-03-13T11:11:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Certamente! Stai cercando un ferro da stiro tradizionale o un ferro da stiro con caldaia?",
+                "timestamp": "2025-03-13T11:11:55.789Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Non conosco la differenza, puoi spiegarmela?",
+                "timestamp": "2025-03-13T11:12:33.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91dd",
+        "name": "Forno microonde",
+        "user_email": "francesca.bianchi@yahoo.com",
+        "created_at": "2025-03-14T14:20:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-14T14:20:44.567Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Che microonde mi consigli?",
+                "timestamp": "2025-03-14T14:21:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ci sono molti ottimi modelli di microonde! Stai cercando un modello base o uno con funzioni aggiuntive come grill o convezione?",
+                "timestamp": "2025-03-14T14:22:05.678Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91de",
+        "name": "Condizionatore",
+        "user_email": "luca.ferrari@gmail.com",
+        "created_at": "2025-03-15T10:35:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-15T10:35:15.789Z"
+            },
+            {
+                "sender": "luca.ferrari@gmail.com",
+                "content": "Cerco un nuovo condizionatore per la mia camera da letto",
+                "timestamp": "2025-03-15T10:36:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Un buon condizionatore è essenziale! Quanto è grande la tua camera da letto in metri quadri?",
+                "timestamp": "2025-03-15T10:36:55.789Z"
+            },
+            {
+                "sender": "luca.ferrari@gmail.com",
+                "content": "Circa 16 metri quadri",
+                "timestamp": "2025-03-15T10:37:33.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91df",
+        "name": "Videocamera",
+        "user_email": "sofia.romano@libero.it",
+        "created_at": "2025-03-16T17:50:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-16T17:50:33.456Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Quale videocamera è migliore per i video familiari?",
+                "timestamp": "2025-03-16T17:51:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Per i video familiari, ci sono diverse ottime opzioni! Hai un budget specifico?",
+                "timestamp": "2025-03-16T17:52:05.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e0",
+        "name": "Router wifi",
+        "user_email": "marco.esposito@gmail.com",
+        "created_at": "2025-03-17T12:25:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-17T12:25:22.123Z"
+            },
+            {
+                "sender": "marco.esposito@gmail.com",
+                "content": "Mi serve un nuovo router wifi",
+                "timestamp": "2025-03-17T12:26:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Un buon router è fondamentale oggi! Quanti dispositivi devi collegare simultaneamente e quanto è grande la tua abitazione?",
+                "timestamp": "2025-03-17T12:26:55.789Z"
+            },
+            {
+                "sender": "marco.esposito@gmail.com",
+                "content": "Circa 10 dispositivi, casa di 100mq",
+                "timestamp": "2025-03-17T12:27:33.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e1",
+        "name": "E-reader",
+        "user_email": "valentina.russo@outlook.com",
+        "created_at": "2025-03-18T09:15:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-18T09:15:44.567Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Vorrei un e-reader, cosa mi consigli?",
+                "timestamp": "2025-03-18T09:16:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Gli e-reader sono fantastici per gli amanti della lettura! Preferisci un Kindle di Amazon o sei aperto ad altre marche?",
+                "timestamp": "2025-03-18T09:17:05.678Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e2",
+        "name": "Drone economico",
+        "user_email": "davide.colombo@yahoo.com",
+        "created_at": "2025-03-19T15:30:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-19T15:30:15.789Z"
+            },
+            {
+                "sender": "davide.colombo@yahoo.com",
+                "content": "Qual è il miglior drone economico?",
+                "timestamp": "2025-03-19T15:31:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "I droni sono divertenti! Per uno economico ma di qualità, cosa ti interessa di più: qualità video, durata della batteria o facilità d'uso?",
+                "timestamp": "2025-03-19T15:31:55.789Z"
+            },
+            {
+                "sender": "davide.colombo@yahoo.com",
+                "content": "Soprattutto la facilità d'uso, sono un principiante",
+                "timestamp": "2025-03-19T15:32:33.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e3",
+        "name": "Fotocamera reflex",
+        "user_email": "test@test.it",
+        "created_at": "2025-03-20T11:20:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-20T11:20:33.456Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Sto pensando di acquistare una fotocamera reflex",
+                "timestamp": "2025-03-20T11:21:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottima scelta! Le reflex offrono grande qualità. Sei un fotografo principiante o hai già esperienza?",
+                "timestamp": "2025-03-20T11:22:05.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e4",
+        "name": "Auricolari wireless",
+        "user_email": "mario.rossi@gmail.com",
+        "created_at": "2025-03-21T14:05:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-21T14:05:22.123Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Cerco degli auricolari wireless di buona qualità",
+                "timestamp": "2025-03-21T14:06:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ci sono molti ottimi auricolari wireless sul mercato! Preferisci un design in-ear o con stelo? E quali sono le caratteristiche più importanti per te?",
+                "timestamp": "2025-03-21T14:06:55.789Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Preferisco in-ear, e vorrei una buona qualità audio e cancellazione del rumore",
+                "timestamp": "2025-03-21T14:07:33.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e5",
+        "name": "Consigli lavatrice",
+        "user_email": "giulia87@hotmail.com",
+        "created_at": "2025-03-22T10:40:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-22T10:40:44.567Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Vorrei comprare una lavatrice nuova",
+                "timestamp": "2025-03-22T10:41:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottimo! Per una lavatrice, quanto spazio hai a disposizione? E quanti kg di carico ti servono?",
+                "timestamp": "2025-03-22T10:42:05.678Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e6",
+        "name": "Ricerca altoparlanti",
+        "user_email": "alessandro.verdi@outlook.com",
+        "created_at": "2025-03-23T13:55:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-23T13:55:15.789Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Cerco degli altoparlanti bluetooth di qualità",
+                "timestamp": "2025-03-23T13:56:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Gli altoparlanti bluetooth sono ottimi per ascoltare musica ovunque! Li userai principalmente in casa o all'aperto?",
+                "timestamp": "2025-03-23T13:56:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e7",
+        "name": "Mixer da cucina",
+        "user_email": "francesca.bianchi@yahoo.com",
+        "created_at": "2025-03-24T09:30:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-24T09:30:33.456Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Vorrei comprare un mixer da cucina",
+                "timestamp": "2025-03-24T09:31:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottimo! Stai cercando un frullatore a immersione o un mixer da tavolo?",
+                "timestamp": "2025-03-24T09:32:05.123Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Un mixer da tavolo",
+                "timestamp": "2025-03-24T09:32:45.456Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e8",
+        "name": "Tastiera computer",
+        "user_email": "luca.ferrari@gmail.com",
+        "created_at": "2025-03-25T16:20:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-25T16:20:22.123Z"
+            },
+            {
+                "sender": "luca.ferrari@gmail.com",
+                "content": "Cerco una tastiera meccanica per gaming",
+                "timestamp": "2025-03-25T16:21:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le tastiere meccaniche sono eccellenti per il gaming! Hai preferenze sul tipo di switch (rossi, blu, marroni)?",
+                "timestamp": "2025-03-25T16:21:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91e9",
+        "name": "Mouse ergonomico",
+        "user_email": "sofia.romano@libero.it",
+        "created_at": "2025-03-26T11:45:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-26T11:45:44.567Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Cerco un mouse ergonomico per lavoro",
+                "timestamp": "2025-03-26T11:46:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Un mouse ergonomico è un'ottima scelta per prevenire problemi al polso! Preferisci un modello verticale o orizzontale?",
+                "timestamp": "2025-03-26T11:47:05.678Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Non conosco la differenza, puoi spiegarmela?",
+                "timestamp": "2025-03-26T11:47:55.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91ea",
+        "name": "Action cam",
+        "user_email": "marco.esposito@gmail.com",
+        "created_at": "2025-03-27T14:10:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-27T14:10:15.789Z"
+            },
+            {
+                "sender": "marco.esposito@gmail.com",
+                "content": "Vorrei comprare una action cam per le vacanze",
+                "timestamp": "2025-03-27T14:11:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le action cam sono perfette per catturare i momenti di avventura! La userai principalmente per attività acquatiche o terrestri?",
+                "timestamp": "2025-03-27T14:11:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91eb",
+        "name": "Asciugacapelli",
+        "user_email": "valentina.russo@outlook.com",
+        "created_at": "2025-03-28T10:35:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-28T10:35:33.456Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Mi serve un asciugacapelli professionale",
+                "timestamp": "2025-03-28T10:36:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Gli asciugacapelli professionali offrono ottime prestazioni! Cerchi caratteristiche particolari come ionizzatore o controllo della temperatura?",
+                "timestamp": "2025-03-28T10:37:05.123Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Sì, vorrei uno con ionizzatore",
+                "timestamp": "2025-03-28T10:37:45.456Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91ec",
+        "name": "Tostapane",
+        "user_email": "davide.colombo@yahoo.com",
+        "created_at": "2025-03-29T09:25:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-29T09:25:22.123Z"
+            },
+            {
+                "sender": "davide.colombo@yahoo.com",
+                "content": "Consigli per un tostapane di qualità?",
+                "timestamp": "2025-03-29T09:26:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Certamente! Stai cercando un tostapane classico a 2 fette o un modello più grande?",
+                "timestamp": "2025-03-29T09:26:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91ed",
+        "name": "Rasoio elettrico",
+        "user_email": "test@test.it",
+        "created_at": "2025-03-30T12:50:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-03-30T12:50:44.567Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Cerco un rasoio elettrico",
+                "timestamp": "2025-03-30T12:51:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "I rasoi elettrici sono molto pratici! Preferisci un modello a lamina o a testine rotanti?",
+                "timestamp": "2025-03-30T12:52:05.678Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Non sono sicuro, qual è la differenza?",
+                "timestamp": "2025-03-30T12:52:45.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91ee",
+        "name": "Bilancia smart",
+        "user_email": "mario.rossi@gmail.com",
+        "created_at": "2025-03-31T15:15:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-03-31T15:15:15.789Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Vorrei una bilancia smart che si sincronizzi con lo smartphone",
+                "timestamp": "2025-03-31T15:16:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le bilance smart sono molto utili per monitorare la salute! Ti interessa che misuri solo il peso o anche altri parametri come massa grassa, muscolare, ecc.?",
+                "timestamp": "2025-03-31T15:16:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91ef",
+        "name": "Orologio da parete",
+        "user_email": "giulia87@hotmail.com",
+        "created_at": "2025-04-01T11:30:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-01T11:30:33.456Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Cerco un orologio da parete moderno",
+                "timestamp": "2025-04-01T11:31:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Gli orologi da parete possono essere un elemento decorativo importante! Preferisci un design minimalista o qualcosa di più elaborato?",
+                "timestamp": "2025-04-01T11:32:05.123Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Preferirei minimalista",
+                "timestamp": "2025-04-01T11:32:45.456Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f0",
+        "name": "Forno elettrico",
+        "user_email": "alessandro.verdi@outlook.com",
+        "created_at": "2025-04-02T14:40:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-04-02T14:40:22.123Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Vorrei acquistare un forno elettrico da incasso",
+                "timestamp": "2025-04-02T14:41:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottima scelta! Per un forno da incasso, di che dimensioni hai bisogno e quali funzioni cerchi (pirolisi, vapore, ecc.)?",
+                "timestamp": "2025-04-02T14:41:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f1",
+        "name": "Macchina caffè",
+        "user_email": "francesca.bianchi@yahoo.com",
+        "created_at": "2025-04-03T10:05:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-03T10:05:44.567Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Cerco una macchina per il caffè",
+                "timestamp": "2025-04-03T10:06:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Il caffè è importante! Preferisci una macchina per caffè espresso, a cialde, capsule o una moka elettrica?",
+                "timestamp": "2025-04-03T10:07:05.678Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Preferirei a capsule, più comoda",
+                "timestamp": "2025-04-03T10:07:45.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f2",
+        "name": "Telecamera sicurezza",
+        "user_email": "luca.ferrari@gmail.com",
+        "created_at": "2025-04-04T16:55:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-04-04T16:55:15.789Z"
+            },
+            {
+                "sender": "luca.ferrari@gmail.com",
+                "content": "Vorrei installare delle telecamere di sicurezza a casa",
+                "timestamp": "2025-04-04T16:56:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "La sicurezza domestica è importante! Stai cercando telecamere per interno, esterno o entrambi? E preferisci un sistema cablato o wireless?",
+                "timestamp": "2025-04-04T16:56:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f3",
+        "name": "Spazzolino elettrico",
+        "user_email": "sofia.romano@libero.it",
+        "created_at": "2025-04-05T13:20:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-05T13:20:33.456Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Cerco uno spazzolino elettrico di qualità",
+                "timestamp": "2025-04-05T13:21:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Gli spazzolini elettrici migliorano molto l'igiene dentale! Preferisci un modello sonico o oscillante-rotante?",
+                "timestamp": "2025-04-05T13:22:05.123Z"
+            },
+            {
+                "sender": "sofia.romano@libero.it",
+                "content": "Non so qual è la differenza",
+                "timestamp": "2025-04-05T13:22:45.456Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f4",
+        "name": "Cassa bluetooth",
+        "user_email": "marco.esposito@gmail.com",
+        "created_at": "2025-04-06T09:45:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-04-06T09:45:22.123Z"
+            },
+            {
+                "sender": "marco.esposito@gmail.com",
+                "content": "Cerco una cassa bluetooth portatile",
+                "timestamp": "2025-04-06T09:46:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le casse bluetooth portatili sono ottime per ascoltare musica ovunque! Hai bisogno che sia resistente all'acqua? E quanto è importante per te l'autonomia della batteria?",
+                "timestamp": "2025-04-06T09:46:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f5",
+        "name": "Hard disk esterno",
+        "user_email": "valentina.russo@outlook.com",
+        "created_at": "2025-04-07T15:10:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-07T15:10:44.567Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Mi serve un hard disk esterno da 1TB",
+                "timestamp": "2025-04-07T15:11:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Un hard disk esterno è ottimo per conservare i dati! Preferisci un modello standard o un SSD esterno (più veloce ma più costoso)?",
+                "timestamp": "2025-04-07T15:12:05.678Z"
+            },
+            {
+                "sender": "valentina.russo@outlook.com",
+                "content": "Mi interessa più la velocità, quindi SSD",
+                "timestamp": "2025-04-07T15:12:45.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f6",
+        "name": "Power bank",
+        "user_email": "davide.colombo@yahoo.com",
+        "created_at": "2025-04-08T12:35:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-04-08T12:35:15.789Z"
+            },
+            {
+                "sender": "davide.colombo@yahoo.com",
+                "content": "Cerco un power bank potente per i viaggi",
+                "timestamp": "2025-04-08T12:36:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "I power bank sono essenziali per viaggiare! Che capacità cerchi (in mAh) e hai bisogno di ricarica rapida?",
+                "timestamp": "2025-04-08T12:36:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f7",
+        "name": "Padella antiaderente",
+        "user_email": "test@test.it",
+        "created_at": "2025-04-09T11:25:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-09T11:25:33.456Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Cerco una buona padella antiaderente",
+                "timestamp": "2025-04-09T11:26:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le padelle antiaderenti di qualità sono fondamentali in cucina! Preferisci un modello standard o una padella per usi specifici come wok o griglia?",
+                "timestamp": "2025-04-09T11:27:05.123Z"
+            },
+            {
+                "sender": "test@test.it",
+                "content": "Una padella standard per uso quotidiano",
+                "timestamp": "2025-04-09T11:27:45.456Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f8",
+        "name": "Ventilatore",
+        "user_email": "mario.rossi@gmail.com",
+        "created_at": "2025-04-10T14:50:22.123Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-04-10T14:50:22.123Z"
+            },
+            {
+                "sender": "mario.rossi@gmail.com",
+                "content": "Vorrei comprare un ventilatore per l'estate",
+                "timestamp": "2025-04-10T14:51:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Ottima idea per prepararsi all'estate! Stai cercando un ventilatore da tavolo, a piantana o a soffitto?",
+                "timestamp": "2025-04-10T14:51:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91f9",
+        "name": "Sedie da giardino",
+        "user_email": "giulia87@hotmail.com",
+        "created_at": "2025-04-11T10:15:44.567Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-11T10:15:44.567Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Cerco delle sedie da giardino resistenti",
+                "timestamp": "2025-04-11T10:16:22.345Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Le sedie da giardino devono essere durature! Preferisci modelli in plastica, legno, metallo o rattan?",
+                "timestamp": "2025-04-11T10:17:05.678Z"
+            },
+            {
+                "sender": "giulia87@hotmail.com",
+                "content": "Preferirei in rattan sintetico",
+                "timestamp": "2025-04-11T10:17:45.123Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91fa",
+        "name": "Tappetino yoga",
+        "user_email": "alessandro.verdi@outlook.com",
+        "created_at": "2025-04-12T16:30:15.789Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
+                "timestamp": "2025-04-12T16:30:15.789Z"
+            },
+            {
+                "sender": "alessandro.verdi@outlook.com",
+                "content": "Vorrei un tappetino per yoga di qualità",
+                "timestamp": "2025-04-12T16:31:05.456Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Un buon tappetino è fondamentale per lo yoga! Preferisci uno spessore standard o extra spesso per maggiore comfort?",
+                "timestamp": "2025-04-12T16:31:55.789Z"
+            }
+        ]
+    },
+    {
+        "_id": "67c220151f890f23980a91fb",
+        "name": "Macchina pane",
+        "user_email": "francesca.bianchi@yahoo.com",
+        "created_at": "2025-04-13T13:40:33.456Z",
+        "messages": [
+            {
+                "sender": "bot",
+                "content": "Buongiorno! Sono SupplAI e sono qui per aiutarti a trovare i prodotti perfetti per te. Di cosa hai bisogno?",
+                "timestamp": "2025-04-13T13:40:33.456Z"
+            },
+            {
+                "sender": "francesca.bianchi@yahoo.com",
+                "content": "Sto pensando di comprare una macchina per il pane",
+                "timestamp": "2025-04-13T13:41:15.789Z"
+            },
+            {
+                "sender": "bot",
+                "content": "Fare il pane in casa è fantastico! Hai bisogno di una macchina con funzioni particolari come programmazione ritardata o opzioni per impasti senza glutine?",
+                "timestamp": "2025-04-13T13:42:05.123Z"
+            }
+        ]
+    }
+]
