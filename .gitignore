@@ -75,5 +75,10 @@ migrations/
 celerybeat-schedule
 celerybeat.pid
 
+# docker db files
+Mongo_Postgres_PerformanceComparison/mongoData/
+Mongo_Postgres_PerformanceComparison/postgresData/
+Mongo_Postgres_PerformanceComparison/pgadmin-data/
+
 # Custom ignore (add your specific paths here)
 # /example_folder/
