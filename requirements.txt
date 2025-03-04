@@ -4,3 +4,4 @@ pydantic[email]
 bcrypt
 motor
 python-jose
+requests

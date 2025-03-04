@@ -37,7 +37,7 @@ class ChatList(BaseModel):
 
 
 class Message(BaseModel):
-    sender: EmailStr
+    sender: str
     content: str
     timestamp: datetime
 
