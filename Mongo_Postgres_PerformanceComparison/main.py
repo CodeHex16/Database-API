@@ -92,6 +92,7 @@ postgres_client = psycopg2.connect(
     host="localhost",
     port="5432",
 )
+postgres_client.autocommit = True
 postgres_cursor = postgres_client.cursor()
 
 mongo_create_times = []
@@ -114,7 +115,7 @@ for i in range(100):
 
     # fetchspecific in json column time test
     mongo_fetchspecific_injsoncol_times.append(
-        mongo_fetchspecific_time({"messages": {"$elemMatch": {"secender": "bot"}}})
+        mongo_fetchspecific_time({"messages": {"$elemMatch": {"sender": "bot"}}})
     )
     postgres_fetchspecific_injsoncol_times.append(
         postgres_fetchspecific_time(
