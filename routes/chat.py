@@ -4,10 +4,10 @@ from datetime import datetime
 from pydantic import EmailStr
 import requests
 
-from ..database import get_db
-from ..repositories.chat_repository import ChatRepository
-from .. import schemas
-from .auth import verify_token, oauth2_scheme
+from database import get_db
+from repositories.chat_repository import ChatRepository
+import schemas
+from routes.auth import verify_token, oauth2_scheme
 from typing_extensions import Annotated
 
 router = APIRouter(

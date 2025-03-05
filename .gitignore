@@ -82,3 +82,4 @@ Mongo_Postgres_PerformanceComparison/pgadmin-data/
 
 # Custom ignore (add your specific paths here)
 # /example_folder/
+.env

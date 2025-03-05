@@ -6,14 +6,15 @@ from logging import info
 import os
 from dotenv import load_dotenv
 
-from .database import init_db, get_db
+from database import init_db, get_db
 
-from .routes import auth, chat
+from routes import auth, chat
 
 load_dotenv()
 
 # Ottieni l'URL del MongoDB dall'ambiente
 MONGODB_URL = os.getenv("MONGODB_URL")
+print(MONGODB_URL)
 
 
 async def lifespan(app: FastAPI):
@@ -37,8 +38,11 @@ app = FastAPI(
     version="0.2",
 )
 
-origins = ["http://localhost:3001", "http://localhost:8000"
-           "http://192.168.1.44:3001", "http://192.168.1.44:8000"]
+origins = [
+    "http://localhost:3001",
+    "http://localhost:8000" "http://192.168.1.44:3001",
+    "http://192.168.1.44:8000",
+]
 
 app.add_middleware(
     CORSMiddleware,

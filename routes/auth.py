@@ -11,9 +11,9 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from dotenv import load_dotenv
 
 
-from ..repositories.user_repository import UserRepository
-from ..database import get_db
-from .. import schemas
+from repositories.user_repository import UserRepository
+from database import get_db
+import schemas
 
 load_dotenv()
 
