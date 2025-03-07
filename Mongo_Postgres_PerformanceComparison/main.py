@@ -4,12 +4,11 @@ import pymongo, psycopg2, json, time
 ###################################################################
 ###### FUNCTIONS ##################################################
 ###################################################################
-def mongo_create_time():
-    start = time.time()
-
+def mongo_insert_time():
     mongo_db["chats"].drop()
-
     chats_table_mongo = mongo_db["chats"]
+
+    start = time.time()
     inserted = chats_table_mongo.insert_many(chats)
 
     return time.time() - start, len(inserted.inserted_ids)
@@ -33,12 +32,12 @@ def mongo_fetchspecific_time(query):
     return time.time() - start, len(results)
 
 
-def postgres_create_time():
-    start = time.time()
-
+def postgres_insert_time():
     postgres_cursor.execute(
         "DROP TABLE IF EXISTS chats; CREATE TABLE chats (_id VARCHAR(24) PRIMARY KEY, name VARCHAR(100), user_email VARCHAR(255), created_at VARCHAR(50), messages JSON);"
     )
+
+    start = time.time()
 
     for chat in chats:
         postgres_cursor.execute(
@@ -95,8 +94,8 @@ postgres_client = psycopg2.connect(
 postgres_client.autocommit = True
 postgres_cursor = postgres_client.cursor()
 
-mongo_create_times = []
-postgres_create_times = []
+mongo_insert_times = []
+postgres_insert_times = []
 mongo_fetchall_times = []
 postgres_fetchall_times = []
 mongo_fetchspecific_injsoncol_times = []
@@ -105,9 +104,9 @@ mongo_fetchspecific_nojsoncol_times = []
 postgres_fetchspecific_nojsoncol_times = []
 
 for i in range(100):
-    # create time test
-    mongo_create_times.append(mongo_create_time())
-    postgres_create_times.append(postgres_create_time())
+    # insert time test
+    mongo_insert_times.append(mongo_insert_time())
+    postgres_insert_times.append(postgres_insert_time())
 
     # fetchall time test
     mongo_fetchall_times.append(mongo_fetachall_time())
@@ -137,36 +136,36 @@ for i in range(100):
 ###### PRINT RESULTS ##############################################
 ###################################################################
 print(
-    "MongoDB Create Time: ",
-    sum([i[0] for i in mongo_create_times]) / len(mongo_create_times),
+    "MongoDB insert time: ",
+    sum([i[0] for i in mongo_insert_times]) / len(mongo_insert_times),
     "sec for ",
-    mongo_create_times[0][1],
+    mongo_insert_times[0][1],
     " rows",
 )
 print(
-    "PostgreSQL Create Time: ",
-    sum([i[0] for i in postgres_create_times]) / len(postgres_create_times),
+    "PostgreSQL insert time: ",
+    sum([i[0] for i in postgres_insert_times]) / len(postgres_insert_times),
     "sec for ",
-    postgres_create_times[0][1],
+    postgres_insert_times[0][1],
     " rows \n",
 )
 
 print(
-    "MongoDB Fetchall Time: ",
+    "MongoDB fetchall time: ",
     sum([i[0] for i in mongo_fetchall_times]) / len(mongo_fetchall_times),
     "sec for ",
     mongo_fetchall_times[0][1],
     " rows",
 )
 print(
-    "PostgreSQL Fetchall Time: ",
+    "PostgreSQL fetchall time: ",
     sum([i[0] for i in postgres_fetchall_times]) / len(postgres_fetchall_times),
     "sec for ",
     postgres_fetchall_times[0][1],
     " rows \n",
 )
 print(
-    "MongoDB Fetchspecific Time in json column: ",
+    "MongoDB fetchspecific time in json column: ",
     sum([i[0] for i in mongo_fetchspecific_injsoncol_times])
     / len(mongo_fetchspecific_injsoncol_times),
     "sec for ",
@@ -174,7 +173,7 @@ print(
     " rows",
 )
 print(
-    "PostgreSQL Fetchspecific Time in json column: ",
+    "PostgreSQL fetchspecific time in json column: ",
     sum([i[0] for i in postgres_fetchspecific_injsoncol_times])
     / len(postgres_fetchspecific_injsoncol_times),
     "sec for ",
@@ -182,7 +181,7 @@ print(
     " rows \n",
 )
 print(
-    "MongoDB Fetchspecific Time no json column: ",
+    "MongoDB fetchspecific time no json column: ",
     sum([i[0] for i in mongo_fetchspecific_nojsoncol_times])
     / len(mongo_fetchspecific_nojsoncol_times),
     "sec for ",
@@ -190,7 +189,7 @@ print(
     " rows",
 )
 print(
-    "PostgreSQL Fetchspecific Time no json column: ",
+    "PostgreSQL fetchspecific time no json column: ",
     sum([i[0] for i in postgres_fetchspecific_nojsoncol_times])
     / len(postgres_fetchspecific_nojsoncol_times),
     "sec for ",
@@ -200,14 +199,14 @@ print(
 
 
 # print time difference in percentage between mongodb and postgres for each test
-print("\nTIME DIFFERENCE IN PERCENTAGE")
+print("\nTIME DIFFERENCES IN PERCENTAGE")
 print(
-    "Mongodb create time difference: ",
+    "Mongodb insert time difference: ",
     (
-        sum([i[0] for i in mongo_create_times]) / len(mongo_create_times)
-        - sum([i[0] for i in postgres_create_times]) / len(postgres_create_times)
+        sum([i[0] for i in mongo_insert_times]) / len(mongo_insert_times)
+        - sum([i[0] for i in postgres_insert_times]) / len(postgres_insert_times)
     )
-    / (sum([i[0] for i in mongo_create_times]) / len(mongo_create_times))
+    / (sum([i[0] for i in mongo_insert_times]) / len(mongo_insert_times))
     * 100,
     "%",
 )
