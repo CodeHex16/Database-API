@@ -14,12 +14,11 @@ load_dotenv()
 
 # Ottieni l'URL del MongoDB dall'ambiente
 MONGODB_URL = os.getenv("MONGODB_URL")
-print(MONGODB_URL)
 
 
 async def lifespan(app: FastAPI):
     # Startup
-    app.mongodb_client = AsyncIOMotorClient(MONGODB_URL)
+    app.mongodb_client = AsyncIOMotorClient(MONGODB_URL+"/supplai?authSource=admin")
     app.database = app.mongodb_client.get_default_database()
     info("Connected to the MongoDB database!")
     init_db(app.database)
