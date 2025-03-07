@@ -195,3 +195,24 @@ async def get_new_chat(
     chats = await chat_repository.initialize_chat(user_email)
 
     return {"chat_id": str(chats["_id"])}
+
+
+@router.put("/{chat_id}/name")
+async def change_chat_name(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    chat_id: str,
+    new_name: str,
+    chat_repository=Depends(get_chat_repository),
+):
+    payload = verify_token(token=token)
+    user_email = payload.get("sub")
+
+    # Verifica che la chat esista e appartenga all'utente
+    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    if not existing_chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    await chat_repository.update(chat_id, {"name": new_name})
+
+    return {"message": "Chat name updated successfully"}
+    

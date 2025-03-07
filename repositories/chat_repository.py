@@ -45,3 +45,4 @@ class ChatRepository:
         return await self.collection.delete_one(
             {"_id": ObjectId(chat_id), "user_email": user_email}
         )
+    
