@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from repositories.user_repository import UserRepository
 from database import get_db
 import schemas
+from utils import get_password_hash, verify_password
 
 load_dotenv()
 
@@ -72,7 +73,7 @@ async def authenticate_user(
     user = await user_repo.get_by_email(email)
     if not user:
         return False
-    if not pwd_context.verify(password, user["hashed_password"]):
+    if not verify_password(password, user["hashed_password"]):
         return False
     return user
 
@@ -126,17 +127,3 @@ def verify_token(token: str):
 async def verify_user_token(token: str):
     verify_token(token=token)
     return {"status": "valid"}
-
-
-def verify_password(plain_password, hashed_password):
-    return bcrypt.checkpw(
-        bytes(plain_password, encoding="utf-8"),
-        bytes(hashed_password, encoding="utf-8"),
-    )
-
-
-def get_password_hash(password):
-    return bcrypt.hashpw(
-        bytes(password, encoding="utf-8"),
-        bcrypt.gensalt(),
-    )
