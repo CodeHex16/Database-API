@@ -49,3 +49,4 @@ class ChatMessages(BaseModel):
 
 class MessageCreate(BaseModel):
     content: str
+    sender: str = "user"

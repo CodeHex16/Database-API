@@ -39,9 +39,11 @@ app = FastAPI(
 )
 
 origins = [
-    "http://localhost:3001",
-    "http://localhost:8000" "http://192.168.1.44:3001",
-    "http://192.168.1.44:8000",
+    "http://suppl-ai:3000",
+    "http://database-api:8000",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://localhost:8001",
 ]
 
 app.add_middleware(

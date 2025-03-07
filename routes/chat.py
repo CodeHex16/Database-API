@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List, Optional
 from datetime import datetime
@@ -128,7 +129,6 @@ async def create_chat_message(
     chat_id: str,
     message: schemas.MessageCreate,
     token: Annotated[str, Depends(oauth2_scheme)],
-    background_tasks: BackgroundTasks,
     chat_repository=Depends(get_chat_repository),
 ):
     payload = verify_token(token=token)
@@ -140,7 +140,7 @@ async def create_chat_message(
         raise HTTPException(status_code=404, detail="Chat not found")
 
     message_data = {
-        "sender": "user",
+        "sender": message.sender,
         "content": message.content,
         "timestamp": datetime.now(),
     }
@@ -149,18 +149,6 @@ async def create_chat_message(
     existing_chat["messages"].append(message_data)
 
     await chat_repository.update(chat_id, {"messages": existing_chat["messages"]}) # aggiorna nel DB
-
-    print("Sending message to AI model START")
-
-    background_tasks.add_task(
-        process_ai_response,
-        chat_id,
-        user_email,
-        message_data["content"],
-        chat_repository,
-    )
-
-    print("Recive message to AI model END")
 
     return message_data
 
@@ -177,7 +165,7 @@ async def process_ai_response(
     
     print("Sending message to AI model BACKGROUND TASK")
 
-    res = requests.post("http://localhost:8001/", json={"question": message})
+    res = requests.post(os.environ.get("LLM_API_URL"), json={"question": message})
     risposta = res.json()["answer"]
 
     risposta_data = {
