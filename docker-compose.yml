@@ -23,12 +23,12 @@ services:
         depends_on:
             - mongo-db
 
-    api:
+    database-api:
         build:
             context: .
             dockerfile: Dockerfile
         ports:
-            - "8000:8000"
+            - 8000:8000
         volumes:
             - ./:/app
         restart: always

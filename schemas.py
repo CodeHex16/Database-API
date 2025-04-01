@@ -1,7 +1,6 @@
-from pydantic import BaseModel, EmailStr, UUID4, Field, field_validator
+from pydantic import BaseModel, EmailStr, UUID3, Field, field_validator
 from typing import Union, Optional, List
 from datetime import datetime
-import uuid
 
 
 class UserRegister(BaseModel):
@@ -53,7 +52,7 @@ class MessageCreate(BaseModel):
     sender: str = "user"
 
 class Document(BaseModel):
-    id: uuid.UUID3
+    id: int
     title: str
     file_path: str
     owner_email: str
