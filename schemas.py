@@ -52,7 +52,6 @@ class MessageCreate(BaseModel):
     sender: str = "user"
 
 class Document(BaseModel):
-    id: int
     title: str
     file_path: str
     owner_email: str

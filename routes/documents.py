@@ -5,6 +5,7 @@ from datetime import datetime
 from pydantic import EmailStr
 import requests
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.errors import DuplicateKeyError
 
 from database import get_db
 from repositories.document_repository import DocumentRepository
@@ -17,22 +18,45 @@ router = APIRouter(
 
 
 def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    Restituisce un'istanza del repository dei documenti.
+    
+    Args:
+        db (AsyncIOMotorDatabase): Il database MongoDB.
+    
+    Returns:
+        DocumentRepository: Un'istanza del repository dei documenti.
+    """
     return DocumentRepository(db)
 
 
-@router.post(
-    "/upload",
-    status_code=status.HTTP_201_CREATED,
-    response_model=schemas.Document,
-)
+@router.post("/upload")
 async def upload_document(
     document: schemas.Document,
     document_repository=Depends(get_document_repository),
 ):
-    print("Document to upload:", type(document), "content:", document)
+    """
+    Carica un documento nel database.
 
-    # document_dict = document.model_dump()
-    # print("Document dict:", document_dict)
+    Args:
+        document (schemas.Document): Il documento da caricare.
+    
+    Returns:
+        status.HTTP_201_CREATED: Se il documento è stato caricato con successo.
 
-    uploaded_document = await document_repository.insert_document(document)
-    return uploaded_document
+    Raises:
+        HTTPException: Se il documento già esiste o se si verifica un errore durante il caricamento.
+    """
+    try: 
+        await document_repository.insert_document(document)
+    except DuplicateKeyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Documento già esistente",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Upload del file fallito: {e}",
+        )
+    return status.HTTP_201_CREATED
