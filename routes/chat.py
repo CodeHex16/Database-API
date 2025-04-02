@@ -152,35 +152,6 @@ async def create_chat_message(
 
     return message_data
 
-
-async def process_ai_response(
-    chat_id: str, user_email: EmailStr, message: str, chat_repository: ChatRepository
-):
-    chat = await chat_repository.get_by_id(
-        chat_id,
-        user_email,
-    )
-    if not chat:
-        return
-    
-    print("Sending message to AI model BACKGROUND TASK")
-
-    res = requests.post(os.environ.get("LLM_API_URL"), json={"question": message})
-    risposta = res.json()["answer"]
-
-    risposta_data = {
-        "sender": "bot",
-        "content": risposta,
-        "timestamp": datetime.now(),
-    }
-
-    chat["messages"].append(risposta_data)
-    await chat_repository.update(chat_id, {"messages": chat["messages"]}) 
-
-    print("Returning response from AI model BACKGROUND TASK")
-    return risposta_data
-
-
 @router.get("/new_chat")  # response_model=List[schemas.ChatResponse]
 async def get_new_chat(
     token: Annotated[str, Depends(oauth2_scheme)],

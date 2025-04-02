@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, UUID4, Field, field_validator
+from pydantic import BaseModel, EmailStr, UUID3, Field, field_validator
 from typing import Union, Optional, List
 from datetime import datetime
 
@@ -50,3 +50,9 @@ class ChatMessages(BaseModel):
 class MessageCreate(BaseModel):
     content: str
     sender: str = "user"
+
+class Document(BaseModel):
+    title: str
+    file_path: str
+    owner_email: str
+    uploaded_at: datetime
