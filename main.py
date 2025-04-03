@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from database import init_db, get_db
 
-from routes import auth, chat, documents
+from routes import auth, chat, documents, user
 from repositories.user_repository import UserRepository
 
 load_dotenv()
@@ -73,3 +73,4 @@ auth.init_router(app)
 app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(documents.router)
+app.include_router(user.router)

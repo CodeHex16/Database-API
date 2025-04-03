@@ -161,7 +161,7 @@ def verify_admin(token: str = Depends(oauth2_scheme)):
 
 @router.get("/only_admin")
 async def only_admin(
-    current_user: schemas.UserDB = Depends(verify_admin),
+    current_user = Depends(verify_admin),
 ):
     return {
         "message": "Questo è un endpoint accessibile solo agli amministratori",

@@ -1,4 +1,6 @@
-from utils import get_password_hash
+from utils import get_password_hash, get_uuid3
+import schemas
+import uuid
 
 
 class UserRepository:
@@ -9,13 +11,14 @@ class UserRepository:
     async def get_by_email(self, email):
         return await self.collection.find_one({"email": email})
 
-    async def create(self, user_data):
+    async def create(self, user_data: schemas.UserDB):
         return await self.collection.insert_one(user_data)
 
     async def add_test_user(self):
         print("Adding test user")
         return await self.collection.insert_one(
             {
+                "_id": get_uuid3("test@test.it"),
                 "email": "test@test.it",
                 "hashed_password": get_password_hash("testtest"),
                 "is_initialized": False,
@@ -27,6 +30,7 @@ class UserRepository:
         print("Adding test admin")
         return await self.collection.insert_one(
             {
+                "_id": get_uuid3("admin@test.it"),
                 "email": "admin@test.it",
                 "hashed_password": get_password_hash("adminadmin"),
                 "is_initialized": True,
