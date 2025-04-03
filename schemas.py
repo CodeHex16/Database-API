@@ -17,7 +17,8 @@ class UserRegister(BaseModel):
 class UserDB(BaseModel):
     email: EmailStr
     hashed_password: str
-    is_initialized: bool
+    is_initialized: bool = False
+    scopes: List[str] = ["user"]
 
 
 class Token(BaseModel):

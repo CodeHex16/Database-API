@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     info("Connected to the MongoDB database!")
     init_db(app.database)
     
-	# TODO: da rimuovere
+    # TODO: da rimuovere
     # AGGIUNGI UTENTE TEST
     user_repo = UserRepository(app.database)
     test_user = await user_repo.get_test_user()
@@ -33,7 +33,12 @@ async def lifespan(app: FastAPI):
         print("Utente test aggiunto con successo")
     else:
         print("Utente test già presente nel database")
-
+    admin_user = await user_repo.get_by_email("admin@test.it")
+    if not admin_user:
+        await user_repo.add_test_admin()
+        print("Utente admin aggiunto con successo")
+    else:
+        print("Utente admin già presente nel database")
     yield
 
     # Shutdown

@@ -10,6 +10,7 @@ from pymongo.errors import DuplicateKeyError
 from database import get_db
 from repositories.document_repository import DocumentRepository
 import schemas
+from routes.auth import verify_admin, verify_user
 
 router = APIRouter(
     prefix="/documents",
@@ -20,10 +21,10 @@ router = APIRouter(
 def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     """
     Restituisce un'istanza del repository dei documenti.
-    
+
     Args:
         db (AsyncIOMotorDatabase): Il database MongoDB.
-    
+
     Returns:
         DocumentRepository: Un'istanza del repository dei documenti.
     """
@@ -33,6 +34,7 @@ def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
 @router.post("/upload")
 async def upload_document(
     document: schemas.Document,
+    current_user=Depends(verify_admin),
     document_repository=Depends(get_document_repository),
 ):
     """
@@ -40,14 +42,15 @@ async def upload_document(
 
     Args:
         document (schemas.Document): Il documento da caricare.
-    
+
     Returns:
         status.HTTP_201_CREATED: Se il documento è stato caricato con successo.
 
     Raises:
         HTTPException: Se il documento già esiste o se si verifica un errore durante il caricamento.
     """
-    try: 
+    document.owner_email = current_user.get("sub")
+    try:
         await document_repository.insert_document(document)
     except DuplicateKeyError as e:
         raise HTTPException(

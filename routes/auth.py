@@ -1,11 +1,15 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import datetime, timedelta, timezone
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    OAuth2PasswordRequestForm,
+    SecurityScopes,
+)
 from passlib.context import CryptContext
 from logging import info, debug, error
 from jose import JWTError, jwt
-from typing import Optional
+from typing import List, Optional
 import bcrypt
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from dotenv import load_dotenv
@@ -15,6 +19,7 @@ from repositories.user_repository import UserRepository
 from database import get_db
 import schemas
 from utils import get_password_hash, verify_password
+from service.auth_service import AccessRoles
 
 load_dotenv()
 
@@ -23,7 +28,7 @@ if not SECRET_KEY_JWT:
     raise ValueError("SECRET_KEY_JWT non impostata nelle variabili d'ambiente")
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60*24
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 
 router = APIRouter(
@@ -79,8 +84,11 @@ async def authenticate_user(
 
 
 # Create access token
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(
+    data: dict, scopes: List[str], expires_delta: Optional[timedelta] = None
+):
     to_encode = data.copy()
+    to_encode.update({"scopes": scopes})
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
@@ -104,20 +112,34 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # Ottieni i permessi dell'utente
+    user_permissions = user.get("scopes", ["user"])
+
     # Crea il token di accesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user["email"]}, expires_delta=access_token_expires
+        data={"sub": user["email"]},
+        scopes=user_permissions,
+        expires_delta=access_token_expires,
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-def verify_token(token: str):
+def verify_token(token: str, required_scopes: List[str] = None):
     try:
         payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=403, detail="Token is invalid or expired")
+
+        if required_scopes:
+            user_permissions = payload.get("scopes", [])
+            print(f"User permissions: {user_permissions}")
+            if not any(scope in user_permissions for scope in required_scopes):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Permesso negato. Richiesto ruolo {required_scopes}",
+                )
         return payload
     except JWTError:
         raise HTTPException(status_code=403, detail="Token is invalid or expired")
@@ -127,3 +149,21 @@ def verify_token(token: str):
 async def verify_user_token(token: str):
     verify_token(token=token)
     return {"status": "valid"}
+
+
+def verify_user(token: str = Depends(oauth2_scheme)):
+    return verify_token(token)
+
+
+def verify_admin(token: str = Depends(oauth2_scheme)):
+    return verify_token(token, required_scopes=AccessRoles.ADMIN)
+
+
+@router.get("/only_admin")
+async def only_admin(
+    current_user: schemas.UserDB = Depends(verify_admin),
+):
+    return {
+        "message": "Questo è un endpoint accessibile solo agli amministratori",
+        "user": current_user.get("sub"),
+    }
