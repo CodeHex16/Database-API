@@ -8,7 +8,12 @@ import requests
 from database import get_db
 from repositories.chat_repository import ChatRepository
 import schemas
-from routes.auth import verify_token, oauth2_scheme
+from routes.auth import (
+    verify_token,
+    oauth2_scheme,
+    verify_user,
+    verify_admin,
+)
 from typing_extensions import Annotated
 
 router = APIRouter(
@@ -23,12 +28,11 @@ def get_chat_repository(db=Depends(get_db)):
 
 @router.get("", response_model=List[schemas.ChatResponse])
 async def get_chats(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
     # Verifica il token e ottieni l'email dell'utente
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+    user_email = current_user.get("sub")
 
     if not user_email:
         raise HTTPException(status_code=400, detail="Invalid user information in token")
@@ -54,11 +58,10 @@ async def get_chats(
 async def update_chat(
     chat_id: str,
     chat: str,  # TODO: Fix this
-    token: Annotated[str, Depends(oauth2_scheme)],
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+    user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
     existing_chat = await chat_repository.get_by_id(chat_id, user_email)
@@ -87,11 +90,10 @@ async def update_chat(
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_chat(
     chat_id: str,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+    user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
     existing_chat = await chat_repository.get_by_id(chat_id, user_email)
@@ -105,11 +107,11 @@ async def delete_chat(
 @router.get("/{chat_id}/messages", response_model=schemas.ChatMessages)
 async def get_chat_messages(
     chat_id: str,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+
+    user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
     existing_chat = await chat_repository.get_by_id(chat_id, user_email)
@@ -128,11 +130,10 @@ async def get_chat_messages(
 async def create_chat_message(
     chat_id: str,
     message: schemas.MessageCreate,
-    token: Annotated[str, Depends(oauth2_scheme)],
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+    user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
     existing_chat = await chat_repository.get_by_id(chat_id, user_email)
@@ -148,46 +149,19 @@ async def create_chat_message(
     # Aggiungi il messaggio alla chat
     existing_chat["messages"].append(message_data)
 
-    await chat_repository.update(chat_id, {"messages": existing_chat["messages"]}) # aggiorna nel DB
+    await chat_repository.update(
+        chat_id, {"messages": existing_chat["messages"]}
+    )  # aggiorna nel DB
 
     return message_data
 
 
-async def process_ai_response(
-    chat_id: str, user_email: EmailStr, message: str, chat_repository: ChatRepository
-):
-    chat = await chat_repository.get_by_id(
-        chat_id,
-        user_email,
-    )
-    if not chat:
-        return
-    
-    print("Sending message to AI model BACKGROUND TASK")
-
-    res = requests.post(os.environ.get("LLM_API_URL"), json={"question": message})
-    risposta = res.json()["answer"]
-
-    risposta_data = {
-        "sender": "bot",
-        "content": risposta,
-        "timestamp": datetime.now(),
-    }
-
-    chat["messages"].append(risposta_data)
-    await chat_repository.update(chat_id, {"messages": chat["messages"]}) 
-
-    print("Returning response from AI model BACKGROUND TASK")
-    return risposta_data
-
-
 @router.get("/new_chat")  # response_model=List[schemas.ChatResponse]
 async def get_new_chat(
-    token: Annotated[str, Depends(oauth2_scheme)],
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+    user_email = current_user.get("sub")
 
     if not user_email:
         raise HTTPException(status_code=400, detail="Invalid user information in token")
@@ -199,13 +173,12 @@ async def get_new_chat(
 
 @router.put("/{chat_id}/name")
 async def change_chat_name(
-    token: Annotated[str, Depends(oauth2_scheme)],
     chat_id: str,
     new_name: str,
+    current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
-    payload = verify_token(token=token)
-    user_email = payload.get("sub")
+    user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
     existing_chat = await chat_repository.get_by_id(chat_id, user_email)
@@ -215,4 +188,3 @@ async def change_chat_name(
     await chat_repository.update(chat_id, {"name": new_name})
 
     return {"message": "Chat name updated successfully"}
-    

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from database import init_db, get_db
 
-from routes import auth, chat
+from routes import auth, chat, documents, user
 from repositories.user_repository import UserRepository
 
 load_dotenv()
@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     info("Connected to the MongoDB database!")
     init_db(app.database)
     
-	# TODO: da rimuovere
+    # TODO: da rimuovere
     # AGGIUNGI UTENTE TEST
     user_repo = UserRepository(app.database)
     test_user = await user_repo.get_test_user()
@@ -33,7 +33,12 @@ async def lifespan(app: FastAPI):
         print("Utente test aggiunto con successo")
     else:
         print("Utente test già presente nel database")
-
+    admin_user = await user_repo.get_by_email("admin@test.it")
+    if not admin_user:
+        await user_repo.add_test_admin()
+        print("Utente admin aggiunto con successo")
+    else:
+        print("Utente admin già presente nel database")
     yield
 
     # Shutdown
@@ -67,5 +72,5 @@ app.add_middleware(
 auth.init_router(app)
 app.include_router(auth.router)
 app.include_router(chat.router)
-
-    
+app.include_router(documents.router)
+app.include_router(user.router)
