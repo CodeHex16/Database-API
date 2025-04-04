@@ -5,4 +5,5 @@ bcrypt
 motor
 python-jose
 requests
+pytest
 pymongo
