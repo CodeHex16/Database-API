@@ -1,23 +1,45 @@
-from utils import get_password_hash
+from utils import get_password_hash, get_uuid3
+import schemas
+import uuid
+
 
 class UserRepository:
     def __init__(self, database):
         self.database = database
         self.collection = database.get_collection("users")
-        
+
     async def get_by_email(self, email):
         return await self.collection.find_one({"email": email})
-        
-    async def create(self, user_data):
+
+    async def create(self, user_data: schemas.UserDB):
         return await self.collection.insert_one(user_data)
-    
+
     async def add_test_user(self):
         print("Adding test user")
-        return await self.collection.insert_one({
-            "email": "test@test.it",
-            "hashed_password": get_password_hash("testtest"),
-            "is_initialized": False
-        })
-    
+        return await self.collection.insert_one(
+            {
+                "_id": get_uuid3("test@test.it"),
+                "email": "test@test.it",
+                "hashed_password": get_password_hash("testtest"),
+                "is_initialized": False,
+                "scopes": ["user"],
+            }
+        )
+
+    async def add_test_admin(self):
+        print("Adding test admin")
+        return await self.collection.insert_one(
+            {
+                "_id": get_uuid3("admin@test.it"),
+                "email": "admin@test.it",
+                "hashed_password": get_password_hash("adminadmin"),
+                "is_initialized": True,
+                "scopes": ["admin"],
+            }
+        )
+
     async def get_test_user(self):
         return await self.collection.find_one({"email": "test@test.it"})
+
+    async def get_test_admin(self):
+        return await self.collection.find_one({"email": "admin@test.it"})

@@ -15,9 +15,11 @@ class UserRegister(BaseModel):
 
 
 class UserDB(BaseModel):
+    id: UUID3 = Field(default_factory=UUID3, alias="_id")
     email: EmailStr
     hashed_password: str
-    is_initialized: bool
+    is_initialized: bool = False
+    scopes: List[str] = ["user"]
 
 
 class Token(BaseModel):
@@ -50,6 +52,7 @@ class ChatMessages(BaseModel):
 class MessageCreate(BaseModel):
     content: str
     sender: str = "user"
+
 
 class Document(BaseModel):
     title: str
