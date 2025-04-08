@@ -1,4 +1,4 @@
-fastapi[standard]
+fastapi[all]
 passlib
 pydantic[email]
 bcrypt
@@ -7,3 +7,4 @@ python-jose
 requests
 pytest
 pymongo
+uvicorn
