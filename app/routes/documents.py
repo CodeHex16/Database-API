@@ -7,10 +7,10 @@ import requests
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
-from database import get_db
-from repositories.document_repository import DocumentRepository
-import schemas
-from routes.auth import verify_admin, verify_user
+from app.database import get_db
+from app.repositories.document_repository import DocumentRepository
+import app.schemas as schemas
+from app.routes.auth import verify_admin, verify_user
 
 router = APIRouter(
     prefix="/documents",

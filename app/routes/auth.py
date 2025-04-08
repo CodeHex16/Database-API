@@ -15,11 +15,11 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from dotenv import load_dotenv
 
 
-from repositories.user_repository import UserRepository
-from database import get_db
-import schemas
-from utils import get_password_hash, verify_password
-from service.auth_service import AccessRoles
+from app.repositories.user_repository import UserRepository
+from app.database import get_db
+import app.schemas as schemas
+from app.utils import get_password_hash, verify_password
+from app.service.auth_service import AccessRoles
 
 load_dotenv()
 

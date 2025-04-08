@@ -1,4 +1,4 @@
-fastapi[standard]
+fastapi[all]
 passlib
 pydantic[email]
 bcrypt
@@ -6,3 +6,4 @@ motor
 python-jose
 requests
 pymongo
+uvicorn

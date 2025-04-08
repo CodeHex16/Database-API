@@ -1,5 +1,5 @@
-from utils import get_password_hash
-import schemas
+from app.utils import get_password_hash
+import app.schemas as schemas
 import uuid
 from pymongo.errors import DuplicateKeyError
 

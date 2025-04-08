@@ -6,10 +6,10 @@ from logging import info
 import os
 from dotenv import load_dotenv
 
-from database import init_db, get_db
+from app.database import init_db, get_db
 
-from routes import auth, chat, documents, user
-from repositories.user_repository import UserRepository
+from app.routes import auth, chat, documents, user
+from app.repositories.user_repository import UserRepository
 
 load_dotenv()
 
@@ -19,11 +19,11 @@ MONGODB_URL = os.getenv("MONGODB_URL")
 
 async def lifespan(app: FastAPI):
     # Startup
-    app.mongodb_client = AsyncIOMotorClient(MONGODB_URL+"/supplai?authSource=admin")
+    app.mongodb_client = AsyncIOMotorClient(MONGODB_URL + "/supplai?authSource=admin")
     app.database = app.mongodb_client.get_default_database()
     info("Connected to the MongoDB database!")
     init_db(app.database)
-    
+
     # TODO: da rimuovere
     # AGGIUNGI UTENTE TEST
     user_repo = UserRepository(app.database)
