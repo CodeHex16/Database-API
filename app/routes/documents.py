@@ -63,3 +63,31 @@ async def upload_document(
             detail=f"Upload del file fallito: {e}",
         )
     return status.HTTP_201_CREATED
+
+@router.delete("/delete")
+async def delete_document(
+    file_path: str,
+    current_user=Depends(verify_admin),
+    document_repository=Depends(get_document_repository),
+):
+    """
+    Elimina un documento dal database.
+
+    Args:
+        file_path (str): Il percorso del file da eliminare.
+        current_user: L'utente corrente, verificato come admin.
+
+    Returns:
+        status.HTTP_200_OK: Se il documento è stato eliminato con successo.
+
+    Raises:
+        HTTPException: Se il documento non esiste o se si verifica un errore durante l'eliminazione.
+    """
+    try:
+        await document_repository.delete_document(file_path)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Eliminazione del file fallita: {e}",
+        )
+    return status.HTTP_200_OK
