@@ -5,10 +5,10 @@ from datetime import datetime
 from pydantic import EmailStr
 import requests
 
-from database import get_db
-from repositories.chat_repository import ChatRepository
-import schemas
-from routes.auth import (
+from app.database import get_db
+from app.repositories.chat_repository import ChatRepository
+import app.schemas as schemas
+from app.routes.auth import (
     verify_token,
     oauth2_scheme,
     verify_user,

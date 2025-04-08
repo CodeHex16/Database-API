@@ -1,5 +1,5 @@
-from utils import get_password_hash, get_uuid3
-import schemas
+from app.utils import get_password_hash, get_uuid3
+import app.schemas as schemas
 import uuid
 
 
