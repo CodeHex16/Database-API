@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
-    title="Suppl-AI API",
+    title="Database-AI API",
     description="API for the Suppl-AI project",
     version="0.2",
 )

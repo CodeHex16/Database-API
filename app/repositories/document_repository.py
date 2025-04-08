@@ -1,6 +1,5 @@
-from app.utils import get_password_hash
+from app.utils import get_uuid3
 import app.schemas as schemas
-import uuid
 from pymongo.errors import DuplicateKeyError
 
 class DocumentRepository:
@@ -24,7 +23,7 @@ class DocumentRepository:
             Exception: Se si verifica qualsiasi altro errore durante l'inserimento.
         """
 		document_data = {
-			"_id": str(uuid.uuid3(uuid.NAMESPACE_DNS, document.file_path)),
+			"_id": get_uuid3(document.file_path),
 			"title": document.title,
 			"file_path": document.file_path,
 			"owner_email": document.owner_email,
@@ -38,3 +37,23 @@ class DocumentRepository:
 		except Exception as e:
 			print(f"Error inserting document: {e}")
 			raise Exception(f"Error inserting document: {e}")
+		
+	async def delete_document(self, file_path: str):
+		"""
+		Elimina un documento dal database in base al percorso del file.
+		
+		Args:
+		- file_path (str): Il percorso del file da eliminare.
+			
+		Returns:
+		- Il risultato dell'operazione di eliminazione.
+			
+		Raises:
+		- Exception: Se si verifica un errore durante l'eliminazione.
+		"""
+		try:
+			print(f"Sto cancellando il documento da MongoDB {file_path}")
+			return await self.collection.delete_one({"_id": get_uuid3(file_path)})
+		except Exception as e:
+			print(f"Error deleting document: {e}")
+			raise Exception(f"Error deleting document: {e}")

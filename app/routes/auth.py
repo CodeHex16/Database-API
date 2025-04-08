@@ -128,8 +128,8 @@ async def login_for_access_token(
 def verify_token(token: str, required_scopes: List[str] = None):
     try:
         payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise HTTPException(status_code=403, detail="Token is invalid or expired")
 
         if required_scopes:
