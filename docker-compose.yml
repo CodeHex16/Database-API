@@ -21,7 +21,8 @@ services:
             ME_CONFIG_MONGODB_ADMINUSERNAME: root
             ME_CONFIG_MONGODB_ADMINPASSWORD: example
             ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo-db:27017
-            # ME_CONFIG_BASICAUTH: false
+            ME_CONFIG_BASICAUTH_USERNAME: codehex
+            ME_CONFIG_BASICAUTH_PASSWORD: adminadmin
         depends_on:
             - mongo-db
         networks:
