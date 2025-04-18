@@ -59,3 +59,7 @@ class Document(BaseModel):
     file_path: str
     owner_email: str
     uploaded_at: datetime
+
+
+class EmailSchema(BaseModel):
+    email: List[EmailStr]

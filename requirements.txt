@@ -8,3 +8,4 @@ requests
 pytest
 pymongo
 uvicorn
+fastapi-mail
