@@ -12,6 +12,7 @@ import app.schemas as schemas
 from app.routes.auth import verify_admin, verify_user
 from app.repositories.user_repository import UserRepository
 from app.utils import get_password_hash, get_uuid3
+from app.service.email_service import EmailService
 
 router = APIRouter(
     prefix="/user",
@@ -50,6 +51,11 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
             detail="User with this email already exists",
         )
 
-    # Invia un'email all'utente con la password temporanea
+    await EmailService().send_email(
+        to=[user_email],
+        subject=f"[Suppl-AI] Registrazione utente",
+        body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!"
+    )
+    
 
     return {"message": "User registered successfully", "password": password}
