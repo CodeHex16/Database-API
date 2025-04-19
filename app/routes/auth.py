@@ -52,7 +52,7 @@ def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(
-    user: schemas.UserRegister, user_repository=Depends(get_user_repository)
+    user: schemas.UserEmailPwd, user_repository=Depends(get_user_repository)
 ):
     # Verifica se l'utente esiste già
     db_user = await user_repository.get_by_email(user.email)
@@ -63,7 +63,7 @@ async def register_user(
 
     # Crea un nuovo utente
     hashed_password = get_password_hash(user.password)
-    user_data = schemas.UserDB(
+    user_data = schemas.User(
         email=user.email, hashed_password=hashed_password, is_initialized=False
     ).model_dump()
 
@@ -161,7 +161,7 @@ def verify_admin(token: str = Depends(oauth2_scheme)):
 
 @router.get("/only_admin")
 async def only_admin(
-    current_user = Depends(verify_admin),
+    current_user=Depends(verify_admin),
 ):
     return {
         "message": "Questo è un endpoint accessibile solo agli amministratori",

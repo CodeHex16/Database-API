@@ -3,7 +3,7 @@ from typing import Union, Optional, List
 from datetime import datetime
 
 
-class UserRegister(BaseModel):
+class UserEmailPwd(BaseModel):
     email: EmailStr
     password: str
 
@@ -14,11 +14,13 @@ class UserRegister(BaseModel):
         return value
 
 
-class UserDB(BaseModel):
-    id: UUID3 = Field(default_factory=UUID3, alias="_id")
-    email: EmailStr
+class User(BaseModel):
+    # id: UUID3 = Field(default_factory=UUID3, alias="_id")
+    # email: EmailStr
+    id: EmailStr
     hashed_password: str
     is_initialized: bool = False
+    remember_me: bool = False
     scopes: List[str] = ["user"]
 
 
