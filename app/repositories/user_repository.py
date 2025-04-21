@@ -11,7 +11,7 @@ class UserRepository:
     async def get_by_email(self, email):
         return await self.collection.find_one({"email": email})
 
-    async def create(self, user_data: schemas.User):
+    async def create(self, user_data: schemas.UserDB):
         return await self.collection.insert_one(user_data)
 
     async def add_test_user(self):

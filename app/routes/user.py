@@ -9,7 +9,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app.database import get_db
 import app.schemas as schemas
-from app.routes.auth import verify_admin, verify_user
+from app.routes.auth import verify_admin, verify_user, authenticate_user
 from app.repositories.user_repository import UserRepository
 from app.utils import get_password_hash, get_uuid3
 
@@ -62,17 +62,26 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
     status_code=status.HTTP_200_OK,
 )
 async def delete_user(
-    user_email: EmailStr,
+    user_to_be_deleted: EmailStr,
+    admin: schemas.UserEmailPwd,
     current_user=Depends(verify_admin),
 ):
     """
-    Elimina un utente esistente.
+    Elimina un utente esistente se la password inserita dall'admin è corretta.
     """
     # Crea un'istanza del repository utente e ottiene il database
     user_repo = UserRepository(await get_db())
 
+    # Verifica che l'utente esista e che la password sia corretta
+    valid_credentials = await authenticate_user(admin.email, admin.password, user_repo)
+    if not valid_credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+
     # Elimina l'utente dal database
-    result = await user_repo.collection.delete_one({"_id": user_email})
+    result = await user_repo.collection.delete_one({"_id": user_to_be_deleted})
 
     if result.deleted_count == 0:
         raise HTTPException(
@@ -88,18 +97,27 @@ async def delete_user(
     status_code=status.HTTP_200_OK,
 )
 async def edit_user(
-    user_new_data: schemas.User,
+    user_new_data: schemas.UserDB,
     current_user=Depends(verify_admin),
 ):
     """
-    Modifica i dati di un utente esistente.
+    Modifica i dati di un utente esistente. La modifca può includere la password, lo stato di inizializzazione,
+    la flag _remember_me_ e gli scopes, l'email, che è anche id dello user, non può essere modificata.
     """
     # Crea un'istanza del repository utente e ottiene il database
     user_repo = UserRepository(await get_db())
 
     # Aggiorna i dati dell'utente nel database
     result = await user_repo.collection.update_one(
-        {"_id": user_new_data.id}, {"$set": {"hashed_password": user_new_data.hashed_password, "is_initialized": user_new_data.is_initialized, "remember_me": user_new_data.remember_me, "scopes": user_new_data.scopes}}
+        {"_id": user_new_data.id},
+        {
+            "$set": {
+                "hashed_password": user_new_data.hashed_password,
+                "is_initialized": user_new_data.is_initialized,
+                "remember_me": user_new_data.remember_me,
+                "scopes": user_new_data.scopes,
+            }
+        },
     )
 
     if result.matched_count == 0:

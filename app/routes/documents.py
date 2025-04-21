@@ -10,7 +10,7 @@ from pymongo.errors import DuplicateKeyError
 from app.database import get_db
 from app.repositories.document_repository import DocumentRepository
 import app.schemas as schemas
-from app.routes.auth import verify_admin, verify_user
+from app.routes.auth import verify_admin, verify_user, authenticate_user
 
 router = APIRouter(
     prefix="/documents",
@@ -67,6 +67,7 @@ async def upload_document(
 @router.delete("/delete")
 async def delete_document(
     file_path: str,
+    admin: schemas.UserEmailPwd,
     current_user=Depends(verify_admin),
     document_repository=Depends(get_document_repository),
 ):
@@ -83,6 +84,17 @@ async def delete_document(
     Raises:
         HTTPException: Se il documento non esiste o se si verifica un errore durante l'eliminazione.
     """
+
+    # Verifica se l'admin ha reinserito correttamente la propria password
+    valid_credentials = authenticate_user(
+        admin.email, admin.password, current_user.get("sub")
+    )
+    if not valid_credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credenziali non valide",
+        )
+
     try:
         await document_repository.delete_document(file_path)
     except Exception as e:

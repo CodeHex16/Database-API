@@ -14,7 +14,7 @@ class UserEmailPwd(BaseModel):
         return value
 
 
-class User(BaseModel):
+class UserDB(BaseModel):
     # id: UUID3 = Field(default_factory=UUID3, alias="_id")
     # email: EmailStr
     id: EmailStr

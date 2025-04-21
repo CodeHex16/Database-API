@@ -45,8 +45,10 @@ def init_router(app_instance):
     yield
 
 
-# Dipendenza per ottenere il repository utenti
 def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    Restituisce il repository della collection users.
+    """
     return UserRepository(db)
 
 
@@ -54,6 +56,9 @@ def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
 async def register_user(
     user: schemas.UserEmailPwd, user_repository=Depends(get_user_repository)
 ):
+    """
+    Inserisce un nuovo utente nella collection user.
+    """
     # Verifica se l'utente esiste già
     db_user = await user_repository.get_by_email(user.email)
     if db_user:
@@ -63,7 +68,7 @@ async def register_user(
 
     # Crea un nuovo utente
     hashed_password = get_password_hash(user.password)
-    user_data = schemas.User(
+    user_data = schemas.UserDB(
         email=user.email, hashed_password=hashed_password, is_initialized=False
     ).model_dump()
 
@@ -71,10 +76,12 @@ async def register_user(
     return {"message": "User created successfully"}
 
 
-# Authenticate the user
 async def authenticate_user(
     email: str, password: str, user_repo: UserRepository = Depends(get_user_repository)
 ):
+    """
+    Ritorna true se l'utente esiste e se la password inserita è quella associata alla mail passata come parametro; altrimenti false.
+    """
     user = await user_repo.get_by_email(email)
     if not user:
         return False
@@ -83,10 +90,12 @@ async def authenticate_user(
     return user
 
 
-# Create access token
 def create_access_token(
     data: dict, scopes: List[str], expires_delta: Optional[timedelta] = None
 ):
+    """
+    Ritorna un token JWT di accesso appena creato.
+    """
     to_encode = data.copy()
     to_encode.update({"scopes": scopes})
     if expires_delta:
@@ -103,6 +112,9 @@ async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     user_repository=Depends(get_user_repository),
 ):
+    """
+    Se l'utente esiste ed ha inserito la password corretta crea e restituisce un token JWT di accesso che embedda email e permessi utente.
+    """
     # Verifica le credenziali dell'utente
     user = await user_repository.get_by_email(form_data.username)
     if not user or not verify_password(form_data.password, user["hashed_password"]):
@@ -126,6 +138,9 @@ async def login_for_access_token(
 
 
 def verify_token(token: str, required_scopes: List[str] = None):
+    """
+    Verifica la validità del token JWT e restituisce il payload decodificato.
+    """
     try:
         payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
@@ -147,11 +162,17 @@ def verify_token(token: str, required_scopes: List[str] = None):
 
 @router.get("/verify")
 async def verify_user_token(token: str):
+    """
+    Chiamata GET che verifica la validità del token JWT.
+    """
     verify_token(token=token)
     return {"status": "valid"}
 
 
 def verify_user(token: str = Depends(oauth2_scheme)):
+    """
+    Verifica la validità del token JWT e restituisce il payload decodificato.
+    """
     return verify_token(token)
 
 
@@ -163,6 +184,9 @@ def verify_admin(token: str = Depends(oauth2_scheme)):
 async def only_admin(
     current_user=Depends(verify_admin),
 ):
+    """
+    Endpoint accessibile solo agli amministratori.
+    """
     return {
         "message": "Questo è un endpoint accessibile solo agli amministratori",
         "user": current_user.get("sub"),
