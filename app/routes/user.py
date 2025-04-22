@@ -19,6 +19,32 @@ router = APIRouter(
 )
 
 
+@router.get(
+    "/",
+    response_model=List[schemas.User],
+    status_code=status.HTTP_200_OK,
+)
+async def get_users(
+    current_user=Depends(verify_admin),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """
+    Restituisce una lista di tutti gli utenti registrati.
+    """
+    # Crea un'istanza del repository utente e ottiene il database
+    user_repo = UserRepository(db)
+    users = await user_repo.get_users()
+
+    # Ritorna la lista di user se esistente, altrimeni solleva un'eccezione 404
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No users found",
+        )
+    print(f"Users: {users}")
+    return users
+
+
 @router.post(
     "/register",
     status_code=status.HTTP_201_CREATED,
@@ -45,7 +71,7 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
     # Crea un'istanza del repository utente e ottiene il database
     user_repo = UserRepository(await get_db())
     try:
-        await user_repo.create(user_data=new_user)
+        await user_repo.create_user(user_data=new_user)
     except DuplicateKeyError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

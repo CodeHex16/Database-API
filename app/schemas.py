@@ -14,10 +14,10 @@ class UserEmailPwd(BaseModel):
         return value
 
 
-class UserToBeRegistered(BaseModel):
+class User(BaseModel):
     # id: UUID3 = Field(default_factory=UUID3, alias="_id")
     # email: EmailStr
-    id: EmailStr
+    _id: EmailStr
     hashed_password: str
     is_initialized: bool = False
     remember_me: bool = False
@@ -69,3 +69,10 @@ class Document(BaseModel):
     file_path: str
     owner_email: str
     uploaded_at: datetime
+
+
+class FAQ(BaseModel):
+    short_question: str
+    question: str
+    answer: str
+    author_email: EmailStr

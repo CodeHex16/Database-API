@@ -6,7 +6,10 @@ class DocumentRepository:
 	def __init__(self, database):
 		self.database = database
 		self.collection = database.get_collection("documents")
-    
+
+	async def get_documents(self):
+		return await self.collection.find().to_list(length=None)
+
 	async def insert_document(self, document: schemas.Document):
 		"""
         Inserisce un nuovo documento nel database.

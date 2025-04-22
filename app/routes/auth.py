@@ -68,7 +68,7 @@ async def register_user(
 
     # Crea un nuovo utente
     hashed_password = get_password_hash(user.password)
-    user_data = schemas.UserToBeRegistered(
+    user_data = schemas.User(
         email=user.email, hashed_password=hashed_password, is_initialized=False
     ).model_dump()
 
