@@ -97,33 +97,62 @@ async def delete_user(
     status_code=status.HTTP_200_OK,
 )
 async def edit_user(
-    user_new_data: schemas.UserDB,
+    user_new_data: schemas.UserNewData,
     current_user=Depends(verify_admin),
+    db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """
-    Modifica i dati di un utente esistente. La modifca può includere la password, lo stato di inizializzazione,
-    la flag _remember_me_ e gli scopes, l'email, che è anche id dello user, non può essere modificata.
+    Modifica i dati di un utente esistente.
+    La modifica può includere la password, lo stato di inizializzazione,
+    la flag _remember_me_ e gli scopes. L'email (_id) non può essere modificata.
+    Se per uno dei campi viene fornito è None (null nel body json della richiesta),
+    il valore attuale rimarrà invariato.
     """
-    # Crea un'istanza del repository utente e ottiene il database
-    user_repo = UserRepository(await get_db())
+    user_repo = UserRepository(db)
 
-    # Aggiorna i dati dell'utente nel database
-    result = await user_repo.collection.update_one(
-        {"_id": user_new_data.id},
-        {
-            "$set": {
-                "hashed_password": user_new_data.hashed_password,
-                "is_initialized": user_new_data.is_initialized,
-                "remember_me": user_new_data.remember_me,
-                "scopes": user_new_data.scopes,
-            }
-        },
-    )
+    # Ottiene i dati attuali dell'user
+    user_old_data = await user_repo.get_by_email(user_new_data.id)
 
-    if result.matched_count == 0:
+    # Check if user exists
+    if not user_old_data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+
+    # Prepara il payload per l'aggiornamento
+    update_payload = {
+        # Hashing della password solo se non è None o stringa vuota
+        "hashed_password": (
+            get_password_hash(user_new_data.hashed_password)
+            if user_new_data.hashed_password
+            else user_old_data["hashed_password"]
+        ),
+        "is_initialized": (
+            user_new_data.is_initialized
+            if user_new_data.is_initialized is not None
+            else user_old_data["is_initialized"]
+        ),
+        "remember_me": (
+            user_new_data.remember_me
+            if user_new_data.remember_me is not None
+            else user_old_data["remember_me"]
+        ),
+        "scopes": (
+            user_new_data.scopes
+            if user_new_data.scopes is not None
+            else user_old_data["scopes"]
+        ),
+    }
+
+    # Aggiorna i dati dell'utente nel database
+    result = await user_repo.collection.update_one(
+        {"_id": user_new_data.id},
+        {"$set": update_payload},
+    )
+
+    # Controlla se l'aggiornamento ha avuto effetto
+    if result.modified_count == 0:
+        return {"message": "User data is already up to date."}
 
     return {"message": "User updated successfully"}

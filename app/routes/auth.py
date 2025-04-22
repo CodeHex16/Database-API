@@ -68,7 +68,7 @@ async def register_user(
 
     # Crea un nuovo utente
     hashed_password = get_password_hash(user.password)
-    user_data = schemas.UserDB(
+    user_data = schemas.UserToBeRegistered(
         email=user.email, hashed_password=hashed_password, is_initialized=False
     ).model_dump()
 
@@ -130,7 +130,7 @@ async def login_for_access_token(
     # Crea il token di accesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user["email"]},
+        data={"sub": user["_id"]},
         scopes=user_permissions,
         expires_delta=access_token_expires,
     )

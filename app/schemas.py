@@ -14,7 +14,7 @@ class UserEmailPwd(BaseModel):
         return value
 
 
-class UserDB(BaseModel):
+class UserToBeRegistered(BaseModel):
     # id: UUID3 = Field(default_factory=UUID3, alias="_id")
     # email: EmailStr
     id: EmailStr
@@ -22,6 +22,14 @@ class UserDB(BaseModel):
     is_initialized: bool = False
     remember_me: bool = False
     scopes: List[str] = ["user"]
+
+
+class UserNewData(BaseModel):
+    id: EmailStr
+    hashed_password: str | None
+    is_initialized: bool | None
+    remember_me: bool | None
+    scopes: List[str] | None
 
 
 class Token(BaseModel):

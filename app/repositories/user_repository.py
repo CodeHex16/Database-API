@@ -9,36 +9,44 @@ class UserRepository:
         self.collection = database.get_collection("users")
 
     async def get_by_email(self, email):
-        return await self.collection.find_one({"email": email})
+        return await self.collection.find_one({"_id": email})
 
-    async def create(self, user_data: schemas.UserDB):
+    async def create(self, user_data: schemas.UserToBeRegistered):
         return await self.collection.insert_one(user_data)
 
     async def add_test_user(self):
         print("Adding test user")
-        return await self.collection.insert_one(
-            {
-                # "_id": get_uuid3("test@test.it"),
-                "_id": "test@test.it",
-                "hashed_password": get_password_hash("testtest"),
-                "is_initialized": False,
-                "remember_me": False,
-                "scopes": ["user"],
-            }
-        )
+        try:
+            return await self.collection.insert_one(
+                {
+                    # "_id": get_uuid3("test@test.it"),
+                    "_id": "test@test.it",
+                    "hashed_password": get_password_hash("testtest"),
+                    "is_initialized": False,
+                    "remember_me": False,
+                    "scopes": ["user"],
+                }
+            )
+        except Exception as e:
+            print(f"Error adding test user: {e}")
+            return None
 
     async def add_test_admin(self):
         print("Adding test admin")
-        return await self.collection.insert_one(
-            {
-                # "_id": get_uuid3("admin@test.it"),
-                "_id": "admin@test.it",
-                "hashed_password": get_password_hash("adminadmin"),
-                "is_initialized": True,
-                "remember_me": False,
-                "scopes": ["admin"],
-            }
-        )
+        try:
+            return await self.collection.insert_one(
+                {
+                    # "_id": get_uuid3("admin@test.it"),
+                    "_id": "admin@test.it",
+                    "hashed_password": get_password_hash("adminadmin"),
+                    "is_initialized": True,
+                    "remember_me": False,
+                    "scopes": ["admin"],
+                }
+            )
+        except Exception as e:
+            print(f"Error adding test admin: {e}")
+            return None
 
     async def get_test_user(self):
         return await self.collection.find_one({"email": "test@test.it"})
