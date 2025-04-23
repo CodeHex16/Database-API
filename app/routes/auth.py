@@ -90,6 +90,20 @@ async def authenticate_user(
     return user
 
 
+async def check_user_initialized(
+    email: str, user_repo: UserRepository = Depends(get_user_repository)
+):
+    """
+    Ritorna il valore della flag _is_initialized_ dell'utente.
+    """
+    user = await user_repo.get_by_email(email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    return user["is_initialized"]
+
+
 def create_access_token(
     data: dict, scopes: List[str], expires_delta: Optional[timedelta] = None
 ):
@@ -166,6 +180,13 @@ async def verify_user_token(token: str):
     Chiamata GET che verifica la validità del token JWT.
     """
     verify_token(token=token)
+
+    is_initialized = await check_user_initialized(token)
+    if not is_initialized:
+        return {
+            "status": "not_initialized",
+        }
+
     return {"status": "valid"}
 
 
