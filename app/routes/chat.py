@@ -37,7 +37,7 @@ async def get_chats(
     if not user_email:
         raise HTTPException(status_code=400, detail="Invalid user information in token")
 
-    chats = await chat_repository.get_by_user_email(user_email)
+    chats = await chat_repository.get_chat_by_user_email(user_email)
 
     result = []
 
