@@ -118,7 +118,7 @@ async def delete_user(
     return {"message": "User deleted successfully"}
 
 
-@router.post(
+@router.put(
     "/edit",
     status_code=status.HTTP_200_OK,
 )
