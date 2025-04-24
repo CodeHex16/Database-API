@@ -6,17 +6,29 @@ from pydantic import EmailStr
 import requests
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
+from jose import jwt, JWTError
 
 from app.database import get_db
 import app.schemas as schemas
-from app.routes.auth import verify_admin, verify_user, authenticate_user
+from app.routes.auth import (
+    verify_admin,
+    verify_user,
+    authenticate_user,
+    get_user_repository,
+)
 from app.repositories.user_repository import UserRepository
-from app.utils import get_password_hash, get_uuid3
+from app.utils import get_password_hash, get_uuid3, verify_password
 
 router = APIRouter(
     prefix="/user",
     tags=["user"],
 )
+
+SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
+if not SECRET_KEY_JWT:
+    raise ValueError("SECRET_KEY_JWT non impostata nelle variabili d'ambiente")
+
+ALGORITHM = "HS256"
 
 
 @router.get(
@@ -89,25 +101,29 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
 )
 async def delete_user(
     user_to_be_deleted: EmailStr,
-    admin: schemas.UserEmailPwd,
+    admin: schemas.UserAuth,
     current_user=Depends(verify_admin),
+    user_repository: UserRepository = Depends(get_user_repository),
 ):
     """
     Elimina un utente esistente se la password inserita dall'admin è corretta.
     """
-    # Crea un'istanza del repository utente e ottiene il database
-    user_repo = UserRepository(await get_db())
-
     # Verifica che l'utente esista e che la password sia corretta
-    valid_credentials = await authenticate_user(admin.email, admin.password, user_repo)
-    if not valid_credentials:
+    valid_user = await authenticate_user(admin.email, admin.password, user_repository)
+    if not valid_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
         )
+    # Ensure the user confirming is the same as the one from the token
+    if valid_user["_id"] != current_user.get("sub"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Credentials do not match the logged-in admin",
+        )
 
-    # Elimina l'utente dal database
-    result = await user_repo.collection.delete_one({"_id": user_to_be_deleted})
+    # Elimina l'utente dal database using the injected repository
+    result = await user_repository.collection.delete_one({"_id": user_to_be_deleted})
 
     if result.deleted_count == 0:
         raise HTTPException(
@@ -123,7 +139,7 @@ async def delete_user(
     status_code=status.HTTP_200_OK,
 )
 async def edit_user(
-    user_new_data: schemas.UserNewData,
+    user_new_data: schemas.UserUpdate,
     current_user=Depends(verify_admin),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
@@ -182,3 +198,49 @@ async def edit_user(
         return {"message": "User data is already up to date."}
 
     return {"message": "User updated successfully"}
+
+
+@router.put(
+    "/update_password",
+    status_code=status.HTTP_200_OK,
+)
+async def update_password(
+    user: schemas.UserChangePassword,
+    user_repository: UserRepository = Depends(get_user_repository),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """
+    Aggiorna la password dell'utente.
+    """
+
+    # Verfifica se l'utente esiste e se la password è corretta
+    try:
+        await authenticate_user(
+            user.email, user.current_password, user_repository
+        )
+    except Exception as e:
+        print(f"Error authenticating user: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+
+    # Aggiorna la password dell'utente
+    try:
+        hashed_password = get_password_hash(user.password)
+        result = await user_repository.collection.update_one(
+            {"_id": user.email},
+            {"$set": {"hashed_password": hashed_password}},
+        )
+    except Exception as e:
+        print(f"Error updating password: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update password: {e}",
+        )
+
+    # Controlla se l'aggiornamento ha avuto effetto
+    if result.modified_count == 0:
+        return {"message": "Password is already up to date."}
+
+    return {"message": "Password updated successfully"}

@@ -54,7 +54,7 @@ def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(
-    user: schemas.UserEmailPwd, user_repository=Depends(get_user_repository)
+    user: schemas.UserAuth, user_repository=Depends(get_user_repository)
 ):
     """
     Inserisce un nuovo utente nella collection user.
@@ -76,12 +76,11 @@ async def register_user(
     return {"message": "User created successfully"}
 
 
-async def authenticate_user(
-    email: str, password: str, user_repo: UserRepository = Depends(get_user_repository)
-):
+async def authenticate_user(email: str, password: str, user_repo: UserRepository):
     """
     Ritorna true se l'utente esiste e se la password inserita è quella associata alla mail passata come parametro; altrimenti false.
     """
+    # user_repo is now expected to be a valid UserRepository instance
     user = await user_repo.get_by_email(email)
     if not user:
         return False
@@ -90,18 +89,26 @@ async def authenticate_user(
     return user
 
 
-async def check_user_initialized(
-    email: str, user_repo: UserRepository = Depends(get_user_repository)
-):
+async def check_user_initialized(token: str, user_repo: UserRepository):
     """
     Ritorna il valore della flag _is_initialized_ dell'utente.
     """
-    user = await user_repo.get_by_email(email)
-    if not user:
+    try:
+        payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
+        user_email = payload.get("sub")
+
+        user = await user_repo.get_by_email(user_email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+
+        return user["is_initialized"]
+    except JWTError:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            status_code=403,
+            detail="Token is invalid or expired during initialization check",
         )
-    return user["is_initialized"]
 
 
 def create_access_token(
@@ -175,13 +182,16 @@ def verify_token(token: str, required_scopes: List[str] = None):
 
 
 @router.get("/verify")
-async def verify_user_token(token: str):
+async def verify_user_token(
+    token: str, user_repository: UserRepository = Depends(get_user_repository)
+):
     """
     Chiamata GET che verifica la validità del token JWT.
     """
     verify_token(token=token)
 
-    is_initialized = await check_user_initialized(token)
+    is_initialized = await check_user_initialized(token, user_repository)
+
     if not is_initialized:
         return {
             "status": "not_initialized",
