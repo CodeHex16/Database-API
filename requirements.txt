@@ -1,6 +1,7 @@
 fastapi[all]
 passlib
 pydantic[email]
+pydantic_core
 bcrypt
 motor
 python-jose

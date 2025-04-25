@@ -104,7 +104,7 @@ async def delete_document(
 
     Args:
         file_path (str): Il percorso del file da eliminare.
-        admin (schemas.UserEmailPwd): Credentials of the admin confirming the action.
+        admin (schemas.UserAuth): Credentials of the admin confirming the action.
         current_user: The verified admin user from the token.
         document_repository: Injected document repository.
         user_repository: Injected user repository.
@@ -124,7 +124,7 @@ async def delete_document(
             detail="Credenziali non valide",
         )
     # Ensure the user confirming is the same as the one from the token
-    if valid_user["_id"] != current_user.get("sub"):
+    if valid_user.get("_id") != current_user.get("sub"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Credentials do not match the logged-in admin",

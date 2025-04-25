@@ -89,6 +89,11 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exists",
         )
+    except Exception as e:  # Catch broader exceptions during creation
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create user: {e}",
+        )
 
     # Invia un'email all'utente con la password temporanea
 
@@ -116,14 +121,22 @@ async def delete_user(
             detail="Invalid credentials",
         )
     # Ensure the user confirming is the same as the one from the token
-    if valid_user["_id"] != current_user.get("sub"):
+    if valid_user.get("_id") != current_user.get("sub"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Credentials do not match the logged-in admin",
         )
 
     # Elimina l'utente dal database using the injected repository
-    result = await user_repository.collection.delete_one({"_id": user_to_be_deleted})
+    try:
+        result = await user_repository.collection.delete_one(
+            {"_id": user_to_be_deleted}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete user: {e}",
+        )
 
     if result.deleted_count == 0:
         raise HTTPException(
@@ -168,34 +181,45 @@ async def edit_user(
         "hashed_password": (
             get_password_hash(user_new_data.hashed_password)
             if user_new_data.hashed_password
-            else user_old_data["hashed_password"]
+            else user_old_data.get("hashed_password")
         ),
         "is_initialized": (
             user_new_data.is_initialized
             if user_new_data.is_initialized is not None
-            else user_old_data["is_initialized"]
+            else user_old_data.get("is_initialized")
         ),
         "remember_me": (
             user_new_data.remember_me
             if user_new_data.remember_me is not None
-            else user_old_data["remember_me"]
+            else user_old_data.get("remember_me")
         ),
         "scopes": (
             user_new_data.scopes
             if user_new_data.scopes is not None
-            else user_old_data["scopes"]
+            else user_old_data.get("scopes")
         ),
     }
 
     # Aggiorna i dati dell'utente nel database
-    result = await user_repo.collection.update_one(
-        {"_id": user_new_data.id},
-        {"$set": update_payload},
-    )
+    try:
+        result = await user_repo.collection.update_one(
+            {"_id": user_new_data.id},
+            {"$set": update_payload},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update user: {e}",
+        )
 
     # Controlla se l'aggiornamento ha avuto effetto
-    if result.modified_count == 0:
+    if result.modified_count == 0 and result.matched_count > 0:
         return {"message": "User data is already up to date."}
+    elif result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found during update attempt",
+        )
 
     return {"message": "User updated successfully"}
 
@@ -207,7 +231,6 @@ async def edit_user(
 async def update_password(
     user: schemas.UserChangePassword,
     user_repository: UserRepository = Depends(get_user_repository),
-    db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """
     Aggiorna la password dell'utente.
@@ -215,9 +238,7 @@ async def update_password(
 
     # Verfifica se l'utente esiste e se la password è corretta
     try:
-        await authenticate_user(
-            user.email, user.current_password, user_repository
-        )
+        await authenticate_user(user.email, user.current_password, user_repository)
     except Exception as e:
         print(f"Error authenticating user: {e}")
         raise HTTPException(
@@ -230,17 +251,24 @@ async def update_password(
         hashed_password = get_password_hash(user.password)
         result = await user_repository.collection.update_one(
             {"_id": user.email},
-            {"$set": {"hashed_password": hashed_password}},
+            {"$set": {"hashed_password": hashed_password, "is_initialized": True}},
         )
     except Exception as e:
         print(f"Error updating password: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update password: {e}",
+            detail=f"Failed to update password: {e}",
         )
 
     # Controlla se l'aggiornamento ha avuto effetto
-    if result.modified_count == 0:
-        return {"message": "Password is already up to date."}
+    if result.modified_count == 0 and result.matched_count > 0:
+        return {
+            "message": "Password update did not modify the document (maybe same password?)."
+        }
+    elif result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found during password update attempt",
+        )
 
     return {"message": "Password updated successfully"}

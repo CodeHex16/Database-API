@@ -84,7 +84,8 @@ async def authenticate_user(email: str, password: str, user_repo: UserRepository
     user = await user_repo.get_by_email(email)
     if not user:
         return False
-    if not verify_password(password, user["hashed_password"]):
+    hashed_pwd_from_db = user.get("hashed_password")
+    if not hashed_pwd_from_db or not verify_password(password, hashed_pwd_from_db):
         return False
     return user
 
@@ -96,6 +97,8 @@ async def check_user_initialized(token: str, user_repo: UserRepository):
     try:
         payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
         user_email = payload.get("sub")
+        if not user_email:
+             raise HTTPException(status_code=403, detail="User not exists")
 
         user = await user_repo.get_by_email(user_email)
         if not user:
@@ -138,7 +141,7 @@ async def login_for_access_token(
     """
     # Verifica le credenziali dell'utente
     user = await user_repository.get_by_email(form_data.username)
-    if not user or not verify_password(form_data.password, user["hashed_password"]):
+    if not user or not verify_password(form_data.password, user.get("hashed_password")):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -151,7 +154,7 @@ async def login_for_access_token(
     # Crea il token di accesso
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user["_id"]},
+        data={"sub": user.get("_id")},
         scopes=user_permissions,
         expires_delta=access_token_expires,
     )

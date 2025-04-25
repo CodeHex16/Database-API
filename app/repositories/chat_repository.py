@@ -49,8 +49,8 @@ class ChatRepository:
 
     async def add_message(self, chat_id, message):
         message_data = {
-            "sender": message["sender"],
-            "content": message["content"],
+            "sender": message.get("sender"),
+            "content": message.get("content"),
             "timestamp": datetime.now(),
         }
 

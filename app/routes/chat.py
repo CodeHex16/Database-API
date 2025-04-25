@@ -46,7 +46,7 @@ async def get_chats(
             {
                 "id": str(chat["_id"]),
                 "name": chat.get("name", "Chat senza nome"),
-                "user_email": chat["user_email"],
+                "user_email": chat.get("user_email"),
                 "created_at": chat.get("created_at"),
             }
         )
@@ -57,32 +57,34 @@ async def get_chats(
 @router.put("/{chat_id}", response_model=schemas.ChatResponse)
 async def update_chat(
     chat_id: str,
-    chat: str,  # TODO: Fix this
+    chat_update: schemas.ChatResponse,
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
     # Aggiorna solo i campi che sono stati forniti
     update_data = {}
-    if chat.name is not None:
-        update_data["name"] = chat.name
+    if chat_update.name is not None:
+        update_data["name"] = chat_update.name
 
     if update_data:
-        await chat_repository.update(chat_id, update_data)
+        await chat_repository.update_chat(chat_id, update_data)
 
     # Recupera la chat aggiornata
-    updated_chat = await chat_repository.get_by_id(chat_id, user_email)
+    updated_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
+    if not updated_chat:
+         raise HTTPException(status_code=404, detail="Chat not found after update")
 
     return {
         "id": str(updated_chat["_id"]),
-        "name": updated_chat["name"],
-        "user_email": updated_chat["user_email"],
+        "name": updated_chat.get("name", "Chat senza nome"),
+        "user_email": updated_chat.get("user_email"),
         "created_at": updated_chat.get("created_at"),
     }
 
@@ -96,11 +98,11 @@ async def delete_chat(
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
-    await chat_repository.delete(chat_id, user_email)
+    await chat_repository.delete_chat(chat_id, user_email)
     return None
 
 
@@ -114,13 +116,13 @@ async def get_chat_messages(
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
     result = {
-        "name": existing_chat.get("name"),
-        "messages": existing_chat.get("messages"),
+        "name": existing_chat.get("name", "Chat senza nome"),
+        "messages": existing_chat.get("messages", []),
     }
 
     return result
@@ -136,7 +138,7 @@ async def create_chat_message(
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
@@ -147,11 +149,7 @@ async def create_chat_message(
     }
 
     # Aggiungi il messaggio alla chat
-    existing_chat["messages"].append(message_data)
-
-    await chat_repository.update(
-        chat_id, {"messages": existing_chat["messages"]}
-    )  # aggiorna nel DB
+    await chat_repository.add_message(chat_id, message_data)
 
     return message_data
 
@@ -181,7 +179,7 @@ async def change_chat_name(
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_by_id(chat_id, user_email)
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 

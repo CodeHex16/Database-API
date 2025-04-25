@@ -1,7 +1,8 @@
-import app.schemas as schemas
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
+from datetime import datetime
 
+import app.schemas as schemas
 class DocumentRepository:
     def __init__(self, database):
         self.database = database
@@ -29,11 +30,11 @@ class DocumentRepository:
             Exception: Se si verifica qualsiasi altro errore durante l'inserimento.
         """
         faq_data = {
-            "_id": faq.id or ObjectId(),
+            "_id": ObjectId(),
             "title": faq.title,
             "question": faq.question,
             "answer": faq.answer,
-            "created_at": faq.created_at,
+            "created_at": datetime.now(),
         }
         try:
             return await self.collection.insert_one(faq_data)
