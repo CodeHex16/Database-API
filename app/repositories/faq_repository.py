@@ -3,7 +3,8 @@ from pymongo.errors import DuplicateKeyError
 from datetime import datetime
 
 import app.schemas as schemas
-class DocumentRepository:
+
+class FaqRepository:
     def __init__(self, database):
         self.database = database
         self.collection = database.get_collection("faq")
@@ -18,13 +19,13 @@ class DocumentRepository:
         """
         Inserisce una nuova FAQ nel database.
         La FAQ viene memorizzata con un UUID generato dal suo percorso file come chiave primaria.
-        
+
         Args:
             faq (schemas.FAQ): L'oggetto FAQ da inserire.
-            
+
         Returns:
             Il risultato dell'operazione di inserimento.
-            
+
         Raises:
             DuplicateKeyError: Se una FAQ con lo stesso percorso esiste già.
             Exception: Se si verifica qualsiasi altro errore durante l'inserimento.
