@@ -53,7 +53,7 @@ async def create_faq(
     Crea una nuova FAQ.
     """
     try:
-        await faq_repo.insert_faq(faq)
+        await faq_repo.insert_faq(faq=faq, author_email=current_user.get("sub"))
     except DuplicateKeyError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -79,47 +79,9 @@ async def update_faq(
     """
     Aggiorna una FAQ esistente.
     """
-    # Ottiene i dati della FAQ esistente
-    faq_current_data = await faq_repo.get_faq_by_id(faq_id=ObjectId(faq.id))
-
-    # Controla se la FAQ esiste
-    if not faq_current_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="FAQ not found",
-        )
-
-    if (
-        faq.title != faq_current_data.get("title")
-        or faq.question != faq_current_data.get("question")
-        or faq.answer != faq_current_data.get("answer")
-        or faq.author_email != faq_current_data.get("author_email")
-    ):
-        # Prepara i dati per l'aggiornamento
-        update_payload = {
-            "id": ObjectId(faq.id),
-            "title": (faq.title if faq.title else faq_current_data.get("title")),
-            "question": (
-                faq.question if faq.question else faq_current_data.get("question")
-            ),
-            "answer": (faq.answer if faq.answer else faq_current_data.get("answer")),
-            "author_email": (
-                faq.author_email
-                if faq.author_email
-                else faq_current_data.get("author_email")
-            ),
-            "updated_at": faq.updated_at,
-        }
-    else:
-        print("FAQ data is already up to date.")
-        raise HTTPException(
-            status_code=status.HTTP_304_NOT_MODIFIED,
-            detail="FAQ data is already up to date.",
-        )
-
     # Aggiorna i campi della FAQ
     try:
-        await faq_repo.update_faq(faq=update_payload)
+        await faq_repo.update_faq(faq=faq, author_email=current_user.get("sub"))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

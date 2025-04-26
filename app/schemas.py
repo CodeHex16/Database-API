@@ -27,7 +27,10 @@ class _ObjectIdPydanticAnnotation:
             serialization=core_schema.to_string_ser_schema(),
         )
 
+
 PydanticObjectId = Annotated[ObjectId, _ObjectIdPydanticAnnotation]
+
+# TODO: field validators di faq e faqupdate, per lunghezze minime, massime e formato
 
 
 class User(BaseModel):
@@ -109,21 +112,34 @@ class Document(BaseModel):
     uploaded_at: datetime
 
 
-    # todo: field validators di faq e faqupdate, per lunghezze minime, massime e formato
 class FAQ(BaseModel):
-    id: PydanticObjectId = Field(alias='_id')
+    # TODO: capire se mettere l'id qui o metterlo come paramtro della route
+    # id: PydanticObjectId = Field(alias="_id")
     title: str
     question: str
     answer: str
-    author_email: EmailStr
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
+
+    @field_validator("title")
+    def check_title_length(cls, value: str):
+        if len(value) > 20:
+            raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
+        return value
+
+    model_config = {
+        "populate_by_name": True,  # Allows using '_id' in input data
+        "json_encoders": {ObjectId: str},  # Ensure ObjectId is serialized as string
+    }
+
 
 class FAQUpdate(BaseModel):
+    # TODO: capire se mettere l'id qui o metterlo come paramtro della route
     id: str
     title: Optional[str]
     question: Optional[str]
     answer: Optional[str]
-    author_email: Optional[EmailStr]
-    updated_at: datetime = Field(default_factory=datetime.now)
 
+    @field_validator("title")
+    def check_title_length(cls, value: Optional[str]):
+        if len(value) > 20:
+            raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
+        return value

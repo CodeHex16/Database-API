@@ -1,6 +1,7 @@
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime
+from fastapi import HTTPException, status
 
 import app.schemas as schemas
 
@@ -18,16 +19,16 @@ class FaqRepository:
 
     async def get_faq_by_id(self, faq_id: ObjectId):
         """
-                Restituisce una FAQ specifica in base all'ID fornito.
+        Restituisce una FAQ specifica in base all'ID fornito.
 
-                Args:
-                    faq_id (ObjectId): L'ID della FAQ da recuperare.
+        Args:
+            faq_id (ObjectId): L'ID della FAQ da recuperare.
 
-                Returns:
-                    La FAQ corrispondente all'ID fornito.
+        Returns:
+            La FAQ corrispondente all'ID fornito.
 
-                Raises:
-                    Exception: Se si verifica un errore durante il recupero della FAQ.
+        Raises:
+            Exception: Se si verifica un errore durante il recupero della FAQ.
         """
         try:
             return await self.collection.find_one({"_id": faq_id})
@@ -35,7 +36,7 @@ class FaqRepository:
             print(f"Error retrieving FAQ: {e}")
             raise Exception(f"Error retrieving FAQ: {e}")
 
-    async def insert_faq(self, faq: schemas.FAQ):
+    async def insert_faq(self, faq: schemas.FAQ, author_email: str):
         """
         Inserisce una nuova FAQ nel database.
         L'ID viene generato automaticamente da MongoDB.
@@ -50,16 +51,16 @@ class FaqRepository:
             DuplicateKeyError: Se si verifica un errore di chiave duplicata.
             Exception: Se si verifica qualsiasi altro errore durante l'inserimento.
         """
-        faq_data = {
-            "title": faq.title,
-            "question": faq.question,
-            "answer": faq.answer,
-            "author_email": faq.author_email,
-            "created_at": faq.created_at,
-            "updated_at": faq.updated_at,
-        }
         try:
-            result = await self.collection.insert_one(faq_data)
+            insert_payload = {
+                "title": faq.title,
+                "question": faq.question,
+                "answer": faq.answer,
+                "author_email": author_email,
+                "created_at": datetime.now(),
+                "updated_at": datetime.now(),
+            }
+            result = await self.collection.insert_one(insert_payload)
             return result.inserted_id
         except DuplicateKeyError as e:
             print(f"Error inserting FAQ: {e}.")
@@ -68,7 +69,7 @@ class FaqRepository:
             print(f"Error inserting FAQ: {e}")
             raise Exception(f"Error inserting FAQ: {e}")
 
-    async def update_faq(self, faq: schemas.FAQUpdate):
+    async def update_faq(self, faq: schemas.FAQUpdate, author_email: str):
         """
         Aggiorna una FAQ esistente nel database.
 
@@ -80,25 +81,52 @@ class FaqRepository:
         """
         try:
             # print(f"Updating FAQ: {faq}")
-            result = await self.collection.update_one(
-                {"_id": faq.get("id")},
-                {
-                    "$set": {
-                        "title": faq.get("title"),
-                        "question": faq.get("question"),
-                        "answer": faq.get("answer"),
-                        "author_email": faq.get("author_email"),
-                        "updated_at": faq.get("updated_at"),
-                    }
-                },
-            )
 
-            if result.modified_count == 0 and result.matched_count > 0:
+            # Ottiene i dati della FAQ esistente
+            faq_current_data = await self.get_faq_by_id(faq_id=ObjectId(faq.id))
+
+            # Controla se la FAQ esiste
+            if not faq_current_data:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="FAQ not found",
+                )
+
+            if (
+                faq.title != faq_current_data.get("title")
+                or faq.question != faq_current_data.get("question")
+                or faq.answer != faq_current_data.get("answer")
+            ):
+                update_payload = {
+                    "title": (
+                        faq.title if faq.title else faq_current_data.get("title")
+                    ),
+                    "question": (
+                        faq.question
+                        if faq.question
+                        else faq_current_data.get("question")
+                    ),
+                    "answer": (
+                        faq.answer if faq.answer else faq_current_data.get("answer")
+                    ),
+                    "author_email": author_email,
+                    "updated_at": datetime.now(),
+                }
+                result = await self.collection.update_one(
+                    {"_id": ObjectId(faq.id)},
+                    {"$set": update_payload},
+                )
+
+                if result.matched_count == 0:
+                    print("FAQ not found during update attempt")
+                    raise Exception("FAQ not found during update attempt")
+            else:
                 print("FAQ data is already up to date.")
-                return {"message": "FAQ data is already up to date."}
-            elif result.matched_count == 0:
-                print("FAQ not found during update attempt")
-                raise Exception("FAQ not found during update attempt")
+                raise HTTPException(
+                    status_code=status.HTTP_304_NOT_MODIFIED,
+                    detail="FAQ data is already up to date.",
+                )
+
         except Exception as e:
             print(f"Error updating FAQ: {e}")
             raise Exception(f"Error updating FAQ: {e}")
