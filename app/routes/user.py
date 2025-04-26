@@ -38,13 +38,11 @@ ALGORITHM = "HS256"
 )
 async def get_users(
     current_user=Depends(verify_admin),
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    user_repo: UserRepository = Depends(get_user_repository),
 ):
     """
     Restituisce una lista di tutti gli utenti registrati.
     """
-    # Crea un'istanza del repository utente e ottiene il database
-    user_repo = UserRepository(db)
     users = await user_repo.get_users()
 
     # Ritorna la lista di user se esistente, altrimeni solleva un'eccezione 404
@@ -53,7 +51,6 @@ async def get_users(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No users found",
         )
-    print(f"Users: {users}")
     return users
 
 
@@ -61,7 +58,11 @@ async def get_users(
     "/register",
     status_code=status.HTTP_201_CREATED,
 )
-async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)):
+async def register_user(
+    user_email: EmailStr,
+    current_user=Depends(verify_admin),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
     """
     Crea un nuovo utente con una password temporanea casuale.
     L'utente riceverà un'email con la password temporanea.
@@ -80,8 +81,6 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
         "scopes": ["user"],
     }
 
-    # Crea un'istanza del repository utente e ottiene il database
-    user_repo = UserRepository(await get_db())
     try:
         await user_repo.create_user(user_data=new_user)
     except DuplicateKeyError:
@@ -89,7 +88,7 @@ async def register_user(user_email: EmailStr, current_user=Depends(verify_admin)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exists",
         )
-    except Exception as e:  # Catch broader exceptions during creation
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create user: {e}",
@@ -120,7 +119,6 @@ async def delete_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
         )
-    # Ensure the user confirming is the same as the one from the token
     if valid_user.get("_id") != current_user.get("sub"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -154,7 +152,7 @@ async def delete_user(
 async def edit_user(
     user_new_data: schemas.UserUpdate,
     current_user=Depends(verify_admin),
-    db: AsyncIOMotorDatabase = Depends(get_db),
+    user_repo: UserRepository = Depends(get_user_repository),
 ):
     """
     Modifica i dati di un utente esistente.
@@ -163,13 +161,11 @@ async def edit_user(
     Se per uno dei campi viene fornito è None (null nel body json della richiesta),
     il valore attuale rimarrà invariato.
     """
-    user_repo = UserRepository(db)
-
     # Ottiene i dati attuali dell'user
-    user_old_data = await user_repo.get_by_email(user_new_data.id)
+    user_current_data = await user_repo.get_by_email(user_new_data.id)
 
-    # Check if user exists
-    if not user_old_data:
+    # Verifica se l'utente esiste
+    if not user_current_data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
@@ -181,22 +177,22 @@ async def edit_user(
         "hashed_password": (
             get_password_hash(user_new_data.hashed_password)
             if user_new_data.hashed_password
-            else user_old_data.get("hashed_password")
+            else user_current_data.get("hashed_password")
         ),
         "is_initialized": (
             user_new_data.is_initialized
             if user_new_data.is_initialized is not None
-            else user_old_data.get("is_initialized")
+            else user_current_data.get("is_initialized")
         ),
         "remember_me": (
             user_new_data.remember_me
             if user_new_data.remember_me is not None
-            else user_old_data.get("remember_me")
+            else user_current_data.get("remember_me")
         ),
         "scopes": (
             user_new_data.scopes
             if user_new_data.scopes is not None
-            else user_old_data.get("scopes")
+            else user_current_data.get("scopes")
         ),
     }
 

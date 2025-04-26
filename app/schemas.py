@@ -16,7 +16,7 @@ class _ObjectIdPydanticAnnotation:
         _handler: Callable[[Any], core_schema.CoreSchema],
     ) -> core_schema.CoreSchema:
         def validate_from_str(input_value: str) -> ObjectId:
-            return ObjectId(input_value)
+            return ObjectId()
 
         return core_schema.union_schema(
             [
@@ -57,16 +57,17 @@ class UserChangePassword(UserAuth):
 
 class UserUpdate(BaseModel):
     id: EmailStr
-    hashed_password: str | None
-    is_initialized: bool | None
-    remember_me: bool | None
-    scopes: List[str] | None
+    hashed_password: Optional[str]
+    is_initialized: Optional[bool]
+    remember_me: Optional[bool]
+    scopes: Optional[List[str]]
 
     @field_validator("hashed_password")
     def check_password(value: str):
-        if len(value) < 8:
-            raise ValueError("La password deve essere lunga almeno 8 caratteri")
-        return value
+        if value:
+            if len(value) < 8:
+                raise ValueError("La password deve essere lunga almeno 8 caratteri")
+            return value
 
 
 class Token(BaseModel):
@@ -108,9 +109,21 @@ class Document(BaseModel):
     uploaded_at: datetime
 
 
+    # todo: field validators di faq e faqupdate, per lunghezze minime, massime e formato
 class FAQ(BaseModel):
     id: PydanticObjectId = Field(alias='_id')
     title: str
     question: str
     answer: str
     author_email: EmailStr
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+class FAQUpdate(BaseModel):
+    id: str
+    title: Optional[str]
+    question: Optional[str]
+    answer: Optional[str]
+    author_email: Optional[EmailStr]
+    updated_at: datetime = Field(default_factory=datetime.now)
+
