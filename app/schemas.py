@@ -3,6 +3,7 @@ from bson import ObjectId
 from typing import Union, Optional, List, Annotated, Any, Callable
 from datetime import datetime
 from pydantic_core import core_schema
+import re
 
 
 # Implementazione ObjectId per pydantic
@@ -30,7 +31,9 @@ class _ObjectIdPydanticAnnotation:
 
 PydanticObjectId = Annotated[ObjectId, _ObjectIdPydanticAnnotation]
 
-# TODO: field validators di faq e faqupdate, per lunghezze minime, massime e formato
+# Define the regex pattern as a constant
+PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$"
+PASSWORD_ERROR_MSG = "La password deve contenere almeno 8 caratteri, una lettera maiuscola, una lettera maiuscola, una cifra e un carattere speciale."
 
 
 class User(BaseModel):
@@ -48,29 +51,29 @@ class UserAuth(BaseModel):
     password: str
 
     @field_validator("password")
-    def check_password(value: str):
-        if len(value) < 8:
-            raise ValueError("La password deve essere lunga almeno 8 caratteri")
+    def check_password_complexity(cls, value: str):
+        if not re.match(PASSWORD_REGEX, value):
+            raise ValueError(PASSWORD_ERROR_MSG)
         return value
 
 
-class UserChangePassword(UserAuth):
+class UserUpdatePassword(UserAuth):
     current_password: str
 
 
 class UserUpdate(BaseModel):
     id: EmailStr
-    hashed_password: Optional[str]
-    is_initialized: Optional[bool]
-    remember_me: Optional[bool]
-    scopes: Optional[List[str]]
+    password: Optional[str] = None
+    is_initialized: Optional[bool] = None
+    remember_me: Optional[bool] = None
+    scopes: Optional[List[str]] = None
 
-    @field_validator("hashed_password")
-    def check_password(value: str):
-        if value:
-            if len(value) < 8:
-                raise ValueError("La password deve essere lunga almeno 8 caratteri")
-            return value
+    @field_validator("password")
+    def check_optional_password_complexity(cls, value: Optional[str]):
+        if value is not None:
+            if not re.match(PASSWORD_REGEX, value):
+                raise ValueError(PASSWORD_ERROR_MSG)
+        return value
 
 
 class Token(BaseModel):
@@ -81,7 +84,8 @@ class Token(BaseModel):
 class ChatResponse(BaseModel):
     id: str
     name: str
-    user_email: str
+    user_email: EmailStr
+    # TODO: created_at va gestito dal server
     created_at: Optional[datetime] = None
 
 
@@ -92,6 +96,7 @@ class ChatList(BaseModel):
 class Message(BaseModel):
     sender: str
     content: str
+    # TODO: timestamp va gestito dal server
     timestamp: datetime
 
 
@@ -109,6 +114,7 @@ class Document(BaseModel):
     title: str
     file_path: str
     owner_email: str
+    # TODO: update_at va gestito dal server
     uploaded_at: datetime
 
 

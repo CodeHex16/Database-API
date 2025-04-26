@@ -225,7 +225,7 @@ async def edit_user(
     status_code=status.HTTP_200_OK,
 )
 async def update_password(
-    user: schemas.UserChangePassword,
+    user: schemas.UserUpdatePassword,
     user_repository: UserRepository = Depends(get_user_repository),
 ):
     """
