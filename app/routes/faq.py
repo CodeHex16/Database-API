@@ -69,9 +69,10 @@ async def create_faq(
 
 
 @router.put(
-    "/update",
+    "/update/{faq_id}",
 )
 async def update_faq(
+    faq_id: str,
     faq: schemas.FAQUpdate,
     current_user=Depends(verify_admin),
     faq_repo: FaqRepository = Depends(get_faq_repository),
@@ -81,7 +82,7 @@ async def update_faq(
     """
     # Aggiorna i campi della FAQ
     try:
-        await faq_repo.update_faq(faq=faq, author_email=current_user.get("sub"))
+        await faq_repo.update_faq(faq_id=ObjectId(faq_id), faq_data=faq, author_email=current_user.get("sub"))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -92,7 +93,7 @@ async def update_faq(
 
 
 @router.delete(
-    "/delete",
+    "/delete/{faq_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_faq(
@@ -104,7 +105,7 @@ async def delete_faq(
     Cancella una FAQ.
     """
     try:
-        await faq_repo.delete_faq(faq_id)
+        await faq_repo.delete_faq(faq_id=ObjectId(faq_id))
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -119,7 +119,6 @@ class Document(BaseModel):
 
 
 class FAQ(BaseModel):
-    # TODO: capire se mettere l'id qui o metterlo come paramtro della route
     # id: PydanticObjectId = Field(alias="_id")
     title: str
     question: str
@@ -139,7 +138,6 @@ class FAQ(BaseModel):
 
 class FAQUpdate(BaseModel):
     # TODO: capire se mettere l'id qui o metterlo come paramtro della route
-    id: str
     title: Optional[str]
     question: Optional[str]
     answer: Optional[str]

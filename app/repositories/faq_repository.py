@@ -69,7 +69,7 @@ class FaqRepository:
             print(f"Error inserting FAQ: {e}")
             raise Exception(f"Error inserting FAQ: {e}")
 
-    async def update_faq(self, faq: schemas.FAQUpdate, author_email: str):
+    async def update_faq(self, faq_id: ObjectId, faq_data: schemas.FAQUpdate, author_email: str):
         """
         Aggiorna una FAQ esistente nel database.
 
@@ -83,7 +83,7 @@ class FaqRepository:
             # print(f"Updating FAQ: {faq}")
 
             # Ottiene i dati della FAQ esistente
-            faq_current_data = await self.get_faq_by_id(faq_id=ObjectId(faq.id))
+            faq_current_data = await self.get_faq_by_id(faq_id)
 
             # Controla se la FAQ esiste
             if not faq_current_data:
@@ -93,27 +93,31 @@ class FaqRepository:
                 )
 
             if (
-                faq.title != faq_current_data.get("title")
-                or faq.question != faq_current_data.get("question")
-                or faq.answer != faq_current_data.get("answer")
+                faq_data.title != faq_current_data.get("title")
+                or faq_data.question != faq_current_data.get("question")
+                or faq_data.answer != faq_current_data.get("answer")
             ):
                 update_payload = {
                     "title": (
-                        faq.title if faq.title else faq_current_data.get("title")
+                        faq_data.title
+                        if faq_data.title
+                        else faq_current_data.get("title")
                     ),
                     "question": (
-                        faq.question
-                        if faq.question
+                        faq_data.question
+                        if faq_data.question
                         else faq_current_data.get("question")
                     ),
                     "answer": (
-                        faq.answer if faq.answer else faq_current_data.get("answer")
+                        faq_data.answer
+                        if faq_data.answer
+                        else faq_current_data.get("answer")
                     ),
                     "author_email": author_email,
                     "updated_at": datetime.now(),
                 }
                 result = await self.collection.update_one(
-                    {"_id": ObjectId(faq.id)},
+                    {"_id": faq_id},
                     {"$set": update_payload},
                 )
 
@@ -142,7 +146,7 @@ class FaqRepository:
             Il risultato dell'operazione di eliminazione.
         """
         try:
-            print(f"Deleting FAQ with ID: {faq_id}")
+            # print(f"Deleting FAQ with ID: {faq_id}")
             return await self.collection.delete_one({"_id": faq_id})
         except Exception as e:
             print(f"Error deleting FAQ: {e}")
