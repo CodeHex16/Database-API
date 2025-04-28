@@ -39,7 +39,7 @@ PASSWORD_ERROR_MSG = "La password deve contenere almeno 8 caratteri, una lettera
 class User(BaseModel):
     # id: UUID3 = Field(default_factory=UUID3, alias="_id")
     # email: EmailStr
-    id: EmailStr
+    _id: EmailStr
     hashed_password: str
     is_initialized: bool = False
     remember_me: bool = False
@@ -57,12 +57,18 @@ class UserAuth(BaseModel):
         return value
 
 
-class UserUpdatePassword(UserAuth):
+class UserUpdatePassword(BaseModel):
+    password: str
     current_password: str
+
+    @field_validator("password")
+    def check_password_complexity(cls, value: str):
+        if not re.match(PASSWORD_REGEX, value):
+            raise ValueError(PASSWORD_ERROR_MSG)
+        return value
 
 
 class UserUpdate(BaseModel):
-    id: EmailStr
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
@@ -137,7 +143,6 @@ class FAQ(BaseModel):
 
 
 class FAQUpdate(BaseModel):
-    # TODO: capire se mettere l'id qui o metterlo come paramtro della route
     title: Optional[str]
     question: Optional[str]
     answer: Optional[str]

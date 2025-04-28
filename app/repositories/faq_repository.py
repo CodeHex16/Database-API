@@ -69,7 +69,9 @@ class FaqRepository:
             print(f"Error inserting FAQ: {e}")
             raise Exception(f"Error inserting FAQ: {e}")
 
-    async def update_faq(self, faq_id: ObjectId, faq_data: schemas.FAQUpdate, author_email: str):
+    async def update_faq(
+        self, faq_id: ObjectId, faq_data: schemas.FAQUpdate, author_email: str
+    ):
         """
         Aggiorna una FAQ esistente nel database.
 
@@ -92,44 +94,47 @@ class FaqRepository:
                     detail="FAQ not found",
                 )
 
+            # Controlla se sono cambiati i dati
             if (
-                faq_data.title != faq_current_data.get("title")
-                or faq_data.question != faq_current_data.get("question")
-                or faq_data.answer != faq_current_data.get("answer")
+                faq_current_data.get("title") == faq_data.title
+                and faq_current_data.get("question") == faq_data.question
+                and faq_current_data.get("answer") == faq_data.answer
             ):
-                update_payload = {
-                    "title": (
-                        faq_data.title
-                        if faq_data.title
-                        else faq_current_data.get("title")
-                    ),
-                    "question": (
-                        faq_data.question
-                        if faq_data.question
-                        else faq_current_data.get("question")
-                    ),
-                    "answer": (
-                        faq_data.answer
-                        if faq_data.answer
-                        else faq_current_data.get("answer")
-                    ),
-                    "author_email": author_email,
-                    "updated_at": datetime.now(),
-                }
-                result = await self.collection.update_one(
-                    {"_id": faq_id},
-                    {"$set": update_payload},
-                )
-
-                if result.matched_count == 0:
-                    print("FAQ not found during update attempt")
-                    raise Exception("FAQ not found during update attempt")
-            else:
                 print("FAQ data is already up to date.")
                 raise HTTPException(
                     status_code=status.HTTP_304_NOT_MODIFIED,
                     detail="FAQ data is already up to date.",
                 )
+
+            # Prepara il payload di aggiornamento
+            update_payload = {
+                "title": (
+                    faq_data.title if faq_data.title else faq_current_data.get("title")
+                ),
+                "question": (
+                    faq_data.question
+                    if faq_data.question
+                    else faq_current_data.get("question")
+                ),
+                "answer": (
+                    faq_data.answer
+                    if faq_data.answer
+                    else faq_current_data.get("answer")
+                ),
+                "author_email": author_email,
+                "updated_at": datetime.now(),
+            }
+
+            # Esegue l'aggiornamento
+            result = await self.collection.update_one(
+                {"_id": faq_id},
+                {"$set": update_payload},
+            )
+
+            # Controlla se l'aggiornamento ha avuto effetto
+            if result.matched_count == 0:
+                print("FAQ not found during update attempt")
+                raise Exception("FAQ not found during update attempt")
 
         except Exception as e:
             print(f"Error updating FAQ: {e}")

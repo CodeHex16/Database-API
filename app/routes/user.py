@@ -54,12 +54,38 @@ async def get_users(
     return users
 
 
+@router.get(
+    "/{user_id}",
+    response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
+)
+async def get_user(
+    user_id: EmailStr,
+    current_user=Depends(verify_admin),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    """
+    Restituisce i dati di un utente specifico.
+    """
+    # Ottiene i dati dell'utente
+    user = await user_repo.get_by_email(user_id)
+
+    # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user
+
+
 @router.post(
-    "/register",
+    "/register/{user_email}",
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
     user_email: EmailStr,
+    scopes: Optional[List[str]] = None,
     current_user=Depends(verify_admin),
     user_repo: UserRepository = Depends(get_user_repository),
 ):
@@ -78,7 +104,7 @@ async def register_user(
         "hashed_password": hashed_password,
         "is_initialized": False,
         "remember_me": False,
-        "scopes": ["user"],
+        "scopes": scopes if scopes else ["user"],
     }
 
     try:
@@ -100,11 +126,12 @@ async def register_user(
 
 
 @router.delete(
-    "/delete",
+    "/delete/{user_id}",
     status_code=status.HTTP_200_OK,
 )
 async def delete_user(
-    user_to_be_deleted: EmailStr,
+    user_id: EmailStr,
+    # TODO: verificare se ha senso controllare il reinserimento della password così:
     admin: schemas.UserAuth,
     current_user=Depends(verify_admin),
     user_repository: UserRepository = Depends(get_user_repository),
@@ -112,44 +139,45 @@ async def delete_user(
     """
     Elimina un utente esistente se la password inserita dall'admin è corretta.
     """
-    # Verifica che l'utente esista e che la password sia corretta
-    valid_user = await authenticate_user(admin.email, admin.password, user_repository)
-    if not valid_user:
+    try:
+        # Verifica che l'admin esista e che la password sia corretta
+        valid_user = await authenticate_user(
+            admin.email, admin.password, user_repository
+        )
+        if not valid_user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
+        if valid_user.get("_id") != admin.get("email"):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Credentials do not match the logged-in admin",
+            )
+
+        await user_repository.delete_user(
+            user_id=user_id,
+        )
+    except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
-        )
-    if valid_user.get("_id") != current_user.get("sub"):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Credentials do not match the logged-in admin",
-        )
-
-    # Elimina l'utente dal database using the injected repository
-    try:
-        result = await user_repository.collection.delete_one(
-            {"_id": user_to_be_deleted}
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete user: {e}",
         )
-
-    if result.deleted_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-
     return {"message": "User deleted successfully"}
 
 
+# TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
 @router.put(
-    "/edit",
+    "/update/{user_id}",
     status_code=status.HTTP_200_OK,
 )
-async def edit_user(
+async def update_user(
+    user_id: EmailStr,
     user_new_data: schemas.UserUpdate,
     current_user=Depends(verify_admin),
     user_repo: UserRepository = Depends(get_user_repository),
@@ -161,46 +189,11 @@ async def edit_user(
     Se per uno dei campi viene fornito è None (null nel body json della richiesta),
     il valore attuale rimarrà invariato.
     """
-    # Ottiene i dati attuali dell'user
-    user_current_data = await user_repo.get_by_email(user_new_data.id)
-
-    # Verifica se l'utente esiste
-    if not user_current_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-
-    # Prepara il payload per l'aggiornamento
-    update_payload = {
-        # Hashing della password solo se non è None o stringa vuota
-        "hashed_password": (
-            get_password_hash(user_new_data.hashed_password)
-            if user_new_data.hashed_password
-            else user_current_data.get("hashed_password")
-        ),
-        "is_initialized": (
-            user_new_data.is_initialized
-            if user_new_data.is_initialized is not None
-            else user_current_data.get("is_initialized")
-        ),
-        "remember_me": (
-            user_new_data.remember_me
-            if user_new_data.remember_me is not None
-            else user_current_data.get("remember_me")
-        ),
-        "scopes": (
-            user_new_data.scopes
-            if user_new_data.scopes is not None
-            else user_current_data.get("scopes")
-        ),
-    }
-
     # Aggiorna i dati dell'utente nel database
     try:
-        result = await user_repo.collection.update_one(
-            {"_id": user_new_data.id},
-            {"$set": update_payload},
+        result = await user_repo.update_user(
+            user_id=user_id,
+            user_data=user_new_data,
         )
     except Exception as e:
         raise HTTPException(
@@ -221,50 +214,42 @@ async def edit_user(
 
 
 @router.put(
-    "/update_password",
+    "/update_password/{user_id}",
     status_code=status.HTTP_200_OK,
 )
 async def update_password(
-    user: schemas.UserUpdatePassword,
+    user_id: EmailStr,
+    user_data: schemas.UserUpdatePassword,
+    current_user=Depends(verify_user),
     user_repository: UserRepository = Depends(get_user_repository),
 ):
     """
     Aggiorna la password dell'utente.
     """
-
-    # Verfifica se l'utente esiste e se la password è corretta
-    try:
-        await authenticate_user(user.email, user.current_password, user_repository)
-    except Exception as e:
-        print(f"Error authenticating user: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
-
     # Aggiorna la password dell'utente
     try:
-        hashed_password = get_password_hash(user.password)
-        result = await user_repository.collection.update_one(
-            {"_id": user.email},
-            {"$set": {"hashed_password": hashed_password, "is_initialized": True}},
+        # Verifica che l'utente esista e che la password sia corretta
+        user_current_data = await user_repository.get_by_email(user_id)
+        if not verify_password(
+            user_data.current_password, user_current_data.get("hashed_password")
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Wrong password",
+            )
+
+        # Aggiorna la password
+        await user_repository.update_user(
+            user_id=user_id,
+            user_data=schemas.UserUpdate(
+                password=user_data.password,
+            ),
         )
     except Exception as e:
         print(f"Error updating password: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update password: {e}",
-        )
-
-    # Controlla se l'aggiornamento ha avuto effetto
-    if result.modified_count == 0 and result.matched_count > 0:
-        return {
-            "message": "Password update did not modify the document (maybe same password?)."
-        }
-    elif result.matched_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found during password update attempt",
         )
 
     return {"message": "Password updated successfully"}
