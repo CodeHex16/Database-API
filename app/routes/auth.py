@@ -147,8 +147,8 @@ def verify_token(token: str, required_scopes: List[str] = None):
 
 @router.get("/verify")
 async def verify_user_token(token: str):
-    verify_token(token=token)
-    return {"status": "valid"}
+    payload = verify_token(token=token)
+    return {"status": "valid", "scopes": payload.get("scopes")}
 
 
 def verify_user(token: str = Depends(oauth2_scheme)):
