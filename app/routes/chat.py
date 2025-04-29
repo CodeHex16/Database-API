@@ -123,7 +123,7 @@ async def change_chat_name(
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
-    await chat_repository.update(chat_id, {"name": new_name})
+    await chat_repository.update_chat(chat_id, {"name": new_name})
 
     return {"message": "Chat name updated successfully"}
 
