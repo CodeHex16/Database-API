@@ -4,6 +4,8 @@ from typing import List, Optional
 from datetime import datetime
 from pydantic import EmailStr
 import requests
+from bson import ObjectId
+from bson.errors import InvalidId
 
 from app.database import get_db
 from app.repositories.chat_repository import ChatRepository
@@ -24,6 +26,21 @@ router = APIRouter(
 
 def get_chat_repository(db=Depends(get_db)):
     return ChatRepository(db)
+
+
+@router.post("")  # response_model=List[schemas.ChatResponse]
+async def get_new_chat(
+    current_user=Depends(verify_user),
+    chat_repository=Depends(get_chat_repository),
+):
+    user_email = current_user.get("sub")
+
+    if not user_email:
+        raise HTTPException(status_code=400, detail="Invalid user information in token")
+
+    chats = await chat_repository.initialize_chat(user_email)
+
+    return {"chat_id": str(chats["_id"])}
 
 
 @router.get("", response_model=List[schemas.ChatResponse])
@@ -54,13 +71,16 @@ async def get_chats(
     return result
 
 
-@router.put("/{chat_id}", response_model=schemas.ChatResponse)
+@router.patch("/{chat_id}", response_model=schemas.ChatResponse)
 async def update_chat(
     chat_id: str,
     chat_update: schemas.ChatResponse,
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Aggiunge un messaggio a una chat esistente.
+    """
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
@@ -79,7 +99,7 @@ async def update_chat(
     # Recupera la chat aggiornata
     updated_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
     if not updated_chat:
-         raise HTTPException(status_code=404, detail="Chat not found after update")
+        raise HTTPException(status_code=404, detail="Chat not found after update")
 
     return {
         "id": str(updated_chat["_id"]),
@@ -87,6 +107,25 @@ async def update_chat(
         "user_email": updated_chat.get("user_email"),
         "created_at": updated_chat.get("created_at"),
     }
+
+
+@router.patch("/{chat_id}/name")
+async def change_chat_name(
+    chat_id: str,
+    new_name: str,
+    current_user=Depends(verify_user),
+    chat_repository=Depends(get_chat_repository),
+):
+    user_email = current_user.get("sub")
+
+    # Verifica che la chat esista e appartenga all'utente
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
+    if not existing_chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    await chat_repository.update(chat_id, {"name": new_name})
+
+    return {"message": "Chat name updated successfully"}
 
 
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -106,30 +145,12 @@ async def delete_chat(
     return None
 
 
-@router.get("/{chat_id}/messages", response_model=schemas.ChatMessages)
-async def get_chat_messages(
-    chat_id: str,
-    current_user=Depends(verify_user),
-    chat_repository=Depends(get_chat_repository),
-):
-
-    user_email = current_user.get("sub")
-
-    # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
-    if not existing_chat:
-        raise HTTPException(status_code=404, detail="Chat not found")
-
-    result = {
-        "name": existing_chat.get("name", "Chat senza nome"),
-        "messages": existing_chat.get("messages", []),
-    }
-
-    return result
-
-
-@router.post("/{chat_id}/messages", response_model=schemas.Message)
-async def create_chat_message(
+@router.post(
+    "/{chat_id}/messages",
+    response_model=schemas.Message,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_message_to_chat(
     chat_id: str,
     message: schemas.MessageCreate,
     current_user=Depends(verify_user),
@@ -154,28 +175,13 @@ async def create_chat_message(
     return message_data
 
 
-@router.get("/new_chat")  # response_model=List[schemas.ChatResponse]
-async def get_new_chat(
-    current_user=Depends(verify_user),
-    chat_repository=Depends(get_chat_repository),
-):
-    user_email = current_user.get("sub")
-
-    if not user_email:
-        raise HTTPException(status_code=400, detail="Invalid user information in token")
-
-    chats = await chat_repository.initialize_chat(user_email)
-
-    return {"chat_id": str(chats["_id"])}
-
-
-@router.put("/{chat_id}/name")
-async def change_chat_name(
+@router.get("/{chat_id}/messages", response_model=schemas.ChatMessages)
+async def get_chat_messages(
     chat_id: str,
-    new_name: str,
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
@@ -183,6 +189,9 @@ async def change_chat_name(
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
-    await chat_repository.update(chat_id, {"name": new_name})
+    result = {
+        "name": existing_chat.get("name", "Chat senza nome"),
+        "messages": existing_chat.get("messages", []),
+    }
 
-    return {"message": "Chat name updated successfully"}
+    return result

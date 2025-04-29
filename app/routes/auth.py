@@ -52,30 +52,6 @@ def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     return UserRepository(db)
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register_user(
-    user: schemas.UserAuth, user_repository=Depends(get_user_repository)
-):
-    """
-    Inserisce un nuovo utente nella collection user.
-    """
-    # Verifica se l'utente esiste già
-    db_user = await user_repository.get_by_email(user.email)
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
-        )
-
-    # Crea un nuovo utente
-    hashed_password = get_password_hash(user.password)
-    user_data = schemas.User(
-        email=user.email, hashed_password=hashed_password, is_initialized=False
-    ).model_dump()
-
-    await user_repository.create(user_data)
-    return {"message": "User created successfully"}
-
-
 async def authenticate_user(email: str, password: str, user_repo: UserRepository):
     """
     Ritorna true se l'utente esiste e se la password inserita è quella associata alla mail passata come parametro; altrimenti false.
@@ -97,7 +73,7 @@ async def check_user_initialized(token: str, user_repo: UserRepository):
         payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
         user_email = payload.get("sub")
         if not user_email:
-             raise HTTPException(status_code=403, detail="User not exists")
+            raise HTTPException(status_code=403, detail="User not exists")
 
         user = await user_repo.get_by_email(user_email)
         if not user:
@@ -130,6 +106,64 @@ def create_access_token(
     return encoded_jwt
 
 
+def verify_token(token: str, required_scopes: List[str] = None):
+    """
+    Verifica la validità del token JWT e restituisce il payload decodificato.
+    """
+    try:
+        payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=403, detail="Token is invalid or expired")
+
+        if required_scopes:
+            user_permissions = payload.get("scopes", [])
+            print(f"User permissions: {user_permissions}")
+            if not any(scope in user_permissions for scope in required_scopes):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Permesso negato. Richiesto ruolo {required_scopes}",
+                )
+        return payload
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Token is invalid or expired")
+
+
+def verify_user(token: str = Depends(oauth2_scheme)):
+    """
+    Verifica la validità del token JWT e restituisce il payload decodificato.
+    """
+    return verify_token(token)
+
+
+def verify_admin(token: str = Depends(oauth2_scheme)):
+    return verify_token(token, required_scopes=AccessRoles.ADMIN)
+
+
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register_user(
+    user: schemas.UserAuth, user_repository=Depends(get_user_repository)
+):
+    """
+    Inserisce un nuovo utente nella collection user.
+    """
+    # Verifica se l'utente esiste già
+    db_user = await user_repository.get_by_email(user.email)
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
+        )
+
+    # Crea un nuovo utente
+    hashed_password = get_password_hash(user.password)
+    user_data = schemas.User(
+        email=user.email, hashed_password=hashed_password, is_initialized=False
+    ).model_dump()
+
+    await user_repository.create(user_data)
+    return {"message": "User created successfully"}
+
+
 @router.post("/token", response_model=schemas.Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -160,29 +194,6 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-def verify_token(token: str, required_scopes: List[str] = None):
-    """
-    Verifica la validità del token JWT e restituisce il payload decodificato.
-    """
-    try:
-        payload = jwt.decode(token, SECRET_KEY_JWT, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise HTTPException(status_code=403, detail="Token is invalid or expired")
-
-        if required_scopes:
-            user_permissions = payload.get("scopes", [])
-            print(f"User permissions: {user_permissions}")
-            if not any(scope in user_permissions for scope in required_scopes):
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"Permesso negato. Richiesto ruolo {required_scopes}",
-                )
-        return payload
-    except JWTError:
-        raise HTTPException(status_code=403, detail="Token is invalid or expired")
-
-
 @router.get("/verify")
 async def verify_user_token(
     token: str, user_repository: UserRepository = Depends(get_user_repository)
@@ -200,17 +211,6 @@ async def verify_user_token(
         }
 
     return {"status": "valid"}
-
-
-def verify_user(token: str = Depends(oauth2_scheme)):
-    """
-    Verifica la validità del token JWT e restituisce il payload decodificato.
-    """
-    return verify_token(token)
-
-
-def verify_admin(token: str = Depends(oauth2_scheme)):
-    return verify_token(token, required_scopes=AccessRoles.ADMIN)
 
 
 @router.get("/only_admin")

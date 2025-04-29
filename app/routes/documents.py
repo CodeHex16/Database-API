@@ -37,27 +37,7 @@ def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     return DocumentRepository(db)
 
 
-@router.get("/", response_model=List[schemas.Document], status_code=status.HTTP_200_OK)
-async def get_documents(
-    current_user=Depends(verify_admin),
-    document_repository=Depends(get_document_repository),
-):
-    """
-    Restituisce la lista di tutti i documenti.
-    """
-
-    documents = await document_repository.get_documents()
-
-    if not documents:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Nessun documento trovato",
-        )
-
-    return documents
-
-
-@router.post("/upload")
+@router.post("")
 async def upload_document(
     document: schemas.Document,
     current_user=Depends(verify_admin),
@@ -91,7 +71,27 @@ async def upload_document(
     return status.HTTP_201_CREATED
 
 
-@router.delete("/delete")
+@router.get("", response_model=List[schemas.Document], status_code=status.HTTP_200_OK)
+async def get_documents(
+    current_user=Depends(verify_admin),
+    document_repository=Depends(get_document_repository),
+):
+    """
+    Restituisce la lista di tutti i documenti.
+    """
+
+    documents = await document_repository.get_documents()
+
+    if not documents:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nessun documento trovato",
+        )
+
+    return documents
+
+
+@router.delete("/{file_path}")
 async def delete_document(
     file_path: str,
     admin: schemas.UserAuth,

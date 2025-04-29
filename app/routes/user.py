@@ -32,7 +32,7 @@ ALGORITHM = "HS256"
 
 
 @router.get(
-    "/",
+    "",
     response_model=List[schemas.User],
     status_code=status.HTTP_200_OK,
 )
@@ -54,33 +54,8 @@ async def get_users(
     return users
 
 
-@router.get(
-    "/{user_id}",
-    response_model=schemas.User,
-    status_code=status.HTTP_200_OK,
-)
-async def get_user(
-    user_id: EmailStr,
-    current_user=Depends(verify_admin),
-    user_repo: UserRepository = Depends(get_user_repository),
-):
-    """
-    Restituisce i dati di un utente specifico.
-    """
-    # Ottiene i dati dell'utente
-    user = await user_repo.get_by_email(user_id)
-
-    # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-    return user
-
-
 @router.post(
-    "/register/{user_email}",
+    "/{user_id}",
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
@@ -125,8 +100,75 @@ async def register_user(
     return {"message": "User registered successfully", "password": password}
 
 
+@router.get(
+    "/{user_id}",
+    response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
+)
+async def get_user(
+    user_id: EmailStr,
+    current_user=Depends(verify_admin),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    """
+    Restituisce i dati di un utente specifico.
+    """
+    # Ottiene i dati dell'utente
+    user = await user_repo.get_by_email(user_id)
+
+    # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user
+
+
+# TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
+@router.put(
+    "/{user_id}",
+    status_code=status.HTTP_200_OK,
+)
+async def update_user(
+    user_id: EmailStr,
+    user_new_data: schemas.UserUpdate,
+    current_user=Depends(verify_admin),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    """
+    Modifica i dati di un utente esistente.
+    La modifica può includere la password, lo stato di inizializzazione,
+    la flag _remember_me_ e gli scopes. L'email (_id) non può essere modificata.
+    Se per uno dei campi viene fornito è None (null nel body json della richiesta),
+    il valore attuale rimarrà invariato.
+    """
+    # Aggiorna i dati dell'utente nel database
+    try:
+        result = await user_repo.update_user(
+            user_id=user_id,
+            user_data=user_new_data,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update user: {e}",
+        )
+
+    # Controlla se l'aggiornamento ha avuto effetto
+    if result.modified_count == 0 and result.matched_count > 0:
+        return {"message": "User data is already up to date."}
+    elif result.matched_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found during update attempt",
+        )
+
+    return {"message": "User updated successfully"}
+
+
 @router.delete(
-    "/delete/{user_id}",
+    "/{user_id}",
     status_code=status.HTTP_200_OK,
 )
 async def delete_user(
@@ -171,50 +213,8 @@ async def delete_user(
     return {"message": "User deleted successfully"}
 
 
-# TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
-@router.put(
-    "/update/{user_id}",
-    status_code=status.HTTP_200_OK,
-)
-async def update_user(
-    user_id: EmailStr,
-    user_new_data: schemas.UserUpdate,
-    current_user=Depends(verify_admin),
-    user_repo: UserRepository = Depends(get_user_repository),
-):
-    """
-    Modifica i dati di un utente esistente.
-    La modifica può includere la password, lo stato di inizializzazione,
-    la flag _remember_me_ e gli scopes. L'email (_id) non può essere modificata.
-    Se per uno dei campi viene fornito è None (null nel body json della richiesta),
-    il valore attuale rimarrà invariato.
-    """
-    # Aggiorna i dati dell'utente nel database
-    try:
-        result = await user_repo.update_user(
-            user_id=user_id,
-            user_data=user_new_data,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update user: {e}",
-        )
-
-    # Controlla se l'aggiornamento ha avuto effetto
-    if result.modified_count == 0 and result.matched_count > 0:
-        return {"message": "User data is already up to date."}
-    elif result.matched_count == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found during update attempt",
-        )
-
-    return {"message": "User updated successfully"}
-
-
-@router.put(
-    "/update_password/{user_id}",
+@router.patch(
+    "/{user_id}/password",
     status_code=status.HTTP_200_OK,
 )
 async def update_password(

@@ -18,30 +18,8 @@ def get_faq_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     return FaqRepository(db)
 
 
-@router.get(
-    "/",
-    response_model=List[schemas.FAQ],
-    status_code=status.HTTP_200_OK,
-)
-async def get_faqs(
-    faq_repo: FaqRepository = Depends(get_faq_repository),
-):
-    """
-    Restituisce una lista di tutte le FAQ.
-    """
-    faqs = await faq_repo.get_faqs()
-
-    # Ritorna la lista di user se esistente, altrimenti solleva un'eccezione 404
-    if not faqs:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No faqs found",
-        )
-    return faqs
-
-
 @router.post(
-    "/create",
+    "",
     status_code=status.HTTP_201_CREATED,
 )
 async def create_faq(
@@ -68,8 +46,30 @@ async def create_faq(
     return status.HTTP_201_CREATED
 
 
+@router.get(
+    "",
+    response_model=List[schemas.FAQ],
+    status_code=status.HTTP_200_OK,
+)
+async def get_faqs(
+    faq_repo: FaqRepository = Depends(get_faq_repository),
+):
+    """
+    Restituisce una lista di tutte le FAQ.
+    """
+    faqs = await faq_repo.get_faqs()
+
+    # Ritorna la lista di user se esistente, altrimenti solleva un'eccezione 404
+    if not faqs:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No faqs found",
+        )
+    return faqs
+
+
 @router.put(
-    "/update/{faq_id}",
+    "/{faq_id}",
 )
 async def update_faq(
     faq_id: str,
@@ -82,7 +82,9 @@ async def update_faq(
     """
     # Aggiorna i campi della FAQ
     try:
-        await faq_repo.update_faq(faq_id=ObjectId(faq_id), faq_data=faq, author_email=current_user.get("sub"))
+        await faq_repo.update_faq(
+            faq_id=ObjectId(faq_id), faq_data=faq, author_email=current_user.get("sub")
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -93,7 +95,7 @@ async def update_faq(
 
 
 @router.delete(
-    "/delete/{faq_id}",
+    "/{faq_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_faq(
