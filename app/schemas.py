@@ -80,6 +80,10 @@ class UserUpdate(BaseModel):
                 raise ValueError(PASSWORD_ERROR_MSG)
         return value
 
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    scopes: Optional[List[str]] = None
 
 class Token(BaseModel):
     access_token: str

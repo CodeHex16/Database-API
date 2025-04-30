@@ -32,49 +32,49 @@ ALGORITHM = "HS256"
 
 
 @router.post(
-    "/{user_id}",
-    status_code=status.HTTP_201_CREATED,
+	"",
+	status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    user_email: EmailStr,
-    scopes: Optional[List[str]] = None,
-    current_user=Depends(verify_admin),
-    user_repo: UserRepository = Depends(get_user_repository),
+	user_data: schemas.UserCreate,
+	current_user=Depends(verify_admin),
+	user_repo: UserRepository = Depends(get_user_repository),
 ):
-    """
-    Crea un nuovo utente con una password temporanea casuale.
-    L'utente riceverà un'email con la password temporanea.
-    """
-    # Genera una password temporanea casuale
-    password = os.urandom(16).hex()
-    # print(f"Generated password: {password}")
+	"""
+	Crea un nuovo utente con una password temporanea casuale.
+	L'utente riceverà un'email con la password temporanea.
+	"""
+	# Genera una password temporanea casuale
+	password = os.urandom(16).hex()
+	# print(f"Generated password: {password}")
 
-    hashed_password = get_password_hash(password)
-    new_user = {
-        # "_id": get_uuid3(user_email),
-        "_id": user_email,
-        "hashed_password": hashed_password,
-        "is_initialized": False,
-        "remember_me": False,
-        "scopes": scopes if scopes else ["user"],
-    }
+	hashed_password = get_password_hash(password)
+	new_user = {
+		# "_id": get_uuid3(user_data.user_email), # Usa user_data
+		"_id": user_data.email, # Usa user_data
+		"name": user_data.name, # Usa user_data
+		"hashed_password": hashed_password,
+		"is_initialized": False,
+		"remember_me": False,
+		"scopes": user_data.scopes if user_data.scopes else ["user"], # Usa user_data
+	}
 
-    try:
-        await user_repo.create_user(user_data=new_user)
-    except DuplicateKeyError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists",
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create user: {e}",
-        )
+	try:
+		await user_repo.create_user(user_data=new_user)
+	except DuplicateKeyError:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="User with this email already exists",
+		)
+	except Exception as e:
+		raise HTTPException(
+			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+			detail=f"Failed to create user: {e}",
+		)
 
-    # Invia un'email all'utente con la password temporanea
+	# Invia un'email all'utente con la password temporanea
 
-    return {"message": "User registered successfully", "password": password}
+	return {"message": "User registered successfully", "password": password}
 
 
 @router.get(
