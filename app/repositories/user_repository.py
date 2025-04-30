@@ -27,6 +27,7 @@ class UserRepository:
                 {
                     # "_id": get_uuid3("test@test.it"),
                     "_id": "test@test.it",
+                    "name": "Test User",
                     "hashed_password": get_password_hash("testtest"),
                     "is_initialized": False,
                     "remember_me": False,
@@ -44,6 +45,7 @@ class UserRepository:
                 {
                     # "_id": get_uuid3("admin@test.it"),
                     "_id": "admin@test.it",
+                    "name": "Test Admin",
                     "hashed_password": get_password_hash("adminadmin"),
                     "is_initialized": True,
                     "remember_me": False,

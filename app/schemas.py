@@ -37,9 +37,8 @@ PASSWORD_ERROR_MSG = "La password deve contenere almeno 8 caratteri, una lettera
 
 
 class User(BaseModel):
-    # id: UUID3 = Field(default_factory=UUID3, alias="_id")
-    # email: EmailStr
-    _id: EmailStr
+    id: EmailStr = Field(alias="_id")
+    name: str
     hashed_password: str
     is_initialized: bool = False
     remember_me: bool = False
