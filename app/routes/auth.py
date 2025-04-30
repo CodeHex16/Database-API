@@ -129,11 +129,6 @@ def verify_token(token: str, required_scopes: List[str] = None):
         raise HTTPException(status_code=403, detail="Token is invalid or expired")
 
 
-@router.get("/verify")
-async def verify_user_token(token: str):
-    payload = verify_token(token=token)
-    return {"status": "valid", "scopes": payload.get("scopes")}
-
 
 def verify_user(token: str = Depends(oauth2_scheme)):
     """
@@ -207,7 +202,7 @@ async def verify_user_token(
     """
     Chiamata GET che verifica la validità del token JWT.
     """
-    verify_token(token=token)
+    payload = verify_token(token=token)
 
     is_initialized = await check_user_initialized(token, user_repository)
 
@@ -216,7 +211,7 @@ async def verify_user_token(
             "status": "not_initialized",
         }
 
-    return {"status": "valid"}
+    return {"status": "valid", "scopes": payload.get("scopes")}
 
 
 @router.get("/only_admin")
