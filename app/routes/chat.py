@@ -1,22 +1,14 @@
-import os
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
 from datetime import datetime
-from pydantic import EmailStr
-import requests
-from bson import ObjectId
-from bson.errors import InvalidId
 
 from app.database import get_db
 from app.repositories.chat_repository import ChatRepository
 import app.schemas as schemas
 from app.routes.auth import (
-    verify_token,
-    oauth2_scheme,
     verify_user,
     verify_admin,
 )
-from typing_extensions import Annotated
 
 router = APIRouter(
     prefix="/chats",
@@ -28,11 +20,24 @@ def get_chat_repository(db=Depends(get_db)):
     return ChatRepository(db)
 
 
-@router.post("")  # response_model=List[schemas.ChatResponse]
+@router.get(
+    "/new_chat",
+)
 async def get_new_chat(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Crea una nuova chat per l'utente autenticato.
+
+    ### Returns:
+    * **chat_id**: ID della chat appena creata.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante la creazione della chat.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante la creazione della chat.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non viene trovata la chat.
+    """
     user_email = current_user.get("sub")
 
     if not user_email:
@@ -48,6 +53,18 @@ async def get_chats(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Recupera i metadati delle chat dell'utente autenticato.
+
+    ### Returns:
+    * **reuslt (List[ChatResponse])**: Lista di chat dell'utente.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante il recupero delle chat.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il recupero delle chat.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non vengono trovate chat.
+    """
+
     # Verifica il token e ottieni l'email dell'utente
     user_email = current_user.get("sub")
 
@@ -71,44 +88,6 @@ async def get_chats(
     return result
 
 
-@router.patch("/{chat_id}", response_model=schemas.ChatResponse)
-async def update_chat(
-    chat_id: str,
-    chat_update: schemas.ChatResponse,
-    current_user=Depends(verify_user),
-    chat_repository=Depends(get_chat_repository),
-):
-    """
-    Aggiunge un messaggio a una chat esistente.
-    """
-    user_email = current_user.get("sub")
-
-    # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
-    if not existing_chat:
-        raise HTTPException(status_code=404, detail="Chat not found")
-
-    # Aggiorna solo i campi che sono stati forniti
-    update_data = {}
-    if chat_update.name is not None:
-        update_data["name"] = chat_update.name
-
-    if update_data:
-        await chat_repository.update_chat(chat_id, update_data)
-
-    # Recupera la chat aggiornata
-    updated_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
-    if not updated_chat:
-        raise HTTPException(status_code=404, detail="Chat not found after update")
-
-    return {
-        "id": str(updated_chat["_id"]),
-        "name": updated_chat.get("name", "Chat senza nome"),
-        "user_email": updated_chat.get("user_email"),
-        "created_at": updated_chat.get("created_at"),
-    }
-
-
 @router.patch("/{chat_id}/name")
 async def change_chat_name(
     chat_id: str,
@@ -116,6 +95,18 @@ async def change_chat_name(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Modifica il nome della chat.
+
+    ### Args:
+    * **chat_id(str)**: ID della chat da modificare.
+    * **new_name(str)**: Nuovo nome da assegnare alla chat.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante la modifica del nome della chat.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante la modifica del nome della chat.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non viene trovata la chat.
+    """
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
@@ -125,8 +116,6 @@ async def change_chat_name(
 
     await chat_repository.update_chat(chat_id, {"name": new_name})
 
-    return {"message": "Chat name updated successfully"}
-
 
 @router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_chat(
@@ -134,6 +123,17 @@ async def delete_chat(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Elimina una chat esistente.
+
+    ### Args:
+    * **chat_id**: ID della chat da eliminare.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante l'eliminazione della chat.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'eliminazione della chat.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non viene trovata la chat.
+    """
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
@@ -142,7 +142,6 @@ async def delete_chat(
         raise HTTPException(status_code=404, detail="Chat not found")
 
     await chat_repository.delete_chat(chat_id, user_email)
-    return None
 
 
 @router.post(

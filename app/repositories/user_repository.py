@@ -102,7 +102,7 @@ class UserRepository:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found",
             )
-
+  
         # Prepara il payload di aggiornamento
         update_payload = {}
         if user_data.password is not None:

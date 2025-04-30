@@ -20,8 +20,8 @@ from app.repositories.user_repository import UserRepository
 from app.utils import get_password_hash, get_uuid3, verify_password
 
 router = APIRouter(
-    prefix="/user",
-    tags=["user"],
+    prefix="/users",
+    tags=["users"],
 )
 
 SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
@@ -29,29 +29,6 @@ if not SECRET_KEY_JWT:
     raise ValueError("SECRET_KEY_JWT non impostata nelle variabili d'ambiente")
 
 ALGORITHM = "HS256"
-
-
-@router.get(
-    "",
-    response_model=List[schemas.User],
-    status_code=status.HTTP_200_OK,
-)
-async def get_users(
-    current_user=Depends(verify_admin),
-    user_repo: UserRepository = Depends(get_user_repository),
-):
-    """
-    Restituisce una lista di tutti gli utenti registrati.
-    """
-    users = await user_repo.get_users()
-
-    # Ritorna la lista di user se esistente, altrimeni solleva un'eccezione 404
-    if not users:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No users found",
-        )
-    return users
 
 
 @router.post(
@@ -98,6 +75,29 @@ async def register_user(
     # Invia un'email all'utente con la password temporanea
 
     return {"message": "User registered successfully", "password": password}
+
+
+@router.get(
+    "",
+    response_model=List[schemas.User],
+    status_code=status.HTTP_200_OK,
+)
+async def get_users(
+    current_user=Depends(verify_admin),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    """
+    Restituisce una lista di tutti gli utenti registrati.
+    """
+    users = await user_repo.get_users()
+
+    # Ritorna la lista di user se esistente, altrimeni solleva un'eccezione 404
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No users found",
+        )
+    return users
 
 
 @router.get(
@@ -214,11 +214,10 @@ async def delete_user(
 
 
 @router.patch(
-    "/{user_id}/password",
+    "/password",
     status_code=status.HTTP_200_OK,
 )
 async def update_password(
-    user_id: EmailStr,
     user_data: schemas.UserUpdatePassword,
     current_user=Depends(verify_user),
     user_repository: UserRepository = Depends(get_user_repository),
@@ -229,7 +228,7 @@ async def update_password(
     # Aggiorna la password dell'utente
     try:
         # Verifica che l'utente esista e che la password sia corretta
-        user_current_data = await user_repository.get_by_email(user_id)
+        user_current_data = await user_repository.get_by_email(current_user.get("sub"))
         if not verify_password(
             user_data.current_password, user_current_data.get("hashed_password")
         ):
@@ -237,12 +236,16 @@ async def update_password(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Wrong password",
             )
-
         # Aggiorna la password
+        initialized = None
+        if user_current_data.get("is_initialized") is False:
+            initialized = True
+
         await user_repository.update_user(
-            user_id=user_id,
+            user_id=current_user.get("sub"),
             user_data=schemas.UserUpdate(
                 password=user_data.password,
+                is_initialized=initialized,
             ),
         )
     except Exception as e:

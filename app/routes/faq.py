@@ -11,7 +11,7 @@ from app.database import get_db
 from app.repositories.faq_repository import FaqRepository
 from app.routes.auth import verify_admin
 
-router = APIRouter(prefix="/faq", tags=["faq"])
+router = APIRouter(prefix="/faqs", tags=["faq"])
 
 
 def get_faq_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
@@ -29,6 +29,11 @@ async def create_faq(
 ):
     """
     Crea una nuova FAQ.
+
+    Args:
+    * **faq (schemas.FAQ)**: La FAQ da creare.
+    * **current_user**: L'utente che ha creato la FAQ, dovrà essere un _admin_ per poter svolgere questa operazione; verrà salvato come _author_email_ nel database.
+    * **faq_repo (FaqRepository)**: Il repository delle FAQ.
     """
     try:
         await faq_repo.insert_faq(faq=faq, author_email=current_user.get("sub"))
@@ -49,9 +54,9 @@ async def create_faq(
 @router.get(
     "",
     response_model=List[schemas.FAQ],
-    status_code=status.HTTP_200_OK,
 )
 async def get_faqs(
+    current_user=Depends(verify_admin),
     faq_repo: FaqRepository = Depends(get_faq_repository),
 ):
     """
