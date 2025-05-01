@@ -95,7 +95,6 @@ class ChatResponse(BaseModel):
     id: str
     name: str
     user_email: EmailStr
-    # TODO: created_at va gestito dal server
     created_at: Optional[datetime] = None
 
 
@@ -106,7 +105,6 @@ class ChatList(BaseModel):
 class Message(BaseModel):
     sender: str
     content: str
-    # TODO: timestamp va gestito dal server
     timestamp: datetime
 
 
@@ -124,7 +122,6 @@ class Document(BaseModel):
     title: str
     file_path: str
     owner_email: str
-    # TODO: update_at va gestito dal server
     uploaded_at: datetime
 
 

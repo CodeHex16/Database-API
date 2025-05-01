@@ -1,6 +1,8 @@
+from pymongo.errors import DuplicateKeyError
+from datetime import datetime
+
 from app.utils import get_uuid3
 import app.schemas as schemas
-from pymongo.errors import DuplicateKeyError
 
 class DocumentRepository:
 	def __init__(self, database):
@@ -30,7 +32,7 @@ class DocumentRepository:
 			"title": document.title,
 			"file_path": document.file_path,
 			"owner_email": document.owner_email,
-			"uploaded_at": document.uploaded_at,
+			"uploaded_at": datetime.now(),
 		}
 		try:
 			return await self.collection.insert_one(document_data)

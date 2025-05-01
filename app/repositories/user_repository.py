@@ -85,7 +85,6 @@ class UserRepository:
                 detail="User not found",
             )
 
-    # TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
     async def update_user(self, user_id: EmailStr, user_data: schemas.UserUpdate):
         """
         Aggiorna un utente esistente nel database.
