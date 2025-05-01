@@ -155,6 +155,21 @@ async def add_message_to_chat(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Aggiunge un messaggio a una chat esistente.
+
+    ### Args:
+    * **chat_id**: ID della chat a cui aggiungere il messaggio.
+    * **message**: Messaggio da aggiungere (contenuto e mittente).
+
+    ### Returns:
+    * **message**: Messaggio aggiunto (contenuto, mittente e timestamp).
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante l'aggiunta del messaggio.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiunta del messaggio.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non viene trovata la chat.
+    """
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
@@ -180,7 +195,20 @@ async def get_chat_messages(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Recupera i messaggi di una chat esistente.
 
+    ### Args:
+    * **chat_id**: ID della chat di cui recuperare i messaggi.
+
+    ### Returns:
+    * **result (ChatMessages)**: Messaggi della chat nome e lista di messaggi.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante il recupero dei messaggi.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il recupero dei messaggi.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non viene trovata la chat.
+    """
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
