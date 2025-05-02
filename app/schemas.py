@@ -44,14 +44,7 @@ class User(BaseModel):
 
 
 class UserAuth(BaseModel):
-    email: EmailStr
-    password: str
-
-    @field_validator("password")
-    def check_password_complexity(cls, value: str):
-        if not re.match(PASSWORD_REGEX, value):
-            raise ValueError(PASSWORD_ERROR_MSG)
-        return value
+    current_password: str
 
 
 class UserUpdatePassword(BaseModel):
@@ -66,6 +59,7 @@ class UserUpdatePassword(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    id: EmailStr = Field(alias="_id")
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
@@ -78,10 +72,15 @@ class UserUpdate(BaseModel):
                 raise ValueError(PASSWORD_ERROR_MSG)
         return value
 
+class UserDelete(BaseModel):
+    id: EmailStr = Field(alias="_id")
+
+
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
     scopes: Optional[List[str]] = None
+
 
 class Token(BaseModel):
     access_token: str
@@ -150,11 +149,13 @@ class FAQUpdate(BaseModel):
     def check_title_length(cls, value: Optional[str]):
         if len(value) > 20:
             raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
-        return value    
+        return value
+
 
 class FAQResponse(FAQ):
     created_at: str
     updated_at: str
+
 
 class EmailSchema(BaseModel):
     email: List[EmailStr]

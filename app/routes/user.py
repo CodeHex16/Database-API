@@ -49,12 +49,12 @@ async def register_user(
 
     hashed_password = get_password_hash(password)
     new_user = {
-        "_id": user_data.email,  
-        "name": user_data.name, 
+        "_id": user_data.email,
+        "name": user_data.name,
         "hashed_password": hashed_password,
         "is_initialized": False,
         "remember_me": False,
-        "scopes": user_data.scopes if user_data.scopes else ["user"],  
+        "scopes": user_data.scopes if user_data.scopes else ["user"],
     }
 
     try:
@@ -102,38 +102,37 @@ async def get_users(
     return users
 
 
-@router.get(
-    "/{user_id}",
-    response_model=schemas.User,
-    status_code=status.HTTP_200_OK,
-)
-async def get_user(
-    user_id: EmailStr,
-    current_user=Depends(verify_admin),
-    user_repo: UserRepository = Depends(get_user_repository),
-):
-    """
-    Restituisce i dati di un utente specifico.
-    """
-    # Ottiene i dati dell'utente
-    user = await user_repo.get_by_email(user_id)
+# @router.get(
+#     "/{user_id}",
+#     response_model=schemas.User,
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_user(
+#     user_id: EmailStr,
+#     current_user=Depends(verify_admin),
+#     user_repo: UserRepository = Depends(get_user_repository),
+# ):
+#     """
+#     Restituisce i dati di un utente specifico.
+#     """
+#     # Ottiene i dati dell'utente
+#     user = await user_repo.get_by_email(user_id)
 
-    # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-    return user
+#     # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="User not found",
+#         )
+#     return user
 
 
 # TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
 @router.put(
-    "/{user_id}",
+    "",
     status_code=status.HTTP_200_OK,
 )
 async def update_user(
-    user_id: EmailStr,
     user_new_data: schemas.UserUpdate,
     current_user=Depends(verify_admin),
     user_repo: UserRepository = Depends(get_user_repository),
@@ -148,7 +147,7 @@ async def update_user(
     # Aggiorna i dati dell'utente nel database
     try:
         result = await user_repo.update_user(
-            user_id=user_id,
+            user_id=user_new_data.id,
             user_data=user_new_data,
         )
     except Exception as e:
@@ -170,12 +169,11 @@ async def update_user(
 
 
 @router.delete(
-    "/{user_id}",
+    "",
     status_code=status.HTTP_200_OK,
 )
 async def delete_user(
-    user_id: EmailStr,
-    # TODO: verificare se ha senso controllare il reinserimento della password così:
+	delete_user: schemas.UserDelete,
     admin: schemas.UserAuth,
     current_user=Depends(verify_admin),
     user_repository: UserRepository = Depends(get_user_repository),
@@ -186,22 +184,25 @@ async def delete_user(
     try:
         # Verifica che l'admin esista e che la password sia corretta
         valid_user = await authenticate_user(
-            admin.email, admin.password, user_repository
+            current_user.get("sub"), admin.current_password, user_repository
         )
+        print(f"valid_user: {valid_user}")
         if not valid_user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
             )
-        if valid_user.get("_id") != admin.get("email"):
+        if valid_user.get("_id") != current_user.get("sub"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Credentials do not match the logged-in admin",
             )
 
         await user_repository.delete_user(
-            user_id=user_id,
+            user_id=delete_user.id,
         )
+    except HTTPException as e:
+        raise e
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

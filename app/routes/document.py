@@ -116,7 +116,9 @@ async def delete_document(
     """
 
     # Verifica se l'admin ha reinserito correttamente la propria password
-    valid_user = await authenticate_user(admin.email, admin.password, user_repository)
+    valid_user = await authenticate_user(
+        admin.email, admin.current_password, user_repository
+    )
     if not valid_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
