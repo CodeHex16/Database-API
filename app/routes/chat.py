@@ -12,7 +12,7 @@ from app.routes.auth import (
 
 router = APIRouter(
     prefix="/chats",
-    tags=["chats"],
+    tags=["chat"],
 )
 
 
@@ -156,14 +156,14 @@ async def add_message_to_chat(
     chat_repository=Depends(get_chat_repository),
 ):
     """
-    Aggiunge un messaggio a una chat esistente.
+    Aggiunge un messaggio ad una chat esistente.
 
     ### Args:
     * **chat_id**: ID della chat a cui aggiungere il messaggio.
     * **message**: Messaggio da aggiungere (contenuto e mittente).
 
     ### Returns:
-    * **message**: Messaggio aggiunto (contenuto, mittente e timestamp).
+    * **message_data**: Messaggio aggiunto (contenuto, mittente e timestamp).
 
     ### Raises:
     * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante l'aggiunta del messaggio.
@@ -177,14 +177,8 @@ async def add_message_to_chat(
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
-    message_data = {
-        "sender": message.sender,
-        "content": message.content,
-        "timestamp": datetime.now(),
-    }
-
     # Aggiungi il messaggio alla chat
-    await chat_repository.add_message(chat_id, message_data)
+    message_data = await chat_repository.add_message(chat_id, message)
 
     return message_data
 
@@ -202,7 +196,7 @@ async def get_chat_messages(
     * **chat_id**: ID della chat di cui recuperare i messaggi.
 
     ### Returns:
-    * **result (ChatMessages)**: Messaggi della chat nome e lista di messaggi.
+    * **result (ChatMessages)**: Nome della chat e lista dei messaggi contenuti in quella chat.
 
     ### Raises:
     * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante il recupero dei messaggi.

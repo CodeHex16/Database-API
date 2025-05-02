@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr, UUID3, Field, field_validator
 from bson import ObjectId
 from typing import Union, Optional, List, Annotated, Any, Callable
-from datetime import datetime
 from pydantic_core import core_schema
 import re
 
@@ -31,7 +30,6 @@ class _ObjectIdPydanticAnnotation:
 
 PydanticObjectId = Annotated[ObjectId, _ObjectIdPydanticAnnotation]
 
-# Define the regex pattern as a constant
 PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$"
 PASSWORD_ERROR_MSG = "La password deve contenere almeno 8 caratteri, una lettera maiuscola, una lettera maiuscola, una cifra e un carattere speciale."
 
@@ -95,7 +93,7 @@ class ChatResponse(BaseModel):
     id: str
     name: str
     user_email: EmailStr
-    created_at: Optional[datetime] = None
+    created_at: Optional[str] = None
 
 
 class ChatList(BaseModel):
@@ -105,7 +103,7 @@ class ChatList(BaseModel):
 class Message(BaseModel):
     sender: str
     content: str
-    timestamp: datetime
+    timestamp: str
 
 
 class ChatMessages(BaseModel):
@@ -122,7 +120,7 @@ class Document(BaseModel):
     title: str
     file_path: str
     owner_email: str
-    uploaded_at: datetime
+    uploaded_at: str
 
 
 class FAQ(BaseModel):
@@ -152,8 +150,11 @@ class FAQUpdate(BaseModel):
     def check_title_length(cls, value: Optional[str]):
         if len(value) > 20:
             raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
-        return value
+        return value    
 
+class FAQResponse(FAQ):
+    created_at: str
+    updated_at: str
 
 class EmailSchema(BaseModel):
     email: List[EmailStr]

@@ -1,7 +1,8 @@
 from bson import ObjectId
 from datetime import datetime
-import uuid
 
+from app.utils import get_timezone
+import app.schemas as schemas
 
 class ChatRepository:
     def __init__(self, database):
@@ -24,12 +25,12 @@ class ChatRepository:
         chat_data = {
             "name": "Chat senza nome",
             "user_email": user_email,
-            "created_at": datetime.now(),
+            "created_at": datetime.now(get_timezone()).isoformat(),
             "messages": [
                 {
                     "sender": "bot",
                     "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
-                    "timestamp": datetime.now(),
+                    "timestamp": datetime.now(get_timezone()).isoformat(),
                 }
             ],
         }
@@ -47,17 +48,19 @@ class ChatRepository:
             {"_id": ObjectId(chat_id)}, {"$set": data}
         )
 
-    async def add_message(self, chat_id, message):
+    async def add_message(self, chat_id, message: schemas.MessageCreate):
         message_data = {
-            "sender": message.get("sender"),
-            "content": message.get("content"),
-            "timestamp": datetime.now(),
+            "sender": message.sender,
+            "content": message.content,
+            "timestamp": datetime.now(get_timezone()).isoformat(),
         }
 
-        return await self.collection.update_one(
+        await self.collection.update_one(
             {"_id": ObjectId(chat_id)},
             {"$push": {"messages": message_data}},
         )
+
+        return message_data
 
     async def update_chat_title(self, chat_id, title):
         return await self.collection.update_one(

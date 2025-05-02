@@ -1,7 +1,6 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List, Optional
-from datetime import datetime
 from pydantic import EmailStr
 import requests
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -22,7 +21,7 @@ from app.service.email_service import EmailService
 
 router = APIRouter(
     prefix="/users",
-    tags=["users"],
+    tags=["user"],
 )
 
 SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")

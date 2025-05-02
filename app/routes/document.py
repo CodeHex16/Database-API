@@ -1,7 +1,6 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List, Optional
-from datetime import datetime
 from pydantic import EmailStr
 import requests
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -20,7 +19,7 @@ from app.routes.auth import (
 
 router = APIRouter(
     prefix="/documents",
-    tags=["documents"],
+    tags=["document"],
 )
 
 

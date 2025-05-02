@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import HTTPException, status
 
 import app.schemas as schemas
-
+from app.utils import get_timezone
 
 class FaqRepository:
     def __init__(self, database):
@@ -57,8 +57,8 @@ class FaqRepository:
                 "question": faq.question,
                 "answer": faq.answer,
                 "author_email": author_email,
-                "created_at": datetime.now(),
-                "updated_at": datetime.now(),
+                "created_at": datetime.now(get_timezone()).isoformat(),
+                "updated_at": datetime.now(get_timezone()).isoformat(),
             }
             result = await self.collection.insert_one(insert_payload)
             return result.inserted_id
@@ -122,7 +122,7 @@ class FaqRepository:
                     else faq_current_data.get("answer")
                 ),
                 "author_email": author_email,
-                "updated_at": datetime.now(),
+                "updated_at": datetime.now(get_timezone()).isoformat(),
             }
 
             # Esegue l'aggiornamento

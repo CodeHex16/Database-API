@@ -11,3 +11,4 @@ pymongo
 uvicorn
 jwt
 fastapi-mail
+pytz

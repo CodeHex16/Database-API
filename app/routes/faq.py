@@ -3,7 +3,6 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 from bson import ObjectId
 from bson.errors import InvalidId
-from datetime import datetime
 
 import app.schemas as schemas
 from typing import List
@@ -53,7 +52,7 @@ async def create_faq(
 
 @router.get(
     "",
-    response_model=List[schemas.FAQ],
+    response_model=List[schemas.FAQResponse],
 )
 async def get_faqs(
     current_user=Depends(verify_admin),
