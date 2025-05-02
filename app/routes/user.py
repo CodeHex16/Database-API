@@ -102,29 +102,28 @@ async def get_users(
     return users
 
 
-# @router.get(
-#     "/{user_id}",
-#     response_model=schemas.User,
-#     status_code=status.HTTP_200_OK,
-# )
-# async def get_user(
-#     user_id: EmailStr,
-#     current_user=Depends(verify_admin),
-#     user_repo: UserRepository = Depends(get_user_repository),
-# ):
-#     """
-#     Restituisce i dati di un utente specifico.
-#     """
-#     # Ottiene i dati dell'utente
-#     user = await user_repo.get_by_email(user_id)
+@router.get(
+    "/me",
+    response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
+)
+async def get_user(
+    current_user=Depends(verify_user),
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    """
+    Restituisce dell'utente che richiede l'operazione.
+    """
+    # Ottiene i dati dell'utente
+    user = await user_repo.get_by_email(current_user.get("sub"))
 
-#     # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="User not found",
-#         )
-#     return user
+    # Ritorna i dati dell'utente se esistente, altrimenti solleva un'eccezione 404
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    return user
 
 
 # TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
