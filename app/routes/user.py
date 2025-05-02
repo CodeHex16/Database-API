@@ -47,17 +47,15 @@ async def register_user(
     """
     # Genera una password temporanea casuale
     password = os.urandom(16).hex()
-    # print(f"Generated password: {password}")
 
     hashed_password = get_password_hash(password)
     new_user = {
-        # "_id": get_uuid3(user_data.user_email), # Usa user_data
-        "_id": user_data.email,  # Usa user_data
-        "name": user_data.name,  # Usa user_data
+        "_id": user_data.email,  
+        "name": user_data.name, 
         "hashed_password": hashed_password,
         "is_initialized": False,
         "remember_me": False,
-        "scopes": user_data.scopes if user_data.scopes else ["user"],  # Usa user_data
+        "scopes": user_data.scopes if user_data.scopes else ["user"],  
     }
 
     try:
@@ -74,7 +72,7 @@ async def register_user(
         )
 
     await EmailService().send_email(
-        to=[user_email],
+        to=[user_data.email],
         subject=f"[Suppl-AI] Registrazione utente",
         body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
     )
