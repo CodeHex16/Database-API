@@ -10,3 +10,4 @@ pytest
 pymongo
 uvicorn
 jwt
+fastapi-mail

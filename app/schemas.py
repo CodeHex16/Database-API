@@ -153,3 +153,7 @@ class FAQUpdate(BaseModel):
         if len(value) > 20:
             raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
         return value
+
+
+class EmailSchema(BaseModel):
+    email: List[EmailStr]
