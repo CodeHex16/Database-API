@@ -176,6 +176,7 @@ async def login_for_access_token(
         await user_repository.update_user(
             user_id=user.get("_id"),
             user_data=schemas.UserUpdate(
+                _id=user.get("_id"),
                 remember_me=remember_me,
             ),
         )
