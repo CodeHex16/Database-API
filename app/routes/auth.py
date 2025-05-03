@@ -12,8 +12,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from dotenv import load_dotenv
 
 
-from app.repositories.user_repository import UserRepository
-from app.database import get_db
+from app.repositories.user_repository import UserRepository, get_user_repository
 import app.schemas as schemas
 from app.utils import verify_password
 from app.service.auth_service import AccessRoles
@@ -42,11 +41,6 @@ def init_router(app_instance):
     yield
 
 
-def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
-    """
-    Restituisce il repository della collection users.
-    """
-    return UserRepository(db)
 
 
 async def authenticate_user(email: str, password: str, user_repo: UserRepository):

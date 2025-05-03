@@ -7,14 +7,11 @@ from bson.errors import InvalidId
 import app.schemas as schemas
 from typing import List
 from app.database import get_db
-from app.repositories.faq_repository import FaqRepository
-from app.routes.auth import verify_admin
+from app.repositories.faq_repository import FaqRepository, get_faq_repository
+from app.repositories.user_repository import UserRepository, get_user_repository
+from app.routes.auth import verify_admin, authenticate_user
 
 router = APIRouter(prefix="/faqs", tags=["faq"])
-
-
-def get_faq_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
-    return FaqRepository(db)
 
 
 @router.post(
@@ -35,7 +32,7 @@ async def create_faq(
     * **faq_repo (FaqRepository)**: Il repository delle FAQ.
     """
     try:
-        await faq_repo.insert_faq(faq=faq, author_email=current_user.get("sub"))
+        inserted = await faq_repo.insert_faq(faq=faq, author_email=current_user.get("sub"))
     except DuplicateKeyError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -47,7 +44,10 @@ async def create_faq(
             detail=f"An error occurred: {str(e)}",
         )
 
-    return status.HTTP_201_CREATED
+    return {
+        "id": str(inserted),
+        "status": status.HTTP_201_CREATED,
+	}
 
 
 @router.get(
@@ -100,16 +100,33 @@ async def update_faq(
 
 @router.delete(
     "/{faq_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
 )
 async def delete_faq(
     faq_id: str,
+    admin: schemas.UserAuth,
     current_user=Depends(verify_admin),
     faq_repo: FaqRepository = Depends(get_faq_repository),
+    user_repository: UserRepository = Depends(get_user_repository),
 ):
     """
     Cancella una FAQ.
     """
+    # Verifica che l'admin esista e che la password sia corretta
+    valid_user = await authenticate_user(
+        current_user.get("sub"), admin.current_password, user_repository
+    )
+    if not valid_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+    if valid_user.get("_id") != current_user.get("sub"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Credentials do not match the logged-in admin",
+        )
+
     try:
         await faq_repo.delete_faq(faq_id=ObjectId(faq_id))
     except Exception as e:

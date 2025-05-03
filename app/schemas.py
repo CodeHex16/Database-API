@@ -130,8 +130,8 @@ class FAQ(BaseModel):
 
     @field_validator("title")
     def check_title_length(cls, value: str):
-        if len(value) > 20:
-            raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
+        if len(value) > 30:
+            raise ValueError(f"Il titolo deve essere lungo massimo 30 caratteri")
         return value
 
     model_config = {
@@ -153,6 +153,7 @@ class FAQUpdate(BaseModel):
 
 
 class FAQResponse(FAQ):
+    id: PydanticObjectId = Field(alias="_id")
     created_at: str
     updated_at: str
 

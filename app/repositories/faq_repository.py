@@ -1,10 +1,13 @@
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+from app.database import get_db
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 import app.schemas as schemas
 from app.utils import get_timezone
+
 
 class FaqRepository:
     def __init__(self, database):
@@ -156,3 +159,7 @@ class FaqRepository:
         except Exception as e:
             print(f"Error deleting FAQ: {e}")
             raise Exception(f"Error deleting FAQ: {e}")
+
+
+def get_faq_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
+    return FaqRepository(db)

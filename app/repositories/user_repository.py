@@ -1,6 +1,10 @@
 import uuid
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
 from pydantic import EmailStr
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from bson import ObjectId
+from app.database import get_db
+
 
 from app.utils import get_password_hash, get_uuid3, verify_password
 import app.schemas as schemas
@@ -153,3 +157,9 @@ class UserRepository:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to update user: {e}",
             )
+
+def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    Restituisce il repository della collection users.
+    """
+    return UserRepository(db)

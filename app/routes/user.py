@@ -13,9 +13,9 @@ from app.routes.auth import (
     verify_admin,
     verify_user,
     authenticate_user,
-    get_user_repository,
 )
-from app.repositories.user_repository import UserRepository
+from app.repositories.user_repository import UserRepository, get_user_repository
+
 from app.utils import get_password_hash, get_uuid3, verify_password
 from app.service.email_service import EmailService
 
@@ -172,7 +172,7 @@ async def update_user(
     status_code=status.HTTP_200_OK,
 )
 async def delete_user(
-	delete_user: schemas.UserDelete,
+    delete_user: schemas.UserDelete,
     admin: schemas.UserAuth,
     current_user=Depends(verify_admin),
     user_repository: UserRepository = Depends(get_user_repository),
