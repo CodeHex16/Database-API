@@ -45,6 +45,9 @@ class User(BaseModel):
 
 class UserAuth(BaseModel):
     current_password: str
+    
+class UserForgotPassword(BaseModel):
+    email: EmailStr
 
 
 class UserUpdatePassword(BaseModel):
@@ -59,18 +62,11 @@ class UserUpdatePassword(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    id: EmailStr = Field(alias="_id")
+    id: Optional[EmailStr] = Field(alias="_id")
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
     scopes: Optional[List[str]] = None
-
-    @field_validator("password")
-    def check_optional_password_complexity(cls, value: Optional[str]):
-        if value is not None:
-            if not re.match(PASSWORD_REGEX, value):
-                raise ValueError(PASSWORD_ERROR_MSG)
-        return value
 
 class UserDelete(BaseModel):
     id: EmailStr = Field(alias="_id")

@@ -258,3 +258,48 @@ async def update_password(
         )
 
     return {"message": "Password updated successfully"}
+
+
+@router.post(
+    "/password_reset",
+    status_code=status.HTTP_200_OK,
+)
+async def reset_password(
+    user_data: schemas.UserForgotPassword,
+    user_repository: UserRepository = Depends(get_user_repository),
+):
+    """
+    Invia un'email per il reset della password.
+    """
+    # Invia l'email per il reset della password
+    try:
+        user = await user_repository.get_by_email(user_data.email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+
+        password = os.urandom(16).hex()
+
+
+        await user_repository.update_user(
+            user_id=user_data.email,
+            user_data=schemas.UserUpdate(
+                _id=user_data.email,
+                password=password,
+                is_initialized=False,
+            ),
+        )
+
+        # Invia l'email con il token
+        await EmailService().send_email(
+            to=[user.get("_id")],
+            subject="[Suppl-AI] Password Reset",
+            body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to send password reset email: {e}",
+)
