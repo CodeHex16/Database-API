@@ -23,15 +23,6 @@ class FaqRepository:
     async def get_faq_by_id(self, faq_id: ObjectId):
         """
         Restituisce una FAQ specifica in base all'ID fornito.
-
-        Args:
-            faq_id (ObjectId): L'ID della FAQ da recuperare.
-
-        Returns:
-            La FAQ corrispondente all'ID fornito.
-
-        Raises:
-            Exception: Se si verifica un errore durante il recupero della FAQ.
         """
         try:
             return await self.collection.find_one({"_id": faq_id})
@@ -43,16 +34,6 @@ class FaqRepository:
         """
         Inserisce una nuova FAQ nel database.
         L'ID viene generato automaticamente da MongoDB.
-
-        Args:
-            faq (schemas.FAQ): L'oggetto FAQ da inserire.
-
-        Returns:
-            ObjectId: L'ID del documento inserito.
-
-        Raises:
-            DuplicateKeyError: Se si verifica un errore di chiave duplicata.
-            Exception: Se si verifica qualsiasi altro errore durante l'inserimento.
         """
         try:
             insert_payload = {
@@ -77,12 +58,6 @@ class FaqRepository:
     ):
         """
         Aggiorna una FAQ esistente nel database.
-
-        Args:
-            faq (schemas.FAQ): L'oggetto FAQ da aggiornare.
-
-        Returns:
-            Il risultato dell'operazione di aggiornamento.
         """
         try:
             # print(f"Updating FAQ: {faq}")

@@ -26,10 +26,16 @@ async def create_faq(
     """
     Crea una nuova FAQ.
 
-    Args:
+    ### Args:
     * **faq (schemas.FAQ)**: La FAQ da creare.
-    * **current_user**: L'utente che ha creato la FAQ, dovrà essere un _admin_ per poter svolgere questa operazione; verrà salvato come _author_email_ nel database.
-    * **faq_repo (FaqRepository)**: Il repository delle FAQ.
+
+    ### Returns:
+    * **id**: L'ID della FAQ appena creata.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se la FAQ esiste già o si verifica un errore durante l'inserimento.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'inserimento.
+    * **DuplicateKeyError**: Se la FAQ esiste già nel database.
     """
     try:
         inserted = await faq_repo.insert_faq(
@@ -62,6 +68,12 @@ async def get_faqs(
 ):
     """
     Restituisce una lista di tutte le FAQ.
+
+    ### Returns:
+    * **result (List[schemas.FAQResponse])**: Lista di FAQ.
+
+    ### Raises:
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non ci sono FAQ nel database.
     """
     faqs = await faq_repo.get_faqs()
 
@@ -85,6 +97,14 @@ async def update_faq(
 ):
     """
     Aggiorna una FAQ esistente.
+
+    ### Args:
+    * **faq_id**: L'ID della FAQ da aggiornare.
+    * **faq (schemas.FAQUpdate)**: I dati della FAQ da aggiornare.
+    
+    ### Raises:
+    * **HTTPException.HTTP_304_NOT_MODIFIED**: Se la FAQ non esiste o se i dati non sono cambiati.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento.
     """
     # Aggiorna i campi della FAQ
     try:
@@ -111,6 +131,15 @@ async def delete_faq(
 ):
     """
     Cancella una FAQ.
+
+    ### Args:
+    * **faq_id**: L'ID della FAQ da cancellare.
+    * **admin (schemas.UserAuth)**: La conferma della password dell'admin necessaria per l'eliminazione.
+
+    ### Raises:
+    * **HTTPException.HTTP_401_UNAUTHORIZED**: Se le credenziali non sono valide.
+    * **HTTPException.HTTP_403_FORBIDDEN**: Se le credenziali non corrispondono all'admin loggato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'eliminazione.
     """
     # Verifica che l'admin esista e che la password sia corretta
     valid_user = await authenticate_user(
