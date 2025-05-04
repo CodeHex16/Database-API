@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List, Optional
-from datetime import datetime
+from typing import List
+from bson import ObjectId
 
 from app.database import get_db
 from app.repositories.chat_repository import ChatRepository
@@ -216,3 +216,66 @@ async def get_chat_messages(
     }
 
     return result
+
+
+@router.patch("/{chat_id}/messages/{message_id}/rating")
+async def rate_message(
+    chat_id: str,
+    message_id: str,
+    rating: bool,
+    current_user=Depends(verify_user),
+    chat_repository=Depends(get_chat_repository),
+):
+    """
+    Aggiunge una valutazione ad un messaggio esistente in una chat.
+
+    ### Args:
+    * **chat_id**: ID della chat contenente il messaggio.
+    * **message_id**: ID del messaggio da valutare.
+    * **rating**: Valutazione da assegnare al messaggio (True o False).
+
+    ### Raises:
+    * **HTTPException.HTTP_304_NOT_MODIFIED**: Se la valutazione del messaggio non è cambiata.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non viene trovata la chat o il messaggio.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante la valutazione del messaggio.
+    """
+    user_email = current_user.get("sub")
+
+    # Verifica che la chat esista e appartenga all'utente
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
+    if not existing_chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    # Aggiorna la valutazione del messaggio
+    try:
+        result = await chat_repository.update_message_rating(ObjectId(chat_id), ObjectId(message_id), rating)
+
+        print(f"Result: {result}")
+        if result.matched_count == 0:
+            raise HTTPException(
+                status_code=404,
+            )
+        if result.modified_count == 0:
+            raise HTTPException(
+                status_code=304,
+                detail="Message rating already updated",
+            )
+    except HTTPException as e:
+        if e.status_code == 404:
+            raise HTTPException(status_code=404, detail="Message not found")
+        if e.status_code == 304:
+            print(f"Message rating already updated")
+            raise HTTPException(
+                status_code=304,
+                detail="Message rating already updated",
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to update message rating: {e.detail}",
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update message rating: {e}",
+        )

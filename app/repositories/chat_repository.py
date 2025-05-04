@@ -4,6 +4,7 @@ from datetime import datetime
 from app.utils import get_timezone
 import app.schemas as schemas
 
+
 class ChatRepository:
     def __init__(self, database):
         self.database = database
@@ -28,9 +29,11 @@ class ChatRepository:
             "created_at": datetime.now(get_timezone()).isoformat(),
             "messages": [
                 {
+                    "_id": ObjectId(),
                     "sender": "bot",
                     "content": "Ciao, sono SupplAI, il tuo assistente per gli acquisti personale! Come posso aiutarti?",
                     "timestamp": datetime.now(get_timezone()).isoformat(),
+                    "rating": None,
                 }
             ],
         }
@@ -50,9 +53,11 @@ class ChatRepository:
 
     async def add_message(self, chat_id, message: schemas.MessageCreate):
         message_data = {
+            "_id": ObjectId(),
             "sender": message.sender,
             "content": message.content,
             "timestamp": datetime.now(get_timezone()).isoformat(),
+            "rating": None,
         }
 
         await self.collection.update_one(
@@ -66,3 +71,17 @@ class ChatRepository:
         return await self.collection.update_one(
             {"_id": ObjectId(chat_id)}, {"$set": {"name": title}}
         )
+
+    async def update_message_rating(
+        self, chat_id: ObjectId, message_id: ObjectId, rating: bool
+    ):
+        """
+        Aggiorna la valutazione di un messaggio solo se questo è di un bot.
+        """
+        query_filter = {
+            "_id": chat_id,
+            "messages": {"$elemMatch": {"_id": message_id, "sender": "bot"}},
+        }
+        update_operation = {"$set": {"messages.$.rating": rating}}
+
+        return await self.collection.update_one(query_filter, update_operation)

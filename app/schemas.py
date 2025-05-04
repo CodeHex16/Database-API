@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from bson import ObjectId
-from typing import Union, Optional, List, Annotated, Any, Callable
+from typing import Optional, List, Annotated, Any, Callable
 from pydantic_core import core_schema
 import re
 
@@ -46,6 +46,7 @@ class User(BaseModel):
 class UserAuth(BaseModel):
     current_password: str
 
+
 class UserForgotPassword(BaseModel):
     email: EmailStr
 
@@ -67,6 +68,7 @@ class UserUpdate(BaseModel):
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
     scopes: Optional[List[str]] = None
+
 
 class UserDelete(BaseModel):
     id: EmailStr = Field(alias="_id")
@@ -96,9 +98,11 @@ class ChatList(BaseModel):
 
 
 class Message(BaseModel):
+    id: PydanticObjectId = Field(alias="_id")
     sender: str
     content: str
     timestamp: str
+    rating: Optional[bool]
 
 
 class ChatMessages(BaseModel):
@@ -109,6 +113,7 @@ class ChatMessages(BaseModel):
 class MessageCreate(BaseModel):
     content: str
     sender: str = "user"
+    rating: Optional[bool] = None
 
 
 class Document(BaseModel):

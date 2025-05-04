@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import EmailStr
 from bson import ObjectId
 
-from app.utils import get_uuid3, get_timezone, get_object_id
+from app.utils import get_timezone, get_object_id
 import app.schemas as schemas
 
 class DocumentRepository:

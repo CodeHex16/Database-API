@@ -1,8 +1,6 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from typing import List, Optional
-from pydantic import EmailStr
-import requests
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 from jose import jwt, JWTError
@@ -16,7 +14,7 @@ from app.routes.auth import (
 )
 from app.repositories.user_repository import UserRepository, get_user_repository
 
-from app.utils import get_password_hash, get_uuid3, verify_password
+from app.utils import get_password_hash, verify_password
 from app.service.email_service import EmailService
 
 router = APIRouter(

@@ -6,7 +6,7 @@ from bson import ObjectId
 from app.database import get_db
 
 
-from app.utils import get_password_hash, get_uuid3, verify_password
+from app.utils import get_password_hash, verify_password
 import app.schemas as schemas
 
 
