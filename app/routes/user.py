@@ -245,6 +245,7 @@ async def update_password(
         await user_repository.update_user(
             user_id=current_user.get("sub"),
             user_data=schemas.UserUpdate(
+                _id=current_user.get("sub"),
                 password=user_data.password,
                 is_initialized=initialized,
             ),
