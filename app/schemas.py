@@ -114,8 +114,11 @@ class MessageCreate(BaseModel):
 class Document(BaseModel):
     title: str
     file_path: str
-    owner_email: str
     uploaded_at: str
+
+
+class DocumentResponse(Document):
+    owner_email: EmailStr
 
 
 class FAQ(BaseModel):
