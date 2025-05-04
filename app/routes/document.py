@@ -1,8 +1,6 @@
-import os
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from typing import List, Optional
-from pydantic import EmailStr
-import requests
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
+from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
@@ -16,6 +14,7 @@ from app.routes.auth import (
     authenticate_user,
     get_user_repository,
 )
+from app.utils import get_object_id
 
 router = APIRouter(
     prefix="/documents",
@@ -36,7 +35,7 @@ def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     return DocumentRepository(db)
 
 
-@router.post("")
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def upload_document(
     document: schemas.Document,
     current_user=Depends(verify_admin),
@@ -45,18 +44,18 @@ async def upload_document(
     """
     Carica un documento nel database.
 
-    Args:
-        document (schemas.Document): Il documento da caricare.
+    ### Args:
+    * **document (schemas.Document)**: Il documento da caricare.
 
-    Returns:
-        status.HTTP_201_CREATED: Se il documento è stato caricato con successo.
-
-    Raises:
-        HTTPException: Se il documento già esiste o se si verifica un errore durante il caricamento.
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se il documento esiste già o si verifica un errore durante l'inserimento.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'upload del file.
+    * **DuplicateKeyError**: Se il documento esiste già nel database.
     """
-    document.owner_email = current_user.get("sub")
     try:
-        await document_repository.insert_document(document)
+        await document_repository.insert_document(
+            owner_email=current_user.get("sub"), document=document
+        )
     except DuplicateKeyError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -67,16 +66,24 @@ async def upload_document(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Upload del file fallito: {e}",
         )
-    return status.HTTP_201_CREATED
 
 
-@router.get("", response_model=List[schemas.Document], status_code=status.HTTP_200_OK)
+@router.get(
+    "", response_model=List[schemas.DocumentResponse], status_code=status.HTTP_200_OK
+)
 async def get_documents(
     current_user=Depends(verify_admin),
     document_repository=Depends(get_document_repository),
 ):
     """
     Restituisce la lista di tutti i documenti.
+
+    ### Returns:
+    * **List[schemas.DocumentResponse]**: La lista dei documenti.
+
+    ### Raises:
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non ci sono documenti nel database.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il recupero dei documenti.
     """
 
     documents = await document_repository.get_documents()
@@ -101,23 +108,20 @@ async def delete_document(
     """
     Elimina un documento dal database.
 
-    Args:
-        file_path (str): Il percorso del file da eliminare.
-        admin (schemas.UserAuth): Credentials of the admin confirming the action.
-        current_user: The verified admin user from the token.
-        document_repository: Injected document repository.
-        user_repository: Injected user repository.
+    ### Args:
+    * **file_path**: Il percorso del file da eliminare.
+    * **admin (schemas.UserAuth)**: Le credenziali dell'amministratore.
 
-    Returns:
-        status.HTTP_200_OK: Se il documento è stato eliminato con successo.
-
-    Raises:
-        HTTPException: Se le credenziali non sono valide, il documento non esiste o si verifica un errore.
+    ### Raises:
+    * **HTTPException.HTTP_401_UNAUTHORIZED**: Se le credenziali non sono valide.
+    * **HTTPException.HTTP_403_FORBIDDEN**: Se l'utente non è autorizzato a eliminare il documento.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se il documento non viene trovato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'eliminazione del documento.
     """
 
     # Verifica se l'admin ha reinserito correttamente la propria password
     valid_user = await authenticate_user(
-        admin.email, admin.current_password, user_repository
+        current_user.get("sub"), admin.current_password, user_repository
     )
     if not valid_user:
         raise HTTPException(
@@ -132,7 +136,8 @@ async def delete_document(
         )
 
     try:
-        result = await document_repository.delete_document(file_path)
+        file_id = get_object_id(file_path)
+        result = await document_repository.delete_document(file_id=file_id)
         if result.deleted_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -144,4 +149,3 @@ async def delete_document(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Eliminazione del file fallita: {e}",
         )
-    return {"message": "Documento eliminato con successo"}

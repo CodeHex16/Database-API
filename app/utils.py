@@ -1,6 +1,8 @@
 from passlib.context import CryptContext
 import uuid
 import pytz
+import hashlib
+from bson import ObjectId
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -20,6 +22,9 @@ def get_uuid3(text):
     """
     return str(uuid.uuid3(uuid.NAMESPACE_DNS, text))
 
+def get_object_id(text):
+    hash_bytes = hashlib.md5(text.encode('utf-8')).digest()[:12]
+    return ObjectId(hash_bytes)
 
 def get_timezone():
     """

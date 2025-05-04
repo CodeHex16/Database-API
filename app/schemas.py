@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, UUID3, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from bson import ObjectId
 from typing import Union, Optional, List, Annotated, Any, Callable
 from pydantic_core import core_schema
@@ -45,7 +45,7 @@ class User(BaseModel):
 
 class UserAuth(BaseModel):
     current_password: str
-    
+
 class UserForgotPassword(BaseModel):
     email: EmailStr
 
@@ -114,11 +114,11 @@ class MessageCreate(BaseModel):
 class Document(BaseModel):
     title: str
     file_path: str
-    uploaded_at: str
 
 
 class DocumentResponse(Document):
     owner_email: EmailStr
+    uploaded_at: str
 
 
 class FAQ(BaseModel):

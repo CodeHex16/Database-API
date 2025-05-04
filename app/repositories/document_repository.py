@@ -1,7 +1,9 @@
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime
+from pydantic import EmailStr
+from bson import ObjectId
 
-from app.utils import get_uuid3, get_timezone
+from app.utils import get_uuid3, get_timezone, get_object_id
 import app.schemas as schemas
 
 class DocumentRepository:
@@ -12,26 +14,16 @@ class DocumentRepository:
     async def get_documents(self):
         return await self.collection.find().to_list(length=None)
 
-    async def insert_document(self, document: schemas.Document):
+    async def insert_document(self, owner_email: EmailStr, document: schemas.Document):
         """
         Inserisce un nuovo documento nel database.
-        Il documento viene memorizzato con un UUID generato dal suo percorso file come chiave primaria.
-        
-        Args:
-            document (schemas.Document): L'oggetto documento da inserire.
-            
-        Returns:
-            Il risultato dell'operazione di inserimento.
-            
-        Raises:
-            DuplicateKeyError: Se un documento con lo stesso percorso esiste già.
-            Exception: Se si verifica qualsiasi altro errore durante l'inserimento.
+        Il documento viene memorizzato con un ObjectId generato dal suo percorso file come chiave primaria.
         """
         document_data = {
-            "_id": get_uuid3(document.file_path),
+            "_id": get_object_id(document.file_path),
             "title": document.title,
             "file_path": document.file_path,
-            "owner_email": document.owner_email,
+            "owner_email": owner_email,
             "uploaded_at": datetime.now(get_timezone()).isoformat(),
         }
         try:
@@ -43,22 +35,13 @@ class DocumentRepository:
             print(f"Error inserting document: {e}")
             raise Exception(f"Error inserting document: {e}")
 
-    async def delete_document(self, file_path: str):
+    async def delete_document(self, file_id: ObjectId):
         """
-        Elimina un documento dal database in base al percorso del file.
-
-        Args:
-        - file_path (str): Il percorso del file da eliminare.
-
-        Returns:
-        - Il risultato dell'operazione di eliminazione.
-
-        Raises:
-        - Exception: Se si verifica un errore durante l'eliminazione.
+        Elimina un documento dal database in base all'ObjectId passato come file_id.
         """
         try:
-            print(f"Sto cancellando il documento da MongoDB {file_path}")
-            return await self.collection.delete_one({"_id": get_uuid3(file_path)})
+            print(f"Sto cancellando il documento da MongoDB {file_id}")
+            return await self.collection.delete_one({"_id": file_id})
         except Exception as e:
             print(f"Error deleting document: {e}")
             raise Exception(f"Error deleting document: {e}")
