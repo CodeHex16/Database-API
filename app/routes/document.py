@@ -97,7 +97,7 @@ async def get_documents(
     return documents
 
 
-@router.delete("/{file_path}")
+@router.delete("/{file_path}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(
     file_path: str,
     admin: schemas.UserAuth,

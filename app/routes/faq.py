@@ -32,7 +32,9 @@ async def create_faq(
     * **faq_repo (FaqRepository)**: Il repository delle FAQ.
     """
     try:
-        inserted = await faq_repo.insert_faq(faq=faq, author_email=current_user.get("sub"))
+        inserted = await faq_repo.insert_faq(
+            faq=faq, author_email=current_user.get("sub")
+        )
     except DuplicateKeyError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -47,7 +49,7 @@ async def create_faq(
     return {
         "id": str(inserted),
         "status": status.HTTP_201_CREATED,
-	}
+    }
 
 
 @router.get(
@@ -95,12 +97,10 @@ async def update_faq(
             detail=f"An error occurred: {str(e)}",
         )
 
-    return status.HTTP_200_OK
-
 
 @router.delete(
     "/{faq_id}",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_faq(
     faq_id: str,
@@ -134,5 +134,3 @@ async def delete_faq(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An error occurred: {str(e)}",
         )
-
-    return status.HTTP_200_OK

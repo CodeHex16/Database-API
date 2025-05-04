@@ -169,7 +169,7 @@ async def update_user(
 
 @router.delete(
     "",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_user(
     delete_user: schemas.UserDelete,
@@ -212,7 +212,6 @@ async def delete_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete user: {e}",
         )
-    return {"message": "User deleted successfully"}
 
 
 @router.patch(
@@ -282,7 +281,6 @@ async def reset_password(
 
         password = os.urandom(16).hex()
 
-
         await user_repository.update_user(
             user_id=user_data.email,
             user_data=schemas.UserUpdate(
@@ -302,4 +300,4 @@ async def reset_password(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to send password reset email: {e}",
-)
+        )
