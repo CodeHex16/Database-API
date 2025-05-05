@@ -116,6 +116,10 @@ class MessageCreate(BaseModel):
     rating: Optional[bool] = None
 
 
+class MessageRatingUpdate(BaseModel):
+    rating: Optional[bool] = None
+
+
 class Document(BaseModel):
     title: str
     file_path: str

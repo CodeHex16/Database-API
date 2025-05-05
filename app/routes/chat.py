@@ -222,7 +222,7 @@ async def get_chat_messages(
 async def rate_message(
     chat_id: str,
     message_id: str,
-    rating: bool,
+    rating_data: schemas.MessageRatingUpdate,
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
@@ -248,7 +248,9 @@ async def rate_message(
 
     # Aggiorna la valutazione del messaggio
     try:
-        result = await chat_repository.update_message_rating(ObjectId(chat_id), ObjectId(message_id), rating)
+        result = await chat_repository.update_message_rating(
+            ObjectId(chat_id), ObjectId(message_id), rating_data.rating
+        )
 
         print(f"Result: {result}")
         if result.matched_count == 0:
@@ -264,7 +266,6 @@ async def rate_message(
         if e.status_code == 404:
             raise HTTPException(status_code=404, detail="Message not found")
         if e.status_code == 304:
-            print(f"Message rating already updated")
             raise HTTPException(
                 status_code=304,
                 detail="Message rating already updated",
