@@ -126,6 +126,7 @@ class Document(BaseModel):
 
 
 class DocumentResponse(Document):
+    id: PydanticObjectId = Field(alias="_id")
     owner_email: EmailStr
     uploaded_at: str
 
