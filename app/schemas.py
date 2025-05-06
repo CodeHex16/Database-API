@@ -131,7 +131,7 @@ class DocumentResponse(Document):
     uploaded_at: str
 
 class DocumentDelete(BaseModel):
-    id: PydanticObjectId = Field(alias="_id")
+    id: str
 
 class FAQ(BaseModel):
     # id: PydanticObjectId = Field(alias="_id")

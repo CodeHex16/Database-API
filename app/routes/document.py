@@ -138,7 +138,8 @@ async def delete_document(
     try:
         print("Deleting document:", file)
         print("AAAAAAAAAAAAAAAAAAAAA")
-        result = await document_repository.delete_document(file_id=file.id)
+        print("ObjectId:", ObjectId(file.id))
+        result = await document_repository.delete_document(file_id=ObjectId(file.id))
         if result.deleted_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
