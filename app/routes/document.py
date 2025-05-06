@@ -97,9 +97,9 @@ async def get_documents(
     return documents
 
 
-@router.delete("/{file_path}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(
-    file_path: str,
+    file: schemas.DocumentDelete,
     admin: schemas.UserAuth,
     current_user=Depends(verify_admin),
     document_repository=Depends(get_document_repository),
@@ -109,7 +109,7 @@ async def delete_document(
     Elimina un documento dal database.
 
     ### Args:
-    * **file_path**: Il percorso del file da eliminare.
+    * **file**: L'id del documento da eliminare.
     * **admin (schemas.UserAuth)**: Le credenziali dell'amministratore.
 
     ### Raises:
@@ -136,8 +136,9 @@ async def delete_document(
         )
 
     try:
-        file_id = get_object_id(file_path)
-        result = await document_repository.delete_document(file_id=file_id)
+        print("Deleting document:", file)
+        print("AAAAAAAAAAAAAAAAAAAAA")
+        result = await document_repository.delete_document(file_id=file.id)
         if result.deleted_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

@@ -130,6 +130,8 @@ class DocumentResponse(Document):
     owner_email: EmailStr
     uploaded_at: str
 
+class DocumentDelete(BaseModel):
+    id: PydanticObjectId = Field(alias="_id")
 
 class FAQ(BaseModel):
     # id: PydanticObjectId = Field(alias="_id")
