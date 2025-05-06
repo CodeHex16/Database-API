@@ -8,14 +8,13 @@ from dotenv import load_dotenv
 
 from app.database import init_db, get_db
 
-from app.routes import auth, chat, documents, user
+from app.routes import auth, chat, document, user, faq
 from app.repositories.user_repository import UserRepository
 
 load_dotenv()
 
 # Ottieni l'URL del MongoDB dall'ambiente
 MONGODB_URL = os.getenv("MONGODB_URL")
-
 
 async def lifespan(app: FastAPI):
     # Startup
@@ -72,5 +71,6 @@ app.add_middleware(
 auth.init_router(app)
 app.include_router(auth.router)
 app.include_router(chat.router)
-app.include_router(documents.router)
+app.include_router(document.router)
 app.include_router(user.router)
+app.include_router(faq.router)
