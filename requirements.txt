@@ -1,6 +1,7 @@
 fastapi[all]
 passlib
 pydantic[email]
+pydantic_core
 bcrypt
 motor
 python-jose
@@ -8,3 +9,6 @@ requests
 pytest
 pymongo
 uvicorn
+jwt
+fastapi-mail
+pytz
