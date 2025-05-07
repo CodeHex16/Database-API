@@ -103,48 +103,34 @@ class UserRepository:
         # Controlla se l'utente esiste
         user_current_data = await self.get_by_email(user_id)
         if not user_current_data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found",
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   
+        provided_data = user_data.model_dump(exclude_unset=True)
+        if not provided_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No data provided for update.",
+            )
         # Prepara il payload di aggiornamento
         update_payload = {}
         if user_data.password is not None:
-            if not verify_password(
-                user_data.password, user_current_data.get("hashed_password")
-            ):
-                update_payload["hashed_password"] = get_password_hash(
-                    user_data.password
-                )
-        if (
-            user_data.is_initialized is not None
-            and user_data.is_initialized != user_current_data.get("is_initialized")
-        ):
+            if not verify_password(user_data.password, user_current_data.get("hashed_password")):
+                update_payload["hashed_password"] = get_password_hash(user_data.password)
+        
+        if (user_data.is_initialized is not None and user_data.is_initialized != user_current_data.get("is_initialized")):
             update_payload["is_initialized"] = user_data.is_initialized
-        if (
-            user_data.remember_me is not None
-            and user_data.remember_me != user_current_data.get("remember_me")
-        ):
+        if (user_data.remember_me is not None and user_data.remember_me != user_current_data.get("remember_me")):
             update_payload["remember_me"] = user_data.remember_me
-        if user_data.scopes is not None and user_data.scopes != user_current_data.get(
-            "scopes"
-        ):
+        if user_data.scopes is not None and user_data.scopes != user_current_data.get("scopes"):
             update_payload["scopes"] = user_data.scopes
 
         # Controlla se ci sono stati cambiamenti nei dati
-        if not update_payload:
-            provided_data = user_data.model_dump(exclude_unset=True)
-            if provided_data:
-                raise HTTPException(
-                    status_code=status.HTTP_304_NOT_MODIFIED,
-                    detail="User data provided matches existing data. No update performed.",
-                )
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="No data provided for update.",
-                )
+        if update_payload == {}:
+            raise HTTPException(
+                status_code=status.HTTP_304_NOT_MODIFIED,
+                detail="User data provided matches existing data. No update performed.",
+            )
+            
 
         try:
             result = await self.collection.update_one(

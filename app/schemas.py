@@ -63,7 +63,7 @@ class UserUpdatePassword(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    id: Optional[EmailStr] = Field(alias="_id")
+    id: Optional[EmailStr] = Field(default=None,alias="_id")
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
