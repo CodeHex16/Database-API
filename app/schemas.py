@@ -173,7 +173,7 @@ class EmailSchema(BaseModel):
     email: List[EmailStr]
 
 
-class SettingsUpdate(BaseModel):
+class Settings(BaseModel):
     color_primary: Optional[str] = None
     color_primary_hover: Optional[str] = None
     color_primary_text: Optional[str] = None

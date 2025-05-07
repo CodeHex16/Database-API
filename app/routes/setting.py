@@ -46,7 +46,7 @@ async def get_settings(
     "/",
 )
 async def update_settings(
-    settings: schemas.SettingsUpdate,
+    settings: schemas.Settings,
     current_user=Depends(verify_admin),
     setting_repository: SettingRepository = Depends(get_setting_repository),
 ):

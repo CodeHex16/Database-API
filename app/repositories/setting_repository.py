@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.database import get_db
-
+from app.schemas import Settings
 
 def get_setting_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     """
@@ -20,7 +20,7 @@ class SettingRepository:
             {
                 "_id": "main",
                 "color_primary": "#5e5c64",
-                "color_primary_hover": "#5e5c64",
+                "color_primary_hover": "#44424a",
                 "color_primary_text": "white",
                 "message_history": 100,
             }
@@ -32,7 +32,7 @@ class SettingRepository:
         """
         return await self.collection.find_one({"_id": "main"})
 
-    async def update_settings(self, settings):
+    async def update_settings(self, settings: Settings):
         """
         Aggiorna le impostazioni dell'applicazione.
         """
