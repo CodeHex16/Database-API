@@ -27,7 +27,7 @@ def chat_repository(mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_chat_by_user_email(chat_repository, mock_database):
+async def test__unit_test__get_chat_by_user_email(chat_repository, mock_database):
     # Define test data
     test_email = "testuser@example.com"
     chat_data = [{"_id": ObjectId(), "name": "Test Chat", "user_email": test_email, "messages": []}]
@@ -44,7 +44,7 @@ async def test_get_chat_by_user_email(chat_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_chat_by_id(chat_repository, mock_database):
+async def test__unit_test__get_chat_by_id(chat_repository, mock_database):
     # Define test data
     test_chat_id = ObjectId()
     test_email = ANY
@@ -63,7 +63,7 @@ async def test_get_chat_by_id(chat_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_initialize_chat(chat_repository, mock_database):
+async def test__unit_test__initialize_chat(chat_repository, mock_database):
     # Define test data
     test_email = "testuser@example.com"
     initial_message = {
@@ -97,7 +97,7 @@ async def test_initialize_chat(chat_repository, mock_database):
     assert chat["messages"][0]["content"] == initial_message["content"]
 
 @pytest.mark.asyncio
-async def test_delete_chat(chat_repository, mock_database):
+async def test__unit_test__delete_chat(chat_repository, mock_database):
     # Define test data
     test_chat_id = ObjectId()
     test_email = "testuser@example.com"
@@ -113,7 +113,7 @@ async def test_delete_chat(chat_repository, mock_database):
     assert result.deleted_count == 1
 
 @pytest.mark.asyncio
-async def test_update_chat(chat_repository, mock_database):
+async def test__unit_test__update_chat(chat_repository, mock_database):
     # Define test data
     test_chat_id = ObjectId()
     update_data = {"name": "Updated Chat Name"}
@@ -133,7 +133,7 @@ async def test_update_chat(chat_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_add_message(chat_repository, mock_database, monkeypatch):
+async def test__unit_test__add_message(chat_repository, mock_database, monkeypatch):
     # Define test data
     test_chat_id = ObjectId()
     test_message = MessageCreate(content="Hello!", sender="user")
@@ -161,7 +161,7 @@ async def test_add_message(chat_repository, mock_database, monkeypatch):
     )
 
 @pytest.mark.asyncio
-async def test_update_chat_title(chat_repository, mock_database):
+async def test__unit_test__update_chat_title(chat_repository, mock_database):
     # Define test data
     test_chat_id = ObjectId()
     new_title = "Updated Chat Name"
@@ -180,7 +180,7 @@ async def test_update_chat_title(chat_repository, mock_database):
     assert result.modified_count == 1
 
 @pytest.mark.asyncio
-async def test_update_message_rating(chat_repository, mock_database):
+async def test__unit_test__update_message_rating(chat_repository, mock_database):
     # Define test data
     test_chat_id = ObjectId()
     test_message_id = ObjectId()
