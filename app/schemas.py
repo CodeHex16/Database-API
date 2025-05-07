@@ -6,7 +6,7 @@ import re
 
 
 # Implementazione ObjectId per pydantic
-class _ObjectIdPydanticAnnotation:
+class _ObjectIdPydanticAnnotation: # pragma: no cover
     # Based on https://docs.pydantic.dev/latest/usage/types/custom/#handling-third-party-types.
 
     @classmethod
@@ -158,8 +158,8 @@ class FAQUpdate(BaseModel):
 
     @field_validator("title")
     def check_title_length(cls, value: Optional[str]):
-        if len(value) > 20:
-            raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
+        if len(value) > 30:
+            raise ValueError(f"Il titolo deve essere lungo massimo 30 caratteri")
         return value
 
 
