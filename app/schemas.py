@@ -171,3 +171,10 @@ class FAQResponse(FAQ):
 
 class EmailSchema(BaseModel):
     email: List[EmailStr]
+
+
+class SettingsUpdate(BaseModel):
+    color_primary: Optional[str] = None
+    color_primary_hover: Optional[str] = None
+    color_primary_text: Optional[str] = None
+    message_history: Optional[int] = None
