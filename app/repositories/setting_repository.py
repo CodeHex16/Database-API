@@ -17,6 +17,8 @@ class SettingRepository:
         self.database = database
         self.collection = database.get_collection("settings")
 
+        print("SettingRepository initialization")
+
         insert_payload = {
                 "color_primary": "#5e5c64",
                 "color_primary_hover": "#44424a",
@@ -26,7 +28,7 @@ class SettingRepository:
         self.collection.update_one(
             {"_id": "main"},
             { 
-                "$set": insert_payload,
+                "$setOnInsert": insert_payload,
             },
             upsert=True,
         )
