@@ -14,10 +14,7 @@ from app.routes.auth import verify_admin, authenticate_user
 router = APIRouter(prefix="/faqs", tags=["faq"])
 
 
-@router.post(
-    "",
-    status_code=status.HTTP_201_CREATED,
-)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_faq(
     faq: schemas.FAQ,
     current_user=Depends(verify_admin),
@@ -58,10 +55,7 @@ async def create_faq(
     }
 
 
-@router.get(
-    "",
-    response_model=List[schemas.FAQResponse],
-)
+@router.get("/", response_model=List[schemas.FAQResponse])
 async def get_faqs(
     current_user=Depends(verify_admin),
     faq_repo: FaqRepository = Depends(get_faq_repository),
@@ -86,9 +80,7 @@ async def get_faqs(
     return faqs
 
 
-@router.put(
-    "/{faq_id}",
-)
+@router.put("/{faq_id}")
 async def update_faq(
     faq_id: str,
     faq: schemas.FAQUpdate,
@@ -118,10 +110,7 @@ async def update_faq(
         )
 
 
-@router.delete(
-    "/{faq_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
+@router.delete("/{faq_id}",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_faq(
     faq_id: str,
     admin: schemas.UserAuth,
