@@ -4,7 +4,7 @@ from datetime import datetime
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 
-from app.repositories.document_repository import DocumentRepository
+from app.repositories.document_repository import DocumentRepository, get_document_repository
 from app.schemas import Document
 
 
@@ -100,3 +100,9 @@ async def test__unit_test__delete_document_error(document_repository, mock_datab
 
     with pytest.raises(Exception):
         await document_repository.delete_document(file_id)
+
+@pytest.mark.asyncio
+async def test__unit_test__get_document_repository_returns_instance(mock_database):
+    test_db = mock_database["test_database"]
+    repo = get_document_repository(test_db)
+    assert isinstance(repo, DocumentRepository)
