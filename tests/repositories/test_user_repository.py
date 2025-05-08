@@ -26,7 +26,7 @@ def user_repository(mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_users(user_repository, mock_database):
+async def test__unit_test__get_users(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find().to_list.return_value = [{"_id": "user@test.com"}]
 
@@ -37,7 +37,7 @@ async def test_get_users(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_by_email(user_repository, mock_database):
+async def test__unit_test__get_by_email(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {"_id": "user@test.com"}
 
@@ -47,7 +47,7 @@ async def test_get_by_email(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_create_user(user_repository, mock_database):
+async def test__unit_test__create_user(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.insert_one.return_value = MagicMock(inserted_id="user@test.com")
 
@@ -67,7 +67,7 @@ async def test_create_user(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_add_test_user(user_repository, mock_database):
+async def test__unit_test__add_test_user(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.insert_one.return_value = MagicMock(inserted_id="test@test.it")
 
@@ -77,7 +77,7 @@ async def test_add_test_user(user_repository, mock_database):
     assert result.inserted_id == "test@test.it"
 
 @pytest.mark.asyncio
-async def test_add_test_user_error(user_repository, mock_database):
+async def test__unit_test__add_test_user_error(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.insert_one.side_effect = Exception("DB error")
 
@@ -87,7 +87,7 @@ async def test_add_test_user_error(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_add_test_admin(user_repository, mock_database):
+async def test__unit_test__add_test_admin(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.insert_one.return_value = MagicMock(inserted_id="admin@test.it")
 
@@ -97,7 +97,7 @@ async def test_add_test_admin(user_repository, mock_database):
     assert result.inserted_id == "admin@test.it"
 
 @pytest.mark.asyncio
-async def test_add_test_admin_error(user_repository, mock_database):
+async def test__unit_test__add_test_admin_error(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.insert_one.side_effect = Exception("DB error")
 
@@ -107,7 +107,7 @@ async def test_add_test_admin_error(user_repository, mock_database):
     assert result is None
 
 @pytest.mark.asyncio
-async def test_get_test_user(user_repository, mock_database):
+async def test__unit_test__get_test_user(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {"_id": "123@234.com"}
 
@@ -116,7 +116,7 @@ async def test_get_test_user(user_repository, mock_database):
     assert result["_id"] == "123@234.com"
 
 @pytest.mark.asyncio
-async def test_get_test_admin(user_repository, mock_database):
+async def test__unit_test__get_test_admin(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {"_id": "admin@admin.com"}
 
@@ -125,7 +125,7 @@ async def test_get_test_admin(user_repository, mock_database):
     assert result["_id"] == "admin@admin.com"
 
 @pytest.mark.asyncio
-async def test_delete_user_success(user_repository, mock_database):
+async def test__unit_test__delete_user_success(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.delete_one.return_value = MagicMock(deleted_count=1)
 
@@ -134,7 +134,7 @@ async def test_delete_user_success(user_repository, mock_database):
     mock_collection.delete_one.assert_awaited_once_with({"_id": "user@test.com"})
 
 @pytest.mark.asyncio
-async def test_delete_user_error(user_repository, mock_database):
+async def test__unit_test__delete_user_error(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.delete_one.side_effect = Exception("DB error")
 
@@ -143,7 +143,7 @@ async def test_delete_user_error(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_delete_user_not_found(user_repository, mock_database):
+async def test__unit_test__delete_user_not_found(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.delete_one.return_value = MagicMock(deleted_count=0)
 
@@ -156,7 +156,7 @@ async def test_delete_user_not_found(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_update_user_success(user_repository, mock_database):
+async def test__unit_test__update_user_success(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {
         "_id": "user@test.com",
@@ -181,7 +181,7 @@ async def test_update_user_success(user_repository, mock_database):
     mock_collection.update_one.assert_awaited_once()
 
 @pytest.mark.asyncio
-async def test_update_user_success_with_no_password(user_repository, mock_database):
+async def test__unit_test__update_user_success_with_no_password(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {
         "_id": "user@test.com",
@@ -206,7 +206,7 @@ async def test_update_user_success_with_no_password(user_repository, mock_databa
 
 
 @pytest.mark.asyncio
-async def test_update_user_error(user_repository, mock_database):
+async def test__unit_test__update_user_error(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {
         "_id": "user@test.com",
@@ -230,14 +230,14 @@ async def test_update_user_error(user_repository, mock_database):
 
                
 @pytest.mark.asyncio
-async def test_update_user_no_changes_provide(user_repository, mock_database):
+async def test__unit_test__update_user_no_changes_provide(user_repository, mock_database):
     update_data = UserUpdate()
     with pytest.raises(HTTPException) as exc_info:
         await user_repository.update_user("user@test.com", update_data)
     assert exc_info.value.status_code == 400
 
 @pytest.mark.asyncio
-async def test_update_user_no_modified(user_repository, mock_database):
+async def test__unit_test__update_user_no_modified(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = {
         "_id": "user@test.com",
@@ -263,7 +263,7 @@ async def test_update_user_no_modified(user_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_update_user_not_found(user_repository, mock_database):
+async def test__unit_test__update_user_not_found(user_repository, mock_database):
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = None
 
@@ -275,7 +275,7 @@ async def test_update_user_not_found(user_repository, mock_database):
     assert exc_info.value.status_code == 404
 
 @pytest.mark.asyncio
-async def test_get_user_repository_returns_instance(mock_database):
+async def test__unit_test__get_user_repository_returns_instance(mock_database):
     test_db = mock_database["test_database"]
     repo = get_user_repository(test_db)
     assert isinstance(repo, UserRepository)

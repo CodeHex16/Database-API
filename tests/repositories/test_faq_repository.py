@@ -28,7 +28,7 @@ def faq_repository(mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_faqs(faq_repository, mock_database):
+async def test__unit_test__get_faqs(faq_repository, mock_database):
     expected_faqs = [{"_id": ObjectId(), "title": "Q1", "question": "?", "answer": "A"}]
     mock_database.get_collection().find.return_value.to_list.return_value = expected_faqs
     result = await faq_repository.get_faqs()
@@ -36,7 +36,7 @@ async def test_get_faqs(faq_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_faq_by_id_success(faq_repository, mock_database):
+async def test__unit_test__get_faq_by_id_success(faq_repository, mock_database):
     faq_id = ObjectId()
     expected_faq = {"_id": faq_id, "title": "Q1", "question": "?", "answer": "A"}
     mock_database.get_collection().find_one.return_value = expected_faq
@@ -45,7 +45,7 @@ async def test_get_faq_by_id_success(faq_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_get_faq_by_id_error(faq_repository, mock_database):
+async def test__unit_test__get_faq_by_id_error(faq_repository, mock_database):
     faq_id = ObjectId()
     mock_database.get_collection().find_one = AsyncMock(side_effect=Exception("DB error"))
     with pytest.raises(Exception, match="Error retrieving FAQ"):
@@ -53,7 +53,7 @@ async def test_get_faq_by_id_error(faq_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_insert_faq_success(faq_repository, mock_database, monkeypatch):
+async def test__unit_test__insert_faq_success(faq_repository, mock_database, monkeypatch):
     faq = FAQ(title="T", question="Q", answer="A")
     mock_result = MagicMock(inserted_id="abc")
     mock_database.get_collection().insert_one = AsyncMock(return_value=mock_result)
@@ -65,7 +65,7 @@ async def test_insert_faq_success(faq_repository, mock_database, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_insert_faq_duplicate_key(faq_repository, mock_database, monkeypatch):
+async def test__unit_test__insert_faq_duplicate_key(faq_repository, mock_database, monkeypatch):
     faq = FAQ(title="T", question="Q", answer="A")
     monkeypatch.setattr("app.repositories.faq_repository.get_timezone", lambda: datetime.now().astimezone().tzinfo)
     mock_database.get_collection().insert_one = AsyncMock(side_effect=DuplicateKeyError("dup"))
@@ -75,7 +75,7 @@ async def test_insert_faq_duplicate_key(faq_repository, mock_database, monkeypat
 
 
 @pytest.mark.asyncio
-async def test_insert_faq_general_error(faq_repository, mock_database, monkeypatch):
+async def test__unit_test__insert_faq_general_error(faq_repository, mock_database, monkeypatch):
     faq = FAQ(title="T", question="Q", answer="A")
     monkeypatch.setattr("app.repositories.faq_repository.get_timezone", lambda: datetime.now().astimezone().tzinfo)
     mock_database.get_collection().insert_one = AsyncMock(side_effect=Exception("error"))
@@ -85,7 +85,7 @@ async def test_insert_faq_general_error(faq_repository, mock_database, monkeypat
 
 
 @pytest.mark.asyncio
-async def test_update_faq_success(faq_repository, mock_database, monkeypatch):
+async def test__unit_test__update_faq_success(faq_repository, mock_database, monkeypatch):
     faq_id = ObjectId()
     faq_data = FAQUpdate(title="New", question="NewQ", answer="NewA")
     current_data = {"_id": faq_id, "title": "Old", "question": "OldQ", "answer": "OldA"}
@@ -99,7 +99,7 @@ async def test_update_faq_success(faq_repository, mock_database, monkeypatch):
     mock_database.get_collection().update_one.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_update_faq_not_updated(faq_repository, mock_database, monkeypatch):
+async def test__unit_test__update_faq_not_updated(faq_repository, mock_database, monkeypatch):
     # Test data setup
     faq_id = ObjectId()
     faq_data = FAQUpdate(title="Nop", question="Same", answer="Same")
@@ -122,7 +122,7 @@ async def test_update_faq_not_updated(faq_repository, mock_database, monkeypatch
         await faq_repository.update_faq(faq_id, faq_data, "user@example.com")
     
 @pytest.mark.asyncio
-async def test_update_faq_not_found(faq_repository, mock_database):
+async def test__unit_test__update_faq_not_found(faq_repository, mock_database):
     faq_id = ObjectId()
     faq_data = FAQUpdate(title="X", question="Y", answer="Z")
     mock_database.get_collection().find_one.return_value = None
@@ -132,7 +132,7 @@ async def test_update_faq_not_found(faq_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_update_faq_not_modified(faq_repository, mock_database):
+async def test__unit_test__update_faq_not_modified(faq_repository, mock_database):
     faq_id = ObjectId()
     faq_data = FAQUpdate(title="Same", question="Same", answer="Same")
     mock_database.get_collection().find_one.return_value = {
@@ -144,7 +144,7 @@ async def test_update_faq_not_modified(faq_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_update_faq_error(faq_repository, mock_database, monkeypatch):
+async def test__unit_test__update_faq_error(faq_repository, mock_database, monkeypatch):
     faq_id = ObjectId()
     faq_data = FAQUpdate(title="A", question="B", answer="C")
     mock_database.get_collection().find_one.return_value = {
@@ -159,7 +159,7 @@ async def test_update_faq_error(faq_repository, mock_database, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_delete_faq_success(faq_repository, mock_database):
+async def test__unit_test__delete_faq_success(faq_repository, mock_database):
     faq_id = ObjectId()
     mock_result = MagicMock(deleted_count=1)
     mock_database.get_collection().delete_one = AsyncMock(return_value=mock_result)
@@ -170,7 +170,7 @@ async def test_delete_faq_success(faq_repository, mock_database):
 
 
 @pytest.mark.asyncio
-async def test_delete_faq_error(faq_repository, mock_database):
+async def test__unit_test__delete_faq_error(faq_repository, mock_database):
     faq_id = ObjectId()
     mock_database.get_collection().delete_one = AsyncMock(side_effect=Exception("error"))
 
@@ -178,7 +178,7 @@ async def test_delete_faq_error(faq_repository, mock_database):
         await faq_repository.delete_faq(faq_id)
 
 @pytest.mark.asyncio
-async def test_get_faq_repository_returns_instance(mock_database):
+async def test__unit_test__get_faq_repository_returns_instance(mock_database):
     test_db = mock_database["test_database"]
     repo = get_faq_repository(test_db)
     assert isinstance(repo, FaqRepository)

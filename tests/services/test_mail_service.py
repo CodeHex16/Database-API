@@ -16,7 +16,7 @@ def valid_env(monkeypatch):
     monkeypatch.setenv("VALIDATE_CERTS", "true")
 
 @pytest.mark.asyncio
-async def test_send_email_calls_fastmail_send(valid_env):
+async def test__unit_test__send_email_calls_fastmail_send(valid_env):
     service = EmailService()
 
     # Patch FastMail.send_message
@@ -25,7 +25,7 @@ async def test_send_email_calls_fastmail_send(valid_env):
         mock_send.assert_awaited_once()
 
 @pytest.mark.asyncio
-async def test_send_email_raises_when_config_invalid():
+async def test__unit_test__send_email_raises_when_config_invalid():
     service = EmailService()
     
     service.conf.MAIL_USERNAME = None
@@ -33,7 +33,7 @@ async def test_send_email_raises_when_config_invalid():
     with pytest.raises(ValueError, match="Email configuration is not valid"):
         await service.send_email(["recipient@example.com"], "Subject", "Body")
 
-def test_is_configuration_valid_returns_false_when_missing_value(valid_env):
+def test__unit_test__is_configuration_valid_returns_false_when_missing_value(valid_env):
     service = EmailService()
     service.conf.MAIL_PASSWORD = None
     assert not service.is_configuration_valid()
