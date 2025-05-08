@@ -2,7 +2,6 @@ from fastapi import APIRouter, status, Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 from bson import ObjectId
-from bson.errors import InvalidId
 
 import app.schemas as schemas
 from typing import List
@@ -86,7 +85,7 @@ async def get_faqs(
     return faqs
 
 
-@router.put(
+@router.patch(
     "/{faq_id}",
 )
 async def update_faq(

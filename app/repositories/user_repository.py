@@ -1,8 +1,6 @@
-import uuid
 from fastapi import HTTPException, status, Depends
 from pydantic import EmailStr
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from bson import ObjectId
 from app.database import get_db
 
 

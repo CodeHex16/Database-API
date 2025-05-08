@@ -11,7 +11,7 @@ router = APIRouter(prefix="/settings", tags=["setting"])
 
 
 @router.get(
-    "/",
+    "",
     response_model=schemas.Settings,
 )
 async def get_settings(
@@ -43,7 +43,7 @@ async def get_settings(
 
 
 @router.patch(
-    "/",
+    "",
 )
 async def update_settings(
     settings: schemas.Settings,
@@ -57,7 +57,17 @@ async def update_settings(
     * **settings**: Le impostazioni da aggiornare.
 
     ### Raises:
+    * **HTTPException.HTTP_401_UNAUTHORIZED**: Se l'utente non è autorizzato a compiere questa azione.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento delle impostazioni.
+    * **HTTPException.HTTP_304_NOT_MODIFIED**: Se le impostazioni non sono state modificate.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se le impostazioni non sono state trovate.
     """
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authorized",
+        )
+
     try:
         await setting_repository.update_settings(settings)
     except Exception as e:
