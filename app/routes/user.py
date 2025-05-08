@@ -166,18 +166,11 @@ async def update_user(
     * **HTTPException.HTTP_304_NOT_MODIFIED**: Se i dati forniti corrispondono a quelli esistenti.
     """
     # Aggiorna i dati dell'utente nel database
-    try:
-        result = await user_repo.update_user(
-            user_id=user_new_data.id,
-            user_data=user_new_data,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update user: {e}",
-        )
+    result = await user_repo.update_user(
+        user_id=user_new_data.id,
+        user_data=user_new_data,
+    )
 
-    # Controlla se l'aggiornamento ha avuto effetto
     if result.modified_count == 0 and result.matched_count > 0:
         return {"message": "User data is already up to date."}
     elif result.matched_count == 0:
