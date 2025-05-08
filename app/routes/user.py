@@ -147,7 +147,6 @@ async def get_user(
 
 @router.patch(
     "",
-    status_code=status.HTTP_200_OK,
 )
 async def update_user(
     user_new_data: schemas.UserUpdate,
@@ -249,7 +248,6 @@ async def delete_user(
 
 @router.patch(
     "/password",
-    status_code=status.HTTP_200_OK,
 )
 async def update_password(
     user_data: schemas.UserUpdatePassword,
@@ -304,7 +302,6 @@ async def update_password(
 
 @router.post(
     "/password_reset",
-    status_code=status.HTTP_200_OK,
 )
 async def reset_password(
     user_data: schemas.UserForgotPassword,

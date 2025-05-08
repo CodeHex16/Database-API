@@ -4,6 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.database import get_db
 from app.schemas import Settings
 
+
 def get_setting_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     """
     Restituisce il repository della collection settings.
@@ -16,14 +17,18 @@ class SettingRepository:
         self.database = database
         self.collection = database.get_collection("settings")
 
-        self.collection.insert_one(
-            {
-                "_id": "main",
+        insert_payload = {
                 "color_primary": "#5e5c64",
                 "color_primary_hover": "#44424a",
                 "color_primary_text": "white",
                 "message_history": 100,
-            }
+        }
+        self.collection.update_one(
+            {"_id": "main"},
+            { 
+                "$set": insert_payload,
+            },
+            upsert=True,
         )
 
     async def get_settings(self):

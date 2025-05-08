@@ -5,7 +5,6 @@ from bson import ObjectId
 
 import app.schemas as schemas
 from typing import List
-from app.database import get_db
 from app.repositories.faq_repository import FaqRepository, get_faq_repository
 from app.repositories.user_repository import UserRepository, get_user_repository
 from app.routes.auth import verify_admin, authenticate_user
