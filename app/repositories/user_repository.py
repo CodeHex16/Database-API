@@ -107,7 +107,6 @@ class UserRepository:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found",
             )
-  
         # Prepara il payload di aggiornamento
         update_payload = {}
         if user_data.password is not None:
@@ -131,20 +130,18 @@ class UserRepository:
             "scopes"
         ):
             update_payload["scopes"] = user_data.scopes
+        if user_data.name is not None and user_data.name != user_current_data.get(
+            "name"
+        ):
+            update_payload["name"] = user_data.name
 
-        # Controlla se ci sono stati cambiamenti nei dati
-        if not update_payload:
-            provided_data = user_data.model_dump(exclude_unset=True)
-            if provided_data:
-                raise HTTPException(
-                    status_code=status.HTTP_304_NOT_MODIFIED,
-                    detail="User data provided matches existing data. No update performed.",
-                )
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="No data provided for update.",
-                )
+        print(f"[USER REPO] Update payload: {update_payload}")
+        if not update_payload or len(update_payload) == 0:
+            print("empty update payload")
+            raise HTTPException(
+                status_code=status.HTTP_304_NOT_MODIFIED,
+                detail="User data provided matches existing data. No update performed.",
+            )
 
         try:
             result = await self.collection.update_one(
@@ -157,6 +154,7 @@ class UserRepository:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to update user: {e}",
             )
+
 
 def get_user_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
     """
