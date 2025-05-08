@@ -4,6 +4,9 @@ from datetime import datetime
 from app.utils import get_timezone
 import app.schemas as schemas
 
+from app.database import get_db
+from fastapi import Depends
+
 
 class ChatRepository:
     def __init__(self, database):
@@ -85,3 +88,6 @@ class ChatRepository:
         update_operation = {"$set": {"messages.$.rating": rating}}
 
         return await self.collection.update_one(query_filter, update_operation)
+
+def get_chat_repository(db=Depends(get_db)):
+    return ChatRepository(db)

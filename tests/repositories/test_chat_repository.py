@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, AsyncMock, ANY
 from datetime import datetime
 from bson import ObjectId
-from app.repositories.chat_repository import ChatRepository
+from app.repositories.chat_repository import ChatRepository, get_chat_repository
 from app.schemas import MessageCreate
 
 @pytest.fixture
@@ -199,3 +199,9 @@ async def test__unit_test__update_message_rating(chat_repository, mock_database)
       ANY   # ignore exact update expression
     )
     assert result.modified_count == 1
+
+@pytest.mark.asyncio
+async def test__unit_test__get_chat_repository_returns_instance(mock_database):
+    test_db = mock_database["test_database"]
+    repo = get_chat_repository(test_db)
+    assert isinstance(repo, ChatRepository)
