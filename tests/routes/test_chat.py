@@ -76,39 +76,39 @@ def fake_chat_repo():
     return FakeChatRepository()
         
 @pytest.mark.asyncio
-async def test_get_new_chat(fake_chat_repo):
+async def test__unit_test__get_new_chat(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat = await get_new_chat(current_user, fake_chat_repo)
     assert chat["chat_id"] == "chat123"
 
 @pytest.mark.asyncio
-async def test_get_new_chat_no_email(fake_chat_repo):
+async def test__unit_test__get_new_chat_no_email(fake_chat_repo):
     current_user = {"sub":""}
     with pytest.raises(HTTPException) as excinfo:
         await get_new_chat(current_user, fake_chat_repo)
     assert excinfo.value.status_code == 400
 
 @pytest.mark.asyncio
-async def test_get_new_chat_no_chat(fake_chat_repo):
+async def test__unit_test__get_new_chat_no_chat(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat = await get_chats(current_user, fake_chat_repo)
     assert chat[0]["id"] == "chat123"
 
 @pytest.mark.asyncio
-async def test_get_new_chat_no_chat_no_email(fake_chat_repo):
+async def test__unit_test__get_new_chat_no_chat_no_email(fake_chat_repo):
     current_user = {"sub":""}
     with pytest.raises(HTTPException) as excinfo:
         await get_chats(current_user, fake_chat_repo)
     assert excinfo.value.status_code == 400
 
 @pytest.mark.asyncio
-async def test_change_chat_name(fake_chat_repo):
+async def test__unit_test__change_chat_name(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat123"
     await change_chat_name(chat_id, "New Chat Name", current_user, fake_chat_repo)
     
 @pytest.mark.asyncio
-async def test_change_chat_name_not_found(fake_chat_repo):
+async def test__unit_test__change_chat_name_not_found(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat124"
     with pytest.raises(HTTPException) as excinfo:
@@ -116,13 +116,13 @@ async def test_change_chat_name_not_found(fake_chat_repo):
     assert excinfo.value.status_code == 404
      
 @pytest.mark.asyncio
-async def test_delete_chat(fake_chat_repo):
+async def test__unit_test__delete_chat(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat123"
     await delete_chat(chat_id, current_user, fake_chat_repo)
 
 @pytest.mark.asyncio
-async def test_delete_chat_not_found(fake_chat_repo):
+async def test__unit_test__delete_chat_not_found(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat124"
     with pytest.raises(HTTPException) as excinfo:
@@ -130,7 +130,7 @@ async def test_delete_chat_not_found(fake_chat_repo):
     assert excinfo.value.status_code == 404
                     
 @pytest.mark.asyncio
-async def test_add_message_to_chat(fake_chat_repo):
+async def test__unit_test__add_message_to_chat(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat123"
     message = schemas.MessageCreate(content="Hello!", sender="user")
@@ -138,7 +138,7 @@ async def test_add_message_to_chat(fake_chat_repo):
     assert result["_id"] == "message123"
 
 @pytest.mark.asyncio
-async def test_add_message_to_chat_not_found(fake_chat_repo):
+async def test__unit_test__add_message_to_chat_not_found(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat124"
     message = schemas.MessageCreate(content="Hello!", sender="user")
@@ -147,14 +147,14 @@ async def test_add_message_to_chat_not_found(fake_chat_repo):
     assert excinfo.value.status_code == 404
 
 @pytest.mark.asyncio
-async def test_get_chat_messages(fake_chat_repo):
+async def test__unit_test__get_chat_messages(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat123"
     messages = await get_chat_messages(chat_id, current_user, fake_chat_repo)
     assert messages["messages"] == []
 
 @pytest.mark.asyncio
-async def test_get_chat_messages_not_found(fake_chat_repo):
+async def test__unit_test__get_chat_messages_not_found(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = "chat125"
     with pytest.raises(HTTPException) as excinfo:
@@ -162,7 +162,7 @@ async def test_get_chat_messages_not_found(fake_chat_repo):
     assert excinfo.value.status_code == 404
 
 @pytest.mark.asyncio
-async def test_rate_message(fake_chat_repo):
+async def test__unit_test__rate_message(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = b'foo-bar-quux'
     message_id = "614c1b2f8e4b0c6a1d2d5d2f"
@@ -171,7 +171,7 @@ async def test_rate_message(fake_chat_repo):
     result = await rate_message(chat_id, message_id, rating_data, current_user, fake_chat_repo)
 
 @pytest.mark.asyncio
-async def test_rate_message_no_chat(fake_chat_repo):
+async def test__unit_test__rate_message_no_chat(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = b'foo-bar-quuu'
     message_id = "614c1b2f8e4b0c6a1d2d5d2f"
@@ -181,7 +181,7 @@ async def test_rate_message_no_chat(fake_chat_repo):
     assert excinfo.value.status_code == 404
 
 @pytest.mark.asyncio
-async def test_rate_message_no_message(fake_chat_repo):
+async def test__unit_test__rate_message_no_message(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = b'foo-bar-quux'
     message_id = "614c1b2f8e4b0c6a1d2d5d29"
@@ -191,7 +191,7 @@ async def test_rate_message_no_message(fake_chat_repo):
     assert excinfo.value.status_code == 404
 
 @pytest.mark.asyncio
-async def test_rate_message_no_edit(fake_chat_repo):
+async def test__unit_test__rate_message_no_edit(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = b'foo-bar-quux'
     message_id = "614c1b2f8e4b0c6a1d2d5d21"
@@ -201,7 +201,7 @@ async def test_rate_message_no_edit(fake_chat_repo):
     assert excinfo.value.status_code == 304
 
 @pytest.mark.asyncio
-async def test_rate_message_internal_error(fake_chat_repo):
+async def test__unit_test__rate_message_internal_error(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = b'foo-bar-quux'
     message_id = "614c1b2f8e4b0c6a1d2d5d25"
@@ -211,7 +211,7 @@ async def test_rate_message_internal_error(fake_chat_repo):
     assert excinfo.value.status_code == 500
 
 @pytest.mark.asyncio
-async def test_rate_message_internal_error_2(fake_chat_repo):
+async def test__unit_test__rate_message_internal_error_2(fake_chat_repo):
     current_user = {"sub":"hi@hi.com"}
     chat_id = b'foo-bar-quux'
     message_id = "614c1b2f8e4b0c6a1d2d5d26"
