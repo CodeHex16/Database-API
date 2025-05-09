@@ -56,7 +56,9 @@ async def upload_document(
         )
 
 
-@router.get("/", response_model=List[schemas.DocumentResponse], status_code=status.HTTP_200_OK)
+@router.get(
+    "", response_model=List[schemas.DocumentResponse]
+)
 async def get_documents(
     current_user=Depends(verify_admin),
     document_repository=Depends(get_document_repository),

@@ -63,7 +63,8 @@ class UserUpdatePassword(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    id: Optional[EmailStr] = Field(default=None,alias="_id")
+    id: Optional[EmailStr] = Field(alias="_id")
+    name: Optional[str] = None
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
@@ -171,3 +172,10 @@ class FAQResponse(FAQ):
 
 class EmailSchema(BaseModel):
     email: List[EmailStr]
+
+
+class Settings(BaseModel):
+    color_primary: Optional[str] = None
+    color_primary_hover: Optional[str] = None
+    color_primary_text: Optional[str] = None
+    message_history: Optional[int] = None

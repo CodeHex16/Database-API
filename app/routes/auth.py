@@ -32,6 +32,10 @@ router = APIRouter(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+def init_router(app_instance):
+    yield
+
+
 def security_check(): # pragma: no cover
     if SECRET_KEY_JWT == "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi":
         print(
@@ -39,6 +43,7 @@ def security_check(): # pragma: no cover
         )
         print("Please set SECRET_KEY_JWT in your environment variables.")
 security_check()
+
 
 async def authenticate_user(email: str, password: str, user_repo: UserRepository):
     """
