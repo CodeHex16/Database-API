@@ -8,6 +8,7 @@ from app.database import get_db
 
 from app.utils import get_password_hash, verify_password
 import app.schemas as schemas
+import os
 
 
 class UserRepository:
@@ -48,9 +49,9 @@ class UserRepository:
             return await self.collection.insert_one(
                 {
                     # "_id": get_uuid3("admin@test.it"),
-                    "_id": "admin@test.it",
+                    "_id": os.getenv("ADMIN_EMAIL") or "admin@test.it",
                     "name": "Test Admin",
-                    "hashed_password": get_password_hash("adminadmin"),
+                    "hashed_password": get_password_hash(os.getenv("ADMIN_PASSWORD") or "admin"),
                     "is_initialized": True,
                     "remember_me": False,
                     "scopes": ["admin"],
