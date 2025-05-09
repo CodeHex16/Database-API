@@ -62,10 +62,10 @@ class UserRepository:
             return None
 
     async def get_test_user(self):
-        return await self.collection.find_one({"email": "test@test.it"})
+        return await self.collection.find_one({"_id": "test@test.it"})
 
     async def get_test_admin(self):
-        return await self.collection.find_one({"email": "admin@test.it"})
+        return await self.collection.find_one({"_id": "admin@test.it"})
 
     async def delete_user(self, user_id: EmailStr):
         """
