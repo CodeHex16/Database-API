@@ -231,10 +231,10 @@ async def test__unit_test__update_user_error(user_repository, mock_database):
                
 @pytest.mark.asyncio
 async def test__unit_test__update_user_no_changes_provide(user_repository, mock_database):
-    update_data = UserUpdate(_id=None)
+    update_data = UserUpdate()
     with pytest.raises(HTTPException) as exc_info:
         await user_repository.update_user("user@test.com", update_data)
-    assert exc_info.value.status_code == 304
+    assert exc_info.value.status_code == 400
 
 @pytest.mark.asyncio
 async def test__unit_test__update_user_no_modified(user_repository, mock_database):
