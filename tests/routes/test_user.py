@@ -54,6 +54,10 @@ def fake_user_repo():
                 MockUpdateResult.modified_count = 1
                 MockUpdateResult.matched_count = 1
                 return MockUpdateResult
+            if user_id == "hi2@hi.com":
+                MockUpdateResult.modified_count = 0
+                MockUpdateResult.matched_count = 1
+                return MockUpdateResult
             if user_id == "error@error.com":
                 raise Exception("error")
             MockUpdateResult.modified_count = 0
@@ -136,6 +140,12 @@ async def test__unit_test__get_user_me_error(fake_user_repo, monkeypatch):
 @pytest.mark.asyncio
 async def test__unit_test__update_user(fake_user_repo, monkeypatch):
     user_new_data = UserUpdate(_id="hi@hi.com", password="newpassword", is_initialized=True, remember_me=True, scopes=AccessRoles.USER)
+    result = await update_user(user_new_data, current_user, fake_user_repo)
+    assert result["message"] != None
+
+@pytest.mark.asyncio
+async def test__unit_test__update_user_same_data(fake_user_repo, monkeypatch):
+    user_new_data = UserUpdate(_id="hi2@hi.com", password="newpassword", is_initialized=True, remember_me=True, scopes=AccessRoles.USER)
     result = await update_user(user_new_data, current_user, fake_user_repo)
     assert result["message"] != None
 
