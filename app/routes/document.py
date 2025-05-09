@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
 from app.database import get_db
@@ -15,6 +14,7 @@ from app.routes.auth import (
     get_user_repository,
 )
 from app.utils import get_object_id
+from app.repositories.document_repository import get_document_repository
 
 router = APIRouter(
     prefix="/documents",
@@ -22,20 +22,8 @@ router = APIRouter(
 )
 
 
-def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
-    """
-    Restituisce un'istanza del repository dei documenti.
 
-    Args:
-        db (AsyncIOMotorDatabase): Il database MongoDB.
-
-    Returns:
-        DocumentRepository: Un'istanza del repository dei documenti.
-    """
-    return DocumentRepository(db)
-
-
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def upload_document(
     document: schemas.Document,
     current_user=Depends(verify_admin),
@@ -68,9 +56,7 @@ async def upload_document(
         )
 
 
-@router.get(
-    "", response_model=List[schemas.DocumentResponse], status_code=status.HTTP_200_OK
-)
+@router.get("/", response_model=List[schemas.DocumentResponse], status_code=status.HTTP_200_OK)
 async def get_documents(
     current_user=Depends(verify_admin),
     document_repository=Depends(get_document_repository),
@@ -97,7 +83,7 @@ async def get_documents(
     return documents
 
 
-@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(
     file: schemas.DocumentDelete,
     admin: schemas.UserAuth,

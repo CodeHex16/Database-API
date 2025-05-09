@@ -7,6 +7,12 @@ motor
 python-jose
 requests
 pytest
+pytest-mock
+pytest-asyncio
+pytest-cov
+httpx
+coverage
+coveralls
 pymongo
 uvicorn
 jwt
