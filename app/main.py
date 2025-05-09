@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from app.database import init_db, get_db, MONGODB_URL
 
-from app.routes import auth, chat, document, user, faq
+from app.routes import auth, chat, document, user, faq, setting
 from app.repositories.user_repository import UserRepository
 
 load_dotenv()
@@ -77,3 +77,4 @@ app.include_router(chat.router)
 app.include_router(document.router)
 app.include_router(user.router)
 app.include_router(faq.router)
+app.include_router(setting.router)

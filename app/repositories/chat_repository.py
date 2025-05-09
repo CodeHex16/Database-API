@@ -55,6 +55,9 @@ class ChatRepository:
         )
 
     async def add_message(self, chat_id, message: schemas.MessageCreate):
+        """
+        Aggiunge un messaggio alla chat.
+        """
         message_data = {
             "_id": ObjectId(),
             "sender": message.sender,
@@ -71,6 +74,9 @@ class ChatRepository:
         return message_data
 
     async def update_chat_title(self, chat_id, title):
+        """
+        Aggiorna il titolo della chat.
+        """
         return await self.collection.update_one(
             {"_id": ObjectId(chat_id)}, {"$set": {"name": title}}
         )
