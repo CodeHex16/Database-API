@@ -41,8 +41,6 @@ def init_router(app_instance):
     yield
 
 
-
-
 async def authenticate_user(email: str, password: str, user_repo: UserRepository):
     """
     Ritorna true se l'utente esiste e se la password inserita è quella associata alla mail passata come parametro; altrimenti false.
