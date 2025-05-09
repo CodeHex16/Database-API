@@ -106,7 +106,7 @@ class UserRepository:
         if not user_current_data:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   
-        provided_data = user_data.model_dump(exclude_unset=True)
+        provided_data = user_data.model_dump(exclude_unset=True, exclude_none=True)
         if not provided_data:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
