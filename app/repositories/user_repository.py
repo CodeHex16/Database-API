@@ -60,10 +60,10 @@ class UserRepository:
             return None
 
     async def get_test_user(self):
-        return await self.collection.find_one({"email": "test@test.it"})
+        return await self.collection.find_one({"_id": "test@test.it"})
 
     async def get_test_admin(self):
-        return await self.collection.find_one({"email": "admin@test.it"})
+        return await self.collection.find_one({"_id": "admin@test.it"})
 
     async def delete_user(self, user_id: EmailStr):
         """
@@ -104,7 +104,7 @@ class UserRepository:
         if not user_current_data:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   
-        provided_data = user_data.model_dump(exclude_unset=True)
+        provided_data = user_data.model_dump(exclude_unset=True, exclude_none=True)
         if not provided_data:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -122,9 +122,7 @@ class UserRepository:
             update_payload["remember_me"] = user_data.remember_me
         if user_data.scopes is not None and user_data.scopes != user_current_data.get("scopes"):
             update_payload["scopes"] = user_data.scopes
-        if user_data.name is not None and user_data.name != user_current_data.get(
-            "name"
-        ):
+        if user_data.name is not None and user_data.name != user_current_data.get("name"):
             update_payload["name"] = user_data.name
             
         print(f"[USER REPO] Update payload: {update_payload}")

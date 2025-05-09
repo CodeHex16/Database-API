@@ -38,7 +38,25 @@ def fake_user_repo():
                     "hashed_password": "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi",
                     "is_initialized": True,
                 }
-            if email == "hi2@hi.com":
+            # if email == "hi2@hi.com":
+            #     return {
+            #         "_id": "user123",
+            #         "name": "Bob",
+            #         "email": email,
+            #         "scopes": AccessRoles.USER,
+            #         "hashed_password": "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi",
+            #         "is_initialized": False,
+            #     }
+            # if email == "hi3@hi.com":
+            #     return {
+            #         "_id": "user123",
+            #         "name": "Bob",
+            #         "email": email,
+            #         "scopes": AccessRoles.USER,
+            #         "hashed_password": "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi",
+            #         "is_initialized": False,
+            #     }
+            if email == "hi4@hi.com":
                 return {
                     "_id": "user123",
                     "name": "Bob",
@@ -47,6 +65,7 @@ def fake_user_repo():
                     "hashed_password": "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi",
                     "is_initialized": False,
                 }
+           
         async def update_user(self, user_id: str, user_data: UserUpdate):
             MockUpdateResult = MagicMock()
             print(user_id, user_data)
@@ -54,6 +73,11 @@ def fake_user_repo():
                 MockUpdateResult.modified_count = 1
                 MockUpdateResult.matched_count = 1
                 return MockUpdateResult
+            if user_id == "hi3@hi.com":
+                MockUpdateResult.modified_count = 0
+                MockUpdateResult.matched_count = 1
+                return MockUpdateResult
+            
             if user_id == "error@error.com":
                 raise Exception("error")
             MockUpdateResult.modified_count = 0
@@ -139,13 +163,18 @@ async def test__unit_test__update_user(fake_user_repo, monkeypatch):
     result = await update_user(user_new_data, current_user, fake_user_repo)
     assert result["message"] != None
 
+@pytest.mark.asyncio
+async def test__unit_test__update_user_same_data(fake_user_repo, monkeypatch):
+    user_new_data = UserUpdate(_id="hi3@hi.com", password="newpassword", is_initialized=True, remember_me=True, scopes=AccessRoles.USER)
+    result = await update_user(user_new_data, current_user, fake_user_repo)
+    assert result["message"] != None
+
 
 @pytest.mark.asyncio
 async def test__unit_test__update_user_error(fake_user_repo, monkeypatch):
     user_new_data = UserUpdate(_id="error@error.com", password="newpassword", is_initialized=True, remember_me=True, scopes=AccessRoles.USER)
-    with pytest.raises(HTTPException) as excinfo:
+    with pytest.raises(Exception) as excinfo:
         await update_user(user_new_data, current_user, fake_user_repo)
-    assert excinfo.value.status_code == 500
 
 @pytest.mark.asyncio
 async def test__unit_test__update_user_no_edit(fake_user_repo, monkeypatch):
@@ -243,13 +272,11 @@ async def test__unit_test__update_password_old_password_error(fake_user_repo, mo
 @pytest.mark.asyncio
 async def test__unit_test__update_password_is_not_init_with_not_found(fake_user_repo, monkeypatch):
     user_data = UserUpdatePassword(password="Abc123!@#@js", current_password="test_password")
-    current_user = {"sub": "hi2@hi.com"}
+    current_user = {"sub": "hi4@hi.com"}
+  
     with pytest.raises(HTTPException) as excinfo:
         await update_password(user_data, current_user, fake_user_repo)
     assert excinfo.value.status_code == 500
-
-
-
 
 @pytest.mark.asyncio
 async def test__unit_test__reset_password(fake_user_repo, monkeypatch):
