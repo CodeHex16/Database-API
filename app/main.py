@@ -20,9 +20,9 @@ async def lifespan(app: FastAPI):
     info("Connected to the MongoDB database!")
     init_db(app.database)
 
+    user_repo = UserRepository(app.database)
     if os.getenv("ENVIRONMENT") == "development":
         # AGGIUNGI UTENTE TEST (Solo in sviluppo)
-        user_repo = UserRepository(app.database)
         test_user = await user_repo.get_test_user()
         if not test_user:
             await user_repo.add_test_user()
