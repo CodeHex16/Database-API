@@ -169,6 +169,7 @@ async def test__unit_test__update_user_success(user_repository, mock_database):
 
     update_data = UserUpdate(
          _id = "user@test.com",
+        name="Test",
         password="newpass",
         is_initialized=True,
         remember_me=True,

@@ -122,9 +122,7 @@ class UserRepository:
             update_payload["remember_me"] = user_data.remember_me
         if user_data.scopes is not None and user_data.scopes != user_current_data.get("scopes"):
             update_payload["scopes"] = user_data.scopes
-        if user_data.name is not None and user_data.name != user_current_data.get(
-            "name"
-        ):
+        if user_data.name is not None and user_data.name != user_current_data.get("name"):
             update_payload["name"] = user_data.name
             
         print(f"[USER REPO] Update payload: {update_payload}")
