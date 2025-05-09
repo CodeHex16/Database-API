@@ -6,6 +6,7 @@ from pymongo.errors import DuplicateKeyError
 from jose import jwt, JWTError
 
 from app.database import get_db
+
 import app.schemas as schemas
 from app.routes.auth import (
     verify_admin,
@@ -22,17 +23,19 @@ router = APIRouter(
     tags=["user"],
 )
 
-SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
-if not SECRET_KEY_JWT:
-    raise ValueError("SECRET_KEY_JWT non impostata nelle variabili d'ambiente")
-
+SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT") or "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi"
 ALGORITHM = "HS256"
 
+def security_check(): # pragma: no cover
+    if SECRET_KEY_JWT == "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi":
+        print(
+            "WARNING: SECRET_KEY_JWT is not set. Using default value for development purposes only."
+        )
+        print("Please set SECRET_KEY_JWT in your environment variables.")
+security_check()
 
-@router.post(
-    "",
-    status_code=status.HTTP_201_CREATED,
-)
+
+@router.post("/",status_code=status.HTTP_201_CREATED)
 async def register_user(
     user_data: schemas.UserCreate,
     current_user=Depends(verify_admin),
@@ -77,11 +80,22 @@ async def register_user(
             detail=f"Failed to create user: {e}",
         )
 
-    await EmailService().send_email(
-        to=[user_data.email],
-        subject=f"[Suppl-AI] Registrazione utente",
-        body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
-    )
+    try:
+        await EmailService().send_email(
+            to=[user_data.email],
+            subject=f"[Suppl-AI] Registrazione utente",
+            body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
+        )
+    except Exception:
+        # raise HTTPException(
+        #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #     detail=f"Failed to send email to user: {e}",
+        # )
+        print("  Error: Failed to send to user the password")
+        print(f" To: {user_data.email}")
+        print(f" Subject: [Suppl-AI] Registrazione utente")
+        print(f" Body: Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!")
+        print("  Error: Failed to send email to user")
 
     return {"message": "User registered successfully", "password": password}
 
@@ -144,7 +158,6 @@ async def get_user(
         )
     return user
 
-
 @router.patch(
     "",
 )
@@ -165,6 +178,9 @@ async def update_user(
     * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento dell'utente.
     * **HTTPException.HTTP_304_NOT_MODIFIED**: Se i dati forniti corrispondono a quelli esistenti.
     """
+    # Rimove il campo password (usa /password per cambiarla)
+    user_new_data.password = None
+
     # Aggiorna i dati dell'utente nel database
     result = await user_repo.update_user(
         user_id=user_new_data.id,
@@ -178,14 +194,12 @@ async def update_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found during update attempt",
         )
+    else:
+        return {"message": "User updated successfully."}
 
-    return {"message": "User updated successfully"}
 
 
-@router.delete(
-    "",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
+@router.delete("/",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     delete_user: schemas.UserDelete,
     admin: schemas.UserAuth,
@@ -275,7 +289,7 @@ async def update_password(
         if user_current_data.get("is_initialized") is False:
             initialized = True
 
-        await user_repository.update_user(
+        result = await user_repository.update_user(
             user_id=current_user.get("sub"),
             user_data=schemas.UserUpdate(
                 _id=current_user.get("sub"),
@@ -283,6 +297,14 @@ async def update_password(
                 is_initialized=initialized,
             ),
         )
+        if result.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found during password update attempt",
+            )
+        else:
+            return {"message": "Password updated successfully"}
+        
     except Exception as e:
         print(f"Error updating password: {e}")
         raise HTTPException(
@@ -290,7 +312,7 @@ async def update_password(
             detail=f"Failed to update password: {e}",
         )
 
-    return {"message": "Password updated successfully"}
+    
 
 
 @router.post(
@@ -330,14 +352,27 @@ async def reset_password(
             ),
         )
 
-        # Invia l'email con il token
-        await EmailService().send_email(
-            to=[user.get("_id")],
-            subject="[Suppl-AI] Password Reset",
-            body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
-        )
+       
+        try:
+            # Invia l'email con il token
+            await EmailService().send_email(
+                to=[user.get("_id")],
+                subject="[Suppl-AI] Password Reset",
+                body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
+            )
+        except Exception:
+            # raise HTTPException(
+            #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            #     detail=f"Failed to send email to user: {e}",
+            # )
+            print("  Error: Failed to send to user the password")
+            print(f" To: {user_data.email}")
+            print(f" Subject: [Suppl-AI] Password Reset")
+            print(f" Body: Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!")
+            print("  Error: Failed to send email to user")
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to send password reset email: {e}",
         )
+    return {"message": "Password reset email sent successfully", "password": password}

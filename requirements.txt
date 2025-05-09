@@ -13,3 +13,9 @@ jwt==1.3.1
 python-multipart==0.0.20
 fastapi-mail==1.4.2
 pytz==2025.2
+pytest-mock
+pytest-asyncio
+pytest-cov
+httpx
+coverage
+coveralls

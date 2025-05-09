@@ -6,6 +6,7 @@ from app.database import get_db
 
 from app.utils import get_password_hash, verify_password
 import app.schemas as schemas
+import os
 
 
 class UserRepository:
@@ -46,9 +47,9 @@ class UserRepository:
             return await self.collection.insert_one(
                 {
                     # "_id": get_uuid3("admin@test.it"),
-                    "_id": "admin@test.it",
+                    "_id": os.getenv("ADMIN_EMAIL") or "admin@test.it",
                     "name": "Test Admin",
-                    "hashed_password": get_password_hash("adminadmin"),
+                    "hashed_password": get_password_hash(os.getenv("ADMIN_PASSWORD") or "admin"),
                     "is_initialized": True,
                     "remember_me": False,
                     "scopes": ["admin"],
@@ -101,38 +102,31 @@ class UserRepository:
         # Controlla se l'utente esiste
         user_current_data = await self.get_by_email(user_id)
         if not user_current_data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+  
+        provided_data = user_data.model_dump(exclude_unset=True)
+        if not provided_data:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No data provided for update.",
             )
         # Prepara il payload di aggiornamento
         update_payload = {}
         if user_data.password is not None:
-            if not verify_password(
-                user_data.password, user_current_data.get("hashed_password")
-            ):
-                update_payload["hashed_password"] = get_password_hash(
-                    user_data.password
-                )
-        if (
-            user_data.is_initialized is not None
-            and user_data.is_initialized != user_current_data.get("is_initialized")
-        ):
+            if not verify_password(user_data.password, user_current_data.get("hashed_password")):
+                update_payload["hashed_password"] = get_password_hash(user_data.password)
+        
+        if (user_data.is_initialized is not None and user_data.is_initialized != user_current_data.get("is_initialized")):
             update_payload["is_initialized"] = user_data.is_initialized
-        if (
-            user_data.remember_me is not None
-            and user_data.remember_me != user_current_data.get("remember_me")
-        ):
+        if (user_data.remember_me is not None and user_data.remember_me != user_current_data.get("remember_me")):
             update_payload["remember_me"] = user_data.remember_me
-        if user_data.scopes is not None and user_data.scopes != user_current_data.get(
-            "scopes"
-        ):
+        if user_data.scopes is not None and user_data.scopes != user_current_data.get("scopes"):
             update_payload["scopes"] = user_data.scopes
         if user_data.name is not None and user_data.name != user_current_data.get(
             "name"
         ):
             update_payload["name"] = user_data.name
-
+            
         print(f"[USER REPO] Update payload: {update_payload}")
         if not update_payload or len(update_payload) == 0:
             print("empty update payload")

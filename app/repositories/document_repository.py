@@ -5,6 +5,9 @@ from bson import ObjectId
 
 from app.utils import get_timezone, get_object_id
 import app.schemas as schemas
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from fastapi import Depends
+from app.database import get_db
 
 class DocumentRepository:
     def __init__(self, database):
@@ -45,3 +48,15 @@ class DocumentRepository:
         except Exception as e:
             print(f"Error deleting document: {e}")
             raise Exception(f"Error deleting document: {e}")
+
+def get_document_repository(db: AsyncIOMotorDatabase = Depends(get_db)):
+    """
+    Restituisce un'istanza del repository dei documenti.
+
+    Args:
+        db (AsyncIOMotorDatabase): Il database MongoDB.
+
+    Returns:
+        DocumentRepository: Un'istanza del repository dei documenti.
+    """
+    return DocumentRepository(db)

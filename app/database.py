@@ -1,16 +1,14 @@
 import os
 
-MONGODB_URL = os.getenv("MONGODB_URL")
+MONGODB_URL = os.getenv("MONGODB_URL") or "mongodb://root:example@mongo-db:27017"
 
 # Variabile globale per memorizzare la connessione al database
 _db = None
-
 
 def init_db(db_instance):
     """Inizializza la connessione al database"""
     global _db
     _db = db_instance
-
 
 async def get_db():
     """Restituisce l'istanza del database"""
