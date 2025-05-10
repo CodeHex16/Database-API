@@ -170,9 +170,16 @@ async def update_user(
     * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento dell'utente.
     * **HTTPException.HTTP_304_NOT_MODIFIED**: Se i dati forniti corrispondono a quelli esistenti.
     """
-    # Rimove il campo password (usa /password per cambiarla)
-    user_new_data.password = None
-
+	# Verifica che l'admin esista e che la password sia corretta
+    valid_user = await authenticate_user(
+        current_user.get("sub"), user_new_data.admin_password, user_repo
+    )
+    if not valid_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid admin password",
+        )
+    
     # Aggiorna i dati dell'utente nel database
     result = await user_repo.update_user(
         user_id=user_new_data.id,
