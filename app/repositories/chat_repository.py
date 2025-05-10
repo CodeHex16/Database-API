@@ -18,10 +18,15 @@ class ChatRepository:
             length=limit
         )
 
-    async def get_chat_by_id(self, chat_id, user_email):
-        return await self.collection.find_one(
+    async def get_chat_by_id(self, chat_id, user_email, limit: int = 0):
+        result = await self.collection.find_one(
             {"_id": ObjectId(chat_id), "user_email": user_email}
         )
+
+        if limit:
+            result["messages"] = result["messages"][-limit:]
+
+        return result
 
     async def initialize_chat(self, user_email):
         """Inizializza una nuova chat con il messaggio iniziale del bot"""
