@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from bson import ObjectId
+from fastapi import Query
+from typing import Optional
 
 from app.database import get_db
 from app.repositories.chat_repository import ChatRepository
@@ -279,3 +281,14 @@ async def rate_message(
             status_code=500,
             detail=f"Failed to update message rating: {e}",
         )
+
+@router.get("/stats", response_model=schemas.Stats)
+async def get_global_stats(
+    current_user=Depends(verify_admin),  # Usa verify_user se non ti serve il controllo admin
+    startDate: Optional[str] = Query(None, description="Data di inizio in formato ISO (YYYY-MM-DD)"),
+    endDate: Optional[str] = Query(None, description="Data di fine in formato ISO (YYYY-MM-DD)"),
+    chat_repository=Depends(get_chat_repository),
+):
+    stats = await chat_repository.get_chat_stats(start_date=startDate, end_date=endDate)
+    return stats
+

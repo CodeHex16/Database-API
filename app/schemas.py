@@ -179,3 +179,14 @@ class Settings(BaseModel):
     color_primary_hover: Optional[str] = None
     color_primary_text: Optional[str] = None
     message_history: Optional[int] = None
+
+
+class Stats(BaseModel):
+    total_chats: int
+    total_messages: int
+    total_chatbot_messages: int
+    total_user_messages: int
+    average_messages_per_chat: float
+    average_messages_per_user: float
+    positive_rating_percentage: float
+    active_users: int
