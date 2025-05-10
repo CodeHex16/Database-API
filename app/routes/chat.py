@@ -186,6 +186,7 @@ async def add_message_to_chat(
 @router.get("/{chat_id}/messages", response_model=schemas.ChatMessages)
 async def get_chat_messages(
     chat_id: str,
+    limit: int = None,
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
 ):
@@ -194,6 +195,7 @@ async def get_chat_messages(
 
     ### Args:
     * **chat_id**: ID della chat di cui recuperare i messaggi.
+    * **limit**: Numero massimo di messaggi da recuperare (opzionale).
 
     ### Returns:
     * **result (ChatMessages)**: Nome della chat e lista dei messaggi contenuti in quella chat.
@@ -206,7 +208,7 @@ async def get_chat_messages(
     user_email = current_user.get("sub")
 
     # Verifica che la chat esista e appartenga all'utente
-    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email)
+    existing_chat = await chat_repository.get_chat_by_id(chat_id, user_email, limit)
     if not existing_chat:
         raise HTTPException(status_code=404, detail="Chat not found")
 
