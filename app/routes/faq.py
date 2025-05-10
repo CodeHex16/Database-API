@@ -12,7 +12,7 @@ from app.routes.auth import verify_admin, authenticate_user
 router = APIRouter(prefix="/faqs", tags=["faq"])
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_faq(
     faq: schemas.FAQ,
     current_user=Depends(verify_admin),
@@ -53,7 +53,7 @@ async def create_faq(
     }
 
 
-@router.get("/", response_model=List[schemas.FAQResponse])
+@router.get("", response_model=List[schemas.FAQResponse])
 async def get_faqs(
     current_user=Depends(verify_admin),
     faq_repo: FaqRepository = Depends(get_faq_repository),

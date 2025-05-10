@@ -45,7 +45,7 @@ async def get_new_chat(
     return {"chat_id": str(chats["_id"])}
 
 
-@router.get("/", response_model=List[schemas.ChatResponse])
+@router.get("", response_model=List[schemas.ChatResponse])
 async def get_chats(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
