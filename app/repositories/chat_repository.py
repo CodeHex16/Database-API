@@ -4,6 +4,9 @@ from datetime import datetime
 from app.utils import get_timezone
 import app.schemas as schemas
 
+from app.database import get_db
+from fastapi import Depends
+
 
 class ChatRepository:
     def __init__(self, database):
@@ -15,10 +18,15 @@ class ChatRepository:
             length=limit
         )
 
-    async def get_chat_by_id(self, chat_id, user_email):
-        return await self.collection.find_one(
+    async def get_chat_by_id(self, chat_id, user_email, limit: int = 0):
+        result = await self.collection.find_one(
             {"_id": ObjectId(chat_id), "user_email": user_email}
         )
+
+        if limit:
+            result["messages"] = result["messages"][-limit:]
+
+        return result
 
     async def initialize_chat(self, user_email):
         """Inizializza una nuova chat con il messaggio iniziale del bot"""
@@ -52,6 +60,9 @@ class ChatRepository:
         )
 
     async def add_message(self, chat_id, message: schemas.MessageCreate):
+        """
+        Aggiunge un messaggio alla chat.
+        """
         message_data = {
             "_id": ObjectId(),
             "sender": message.sender,
@@ -68,6 +79,9 @@ class ChatRepository:
         return message_data
 
     async def update_chat_title(self, chat_id, title):
+        """
+        Aggiorna il titolo della chat.
+        """
         return await self.collection.update_one(
             {"_id": ObjectId(chat_id)}, {"$set": {"name": title}}
         )
@@ -85,3 +99,6 @@ class ChatRepository:
         update_operation = {"$set": {"messages.$.rating": rating}}
 
         return await self.collection.update_one(query_filter, update_operation)
+
+def get_chat_repository(db=Depends(get_db)):
+    return ChatRepository(db)

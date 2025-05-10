@@ -3,6 +3,7 @@ import uuid
 import pytz
 import hashlib
 from bson import ObjectId
+import os
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -30,4 +31,4 @@ def get_timezone():
     """
     Get the timezone of the server.
     """
-    return pytz.timezone("Europe/Rome")
+    return pytz.timezone(os.getenv("TZ", "Europe/Rome"))

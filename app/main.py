@@ -6,15 +6,12 @@ from logging import info
 import os
 from dotenv import load_dotenv
 
-from app.database import init_db, get_db
+from app.database import init_db, get_db, MONGODB_URL
 
-from app.routes import auth, chat, document, user, faq
+from app.routes import auth, chat, document, user, faq, setting
 from app.repositories.user_repository import UserRepository
 
 load_dotenv()
-
-# Ottieni l'URL del MongoDB dall'ambiente
-MONGODB_URL = os.getenv("MONGODB_URL")
 
 async def lifespan(app: FastAPI):
     # Startup
@@ -23,21 +20,28 @@ async def lifespan(app: FastAPI):
     info("Connected to the MongoDB database!")
     init_db(app.database)
 
-    # TODO: da rimuovere
-    # AGGIUNGI UTENTE TEST
     user_repo = UserRepository(app.database)
-    test_user = await user_repo.get_test_user()
-    if not test_user:
-        await user_repo.add_test_user()
-        print("Utente test aggiunto con successo")
-    else:
-        print("Utente test già presente nel database")
-    admin_user = await user_repo.get_by_email("admin@test.it")
+    if os.getenv("ENVIRONMENT") == "development":
+        # AGGIUNGI UTENTE TEST (Solo in sviluppo)
+        test_user = await user_repo.get_test_user()
+        if not test_user:
+            await user_repo.add_test_user()
+            print("Utente test aggiunto con successo")
+        else:
+            print("Utente test già presente nel database")
+    
+    if (not os.getenv("ADMIN_EMAIL")) or (not os.getenv("ADMIN_PASSWORD")):
+        print("ADMIN_EMAIL e ADMIN_PASSWORD non sono stati definiti in .env")
+        print("Defalt admin user:", os.getenv("ADMIN_EMAIL") or "admin@test.it")
+        print("Defalt admin password:", os.getenv("ADMIN_PASSWORD") or "adminadmin")
+
+    admin_user = await user_repo.get_by_email(os.getenv("ADMIN_EMAIL") or "admin@test.it")
     if not admin_user:
         await user_repo.add_test_admin()
         print("Utente admin aggiunto con successo")
     else:
         print("Utente admin già presente nel database")
+        
     yield
 
     # Shutdown
@@ -68,9 +72,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-auth.init_router(app)
 app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(document.router)
 app.include_router(user.router)
 app.include_router(faq.router)
+app.include_router(setting.router)

@@ -1,6 +1,7 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import datetime, timedelta, timezone
+from app.utils import get_timezone
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -19,28 +20,25 @@ from app.service.auth_service import AccessRoles
 
 load_dotenv()
 
-SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
-if not SECRET_KEY_JWT:
-    raise ValueError("SECRET_KEY_JWT non impostata nelle variabili d'ambiente")
-
+SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT") or "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 30  # 30 giorni
-
+ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES") or 60 * 24 * 30
 
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
 )
 
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
-def init_router(app_instance):
-    yield
-
-
+def security_check(): # pragma: no cover
+    if SECRET_KEY_JWT == "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi":
+        print(
+            "WARNING: SECRET_KEY_JWT is not set. Using default value for development purposes only."
+        )
+        print("Please set SECRET_KEY_JWT in your environment variables.")
+security_check()
 
 
 async def authenticate_user(email: str, password: str, user_repo: UserRepository):
@@ -89,9 +87,9 @@ def create_access_token(
     to_encode = data.copy()
     to_encode.update({"scopes": scopes})
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(get_timezone()) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=60 * 24)
+        expire = datetime.now(get_timezone()) + timedelta(minutes=60 * 24)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY_JWT, algorithm=ALGORITHM)
     return encoded_jwt

@@ -6,6 +6,7 @@ from pymongo.errors import DuplicateKeyError
 from jose import jwt, JWTError
 
 from app.database import get_db
+
 import app.schemas as schemas
 from app.routes.auth import (
     verify_admin,
@@ -22,25 +23,36 @@ router = APIRouter(
     tags=["user"],
 )
 
-SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT")
-if not SECRET_KEY_JWT:
-    raise ValueError("SECRET_KEY_JWT non impostata nelle variabili d'ambiente")
-
+SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT") or "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi"
 ALGORITHM = "HS256"
 
+def security_check(): # pragma: no cover
+    if SECRET_KEY_JWT == "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi":
+        print(
+            "WARNING: SECRET_KEY_JWT is not set. Using default value for development purposes only."
+        )
+        print("Please set SECRET_KEY_JWT in your environment variables.")
+security_check()
 
-@router.post(
-    "",
-    status_code=status.HTTP_201_CREATED,
-)
+
+@router.post("",status_code=status.HTTP_201_CREATED)
 async def register_user(
     user_data: schemas.UserCreate,
     current_user=Depends(verify_admin),
     user_repo: UserRepository = Depends(get_user_repository),
 ):
     """
-    Crea un nuovo utente con una password temporanea casuale.
-    L'utente riceverà un'email con la password temporanea.
+    Registra un nuovo utente.
+
+    ### Args:
+    * **user_data**: I dati dell'utente da registrare.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'email è già in uso.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante la registrazione dell'utente.
+
+    ### Returns:
+    * **dict**: Un messaggio di successo e la password temporanea generata.
     """
     # Genera una password temporanea casuale
     password = os.urandom(16).hex()
@@ -68,11 +80,22 @@ async def register_user(
             detail=f"Failed to create user: {e}",
         )
 
-    await EmailService().send_email(
-        to=[user_data.email],
-        subject=f"[Suppl-AI] Registrazione utente",
-        body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
-    )
+    try:
+        await EmailService().send_email(
+            to=[user_data.email],
+            subject=f"[Suppl-AI] Registrazione utente",
+            body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
+        )
+    except Exception:
+        # raise HTTPException(
+        #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #     detail=f"Failed to send email to user: {e}",
+        # )
+        print("  Error: Failed to send to user the password")
+        print(f" To: {user_data.email}")
+        print(f" Subject: [Suppl-AI] Registrazione utente")
+        print(f" Body: Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!")
+        print("  Error: Failed to send email to user")
 
     return {"message": "User registered successfully", "password": password}
 
@@ -80,7 +103,6 @@ async def register_user(
 @router.get(
     "",
     response_model=List[schemas.User],
-    status_code=status.HTTP_200_OK,
 )
 async def get_users(
     current_user=Depends(verify_admin),
@@ -88,6 +110,13 @@ async def get_users(
 ):
     """
     Restituisce una lista di tutti gli utenti registrati.
+
+    ### Returns:
+    * **List[schemas.User]**: La lista degli utenti registrati.
+
+    ### Raises:
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se non sono stati trovati utenti.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il recupero degli utenti.
     """
     users = await user_repo.get_users()
 
@@ -103,14 +132,20 @@ async def get_users(
 @router.get(
     "/me",
     response_model=schemas.User,
-    status_code=status.HTTP_200_OK,
 )
 async def get_user(
     current_user=Depends(verify_user),
     user_repo: UserRepository = Depends(get_user_repository),
 ):
     """
-    Restituisce dell'utente che richiede l'operazione.
+    Restituisce i dati dell'utente che richiede l'operazione.
+
+    ### Returns:
+    * **schemas.User**: I dati dell'utente.
+
+    ### Raises:
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se l'utente non è stato trovato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il recupero dell'utente.
     """
     # Ottiene i dati dell'utente
     user = await user_repo.get_by_email(current_user.get("sub"))
@@ -123,11 +158,8 @@ async def get_user(
         )
     return user
 
-
-# TODO: non si dovrebbe poter cambiare la password senza reinserire quella attuale
-@router.put(
+@router.patch(
     "",
-    status_code=status.HTTP_200_OK,
 )
 async def update_user(
     user_new_data: schemas.UserUpdate,
@@ -135,25 +167,26 @@ async def update_user(
     user_repo: UserRepository = Depends(get_user_repository),
 ):
     """
-    Modifica i dati di un utente esistente.
-    La modifica può includere la password, lo stato di inizializzazione,
-    la flag _remember_me_ e gli scopes. L'email (_id) non può essere modificata.
-    Se per uno dei campi viene fornito è None (null nel body json della richiesta),
-    il valore attuale rimarrà invariato.
-    """
-    # Aggiorna i dati dell'utente nel database
-    try:
-        result = await user_repo.update_user(
-            user_id=user_new_data.id,
-            user_data=user_new_data,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to update user: {e}",
-        )
+    Aggiorna i dati di un utente esistente.
 
-    # Controlla se l'aggiornamento ha avuto effetto
+    ### Args:
+    * **user_new_data**: I nuovi dati dell'utente da aggiornare.
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'email è già in uso.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se l'utente non è stato trovato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento dell'utente.
+    * **HTTPException.HTTP_304_NOT_MODIFIED**: Se i dati forniti corrispondono a quelli esistenti.
+    """
+    # Rimove il campo password (usa /password per cambiarla)
+    user_new_data.password = None
+
+    # Aggiorna i dati dell'utente nel database
+    result = await user_repo.update_user(
+        user_id=user_new_data.id,
+        user_data=user_new_data,
+    )
+
     if result.modified_count == 0 and result.matched_count > 0:
         return {"message": "User data is already up to date."}
     elif result.matched_count == 0:
@@ -161,14 +194,12 @@ async def update_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found during update attempt",
         )
+    else:
+        return {"message": "User updated successfully."}
 
-    return {"message": "User updated successfully"}
 
 
-@router.delete(
-    "",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
+@router.delete("",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     delete_user: schemas.UserDelete,
     admin: schemas.UserAuth,
@@ -176,7 +207,17 @@ async def delete_user(
     user_repository: UserRepository = Depends(get_user_repository),
 ):
     """
-    Elimina un utente esistente se la password inserita dall'admin è corretta.
+    Elimina un utente esistente.
+
+    ### Args:
+    * **delete_user**: I dati dell'utente da eliminare.
+    * **admin**: I dati dell'amministratore che richiede l'operazione.
+
+    ### Raises:
+    * **HTTPException.HTTP_401_UNAUTHORIZED**: Se le credenziali dell'amministratore non sono valide.
+    * **HTTPException.HTTP_403_FORBIDDEN**: Se le credenziali non corrispondono all'amministratore loggato.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se l'utente non è stato trovato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'eliminazione dell'utente.
     """
     try:
         # Verifica che l'admin esista e che la password sia corretta
@@ -214,7 +255,6 @@ async def delete_user(
 
 @router.patch(
     "/password",
-    status_code=status.HTTP_200_OK,
 )
 async def update_password(
     user_data: schemas.UserUpdatePassword,
@@ -223,6 +263,15 @@ async def update_password(
 ):
     """
     Aggiorna la password dell'utente.
+
+    ### Args:
+    * **user_data**: I dati dell'utente da aggiornare.
+
+    ### Raises:
+    * **HTTPException.HTTP_401_UNAUTHORIZED**: Se la password corrente non è corretta.
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se l'utente non è stato trovato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento della password.
+    * **HTTPException.HTTP_304_NOT_MODIFIED**: Se la password fornita corrisponde a quella esistente.
     """
     # Aggiorna la password dell'utente
     try:
@@ -240,7 +289,7 @@ async def update_password(
         if user_current_data.get("is_initialized") is False:
             initialized = True
 
-        await user_repository.update_user(
+        result = await user_repository.update_user(
             user_id=current_user.get("sub"),
             user_data=schemas.UserUpdate(
                 _id=current_user.get("sub"),
@@ -248,6 +297,14 @@ async def update_password(
                 is_initialized=initialized,
             ),
         )
+        if result.matched_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found during password update attempt",
+            )
+        else:
+            return {"message": "Password updated successfully"}
+        
     except Exception as e:
         print(f"Error updating password: {e}")
         raise HTTPException(
@@ -255,21 +312,27 @@ async def update_password(
             detail=f"Failed to update password: {e}",
         )
 
-    return {"message": "Password updated successfully"}
+    
 
 
 @router.post(
     "/password_reset",
-    status_code=status.HTTP_200_OK,
 )
 async def reset_password(
     user_data: schemas.UserForgotPassword,
     user_repository: UserRepository = Depends(get_user_repository),
 ):
     """
-    Invia un'email per il reset della password.
+    Resetta la password dell'utente e invia un'email con la nuova password temporanea.
+
+    ### Args:
+    * **user_data**: I dati dell'utente di cui resettare la password.
+
+    ### Raises:
+    * **HTTPException.HTTP_404_NOT_FOUND**: Se l'utente non è stato trovato.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il reset della password.
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se i nuovi dati non sono validi.
     """
-    # Invia l'email per il reset della password
     try:
         user = await user_repository.get_by_email(user_data.email)
         if not user:
@@ -289,14 +352,27 @@ async def reset_password(
             ),
         )
 
-        # Invia l'email con il token
-        await EmailService().send_email(
-            to=[user.get("_id")],
-            subject="[Suppl-AI] Password Reset",
-            body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
-        )
+       
+        try:
+            # Invia l'email con il token
+            await EmailService().send_email(
+                to=[user.get("_id")],
+                subject="[Suppl-AI] Password Reset",
+                body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
+            )
+        except Exception:
+            # raise HTTPException(
+            #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            #     detail=f"Failed to send email to user: {e}",
+            # )
+            print("  Error: Failed to send to user the password")
+            print(f" To: {user_data.email}")
+            print(f" Subject: [Suppl-AI] Password Reset")
+            print(f" Body: Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!")
+            print("  Error: Failed to send email to user")
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to send password reset email: {e}",
         )
+    return {"message": "Password reset email sent successfully", "password": password}

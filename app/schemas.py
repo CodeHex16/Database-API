@@ -6,7 +6,7 @@ import re
 
 
 # Implementazione ObjectId per pydantic
-class _ObjectIdPydanticAnnotation:
+class _ObjectIdPydanticAnnotation: # pragma: no cover
     # Based on https://docs.pydantic.dev/latest/usage/types/custom/#handling-third-party-types.
 
     @classmethod
@@ -64,6 +64,7 @@ class UserUpdatePassword(BaseModel):
 
 class UserUpdate(BaseModel):
     id: Optional[EmailStr] = Field(alias="_id")
+    name: Optional[str] = None
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
@@ -158,8 +159,8 @@ class FAQUpdate(BaseModel):
 
     @field_validator("title")
     def check_title_length(cls, value: Optional[str]):
-        if len(value) > 20:
-            raise ValueError(f"Il titolo deve essere lungo massimo 20 caratteri")
+        if len(value) > 30:
+            raise ValueError(f"Il titolo deve essere lungo massimo 30 caratteri")
         return value
 
 
@@ -171,3 +172,10 @@ class FAQResponse(FAQ):
 
 class EmailSchema(BaseModel):
     email: List[EmailStr]
+
+
+class Settings(BaseModel):
+    color_primary: Optional[str] = None
+    color_primary_hover: Optional[str] = None
+    color_primary_text: Optional[str] = None
+    message_history: Optional[int] = None
