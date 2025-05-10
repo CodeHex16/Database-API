@@ -9,15 +9,12 @@ from app.routes.auth import (
     verify_user,
     verify_admin,
 )
+from app.repositories.chat_repository import get_chat_repository
 
 router = APIRouter(
     prefix="/chats",
     tags=["chat"],
 )
-
-
-def get_chat_repository(db=Depends(get_db)):
-    return ChatRepository(db)
 
 
 @router.get(
@@ -48,7 +45,7 @@ async def get_new_chat(
     return {"chat_id": str(chats["_id"])}
 
 
-@router.get("", response_model=List[schemas.ChatResponse])
+@router.get("/", response_model=List[schemas.ChatResponse])
 async def get_chats(
     current_user=Depends(verify_user),
     chat_repository=Depends(get_chat_repository),
