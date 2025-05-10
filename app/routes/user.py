@@ -35,7 +35,7 @@ def security_check(): # pragma: no cover
 security_check()
 
 
-@router.post("/",status_code=status.HTTP_201_CREATED)
+@router.post("",status_code=status.HTTP_201_CREATED)
 async def register_user(
     user_data: schemas.UserCreate,
     current_user=Depends(verify_admin),
@@ -199,7 +199,7 @@ async def update_user(
 
 
 
-@router.delete("/",status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     delete_user: schemas.UserDelete,
     admin: schemas.UserAuth,

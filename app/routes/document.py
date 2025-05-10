@@ -23,7 +23,7 @@ router = APIRouter(
 
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def upload_document(
     document: schemas.Document,
     current_user=Depends(verify_admin),
@@ -85,7 +85,7 @@ async def get_documents(
     return documents
 
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(
     file: schemas.DocumentDelete,
     admin: schemas.UserAuth,
