@@ -72,7 +72,7 @@ async def register_user(
     except DuplicateKeyError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists",
+            detail="Esiste già un utente con questa email",
         )
     except Exception as e:
         raise HTTPException(
