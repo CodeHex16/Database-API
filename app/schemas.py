@@ -185,6 +185,7 @@ class Stats(BaseModel):
     total_chats: int
     total_messages: int
     total_chatbot_messages: int
+    total_rated_messages: int
     total_user_messages: int
     average_messages_per_chat: float
     average_messages_per_user: float
