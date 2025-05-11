@@ -18,7 +18,7 @@ class EmailService:
             MAIL_FROM=os.getenv("MAIL_ADDRESS","unipd.codehex16@gmail.com"),
             MAIL_FROM_NAME=os.getenv("MAIL_USERNAME",""),
             MAIL_PORT=os.getenv("MAIL_PORT",587),
-            MAIL_SERVER=os.getenv("MAIL_SERVER","smtp.test.it"),
+            MAIL_SERVER=os.getenv("MAIL_SERVER","smtp.gmail.it"),
             MAIL_STARTTLS = os.getenv("MAIL_STARTTLS",True),
             MAIL_SSL_TLS = os.getenv("MAIL_SSL_TLS", False),
             USE_CREDENTIALS=os.getenv("MAIL_USE_CREDENTIALS",True),
@@ -39,7 +39,4 @@ class EmailService:
         return all([
             self.conf.MAIL_USERNAME,
             self.conf.MAIL_PASSWORD,
-            self.conf.MAIL_FROM,
-            self.conf.MAIL_PORT,
-            self.conf.MAIL_SERVER,
 		])
