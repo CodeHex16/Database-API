@@ -15,7 +15,7 @@ class EmailService:
         self.conf = ConnectionConfig(
             MAIL_USERNAME=os.getenv("MAIL_ADDRESS",""),
             MAIL_PASSWORD=os.getenv("MAIL_PASSWORD",""),
-            MAIL_FROM=os.getenv("MAIL_ADDRESS",""),
+            MAIL_FROM=os.getenv("MAIL_ADDRESS","unipd.codehex16@gmail.com"),
             MAIL_FROM_NAME=os.getenv("MAIL_USERNAME",""),
             MAIL_PORT=os.getenv("MAIL_PORT",587),
             MAIL_SERVER=os.getenv("MAIL_SERVER",""),
