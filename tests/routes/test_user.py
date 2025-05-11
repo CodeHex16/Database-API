@@ -107,8 +107,20 @@ current_user = {"sub": "hi@hi.com"}
 
 
 @pytest.mark.asyncio
-async def test__unit_test__register_user(fake_user_repo):
+async def test__unit_test__register_user(fake_user_repo, monkeypatch): 
     user_data = UserCreate(name="Bob", email="hi@hi.com", scopes=AccessRoles.USER)
+
+    mock_email_service_instance = AsyncMock()
+    mock_email_service_instance.send_email = AsyncMock(return_value=None)
+
+    class MockEmailService:
+        def __init__(self):
+            pass 
+        async def send_email(self, to, subject, body):
+            return await mock_email_service_instance.send_email(to, subject, body)
+
+    monkeypatch.setattr("app.routes.user.EmailService", MockEmailService)
+
     result = await register_user(user_data, current_user, fake_user_repo)
     assert result["message"] != None
 
