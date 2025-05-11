@@ -170,7 +170,8 @@ async def update_user(
     * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento dell'utente.
     * **HTTPException.HTTP_304_NOT_MODIFIED**: Se i dati forniti corrispondono a quelli esistenti.
     """
-	# Verifica che l'admin esista e che la password sia corretta
+    user_new_data.password = None
+    # Verifica che l'admin esista e che la password sia corretta
     valid_user = await authenticate_user(
         current_user.get("sub"), user_new_data.admin_password, user_repo
     )
