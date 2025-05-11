@@ -173,7 +173,8 @@ async def test__unit_test__update_user_success(user_repository, mock_database):
         password="newpass",
         is_initialized=True,
         remember_me=True,
-        scopes=["admin"]
+        scopes=["admin"],
+        admin_password="adminadmin",
     )
 
     result = await user_repository.update_user("user@test.com", update_data)
@@ -197,7 +198,8 @@ async def test__unit_test__update_user_success_with_no_password(user_repository,
          _id = "user@test.com",
         is_initialized=True,
         remember_me=True,
-        scopes=["admin"]
+        scopes=["admin"],
+        admin_password="adminadmin"
     )
 
     result = await user_repository.update_user("user@test.com", update_data)
@@ -223,7 +225,8 @@ async def test__unit_test__update_user_error(user_repository, mock_database):
         password="newpass",
         is_initialized=True,
         remember_me=True,
-        scopes=["admin"]
+        scopes=["admin"],
+        admin_password="adminadmin",
     )
     with pytest.raises(HTTPException) as exc_info:
         result = await user_repository.update_user("user@test.com", update_data)
@@ -232,10 +235,10 @@ async def test__unit_test__update_user_error(user_repository, mock_database):
                
 @pytest.mark.asyncio
 async def test__unit_test__update_user_no_changes_provide(user_repository, mock_database):
-    update_data = UserUpdate(_id=None)
+    update_data = UserUpdate(_id="user@test.com", password=None, is_initialized=None, remember_me=None, scopes=None, admin_password=None)
     with pytest.raises(HTTPException) as exc_info:
         await user_repository.update_user("user@test.com", update_data)
-    assert exc_info.value.status_code == 400
+    assert exc_info.value.status_code == 304
 
 @pytest.mark.asyncio
 async def test__unit_test__update_user_no_modified(user_repository, mock_database):
@@ -254,7 +257,8 @@ async def test__unit_test__update_user_no_modified(user_repository, mock_databas
         password="test_password",
         is_initialized=False,
         remember_me=False,
-        scopes=["admin"]
+        scopes=["admin"],
+        admin_password="adminadmin"
     )
 
     with pytest.raises(HTTPException) as exc_info:
@@ -268,7 +272,7 @@ async def test__unit_test__update_user_not_found(user_repository, mock_database)
     mock_collection = mock_database.get_collection.return_value
     mock_collection.find_one.return_value = None
 
-    update_data = UserUpdate(_id="test@test.com",password="anypass")
+    update_data = UserUpdate(_id="test@test.com",password="anypass", admin_password="adminadmin")
 
     with pytest.raises(HTTPException) as exc_info:
         await user_repository.update_user("missing@test.com", update_data)

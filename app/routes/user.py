@@ -72,7 +72,7 @@ async def register_user(
     except DuplicateKeyError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists",
+            detail="Esiste già un utente con questa email",
         )
     except Exception as e:
         raise HTTPException(
@@ -86,16 +86,12 @@ async def register_user(
             subject=f"[Suppl-AI] Registrazione utente",
             body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
         )
-    except Exception:
-        # raise HTTPException(
-        #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        #     detail=f"Failed to send email to user: {e}",
-        # )
-        print("  Error: Failed to send to user the password")
-        print(f" To: {user_data.email}")
-        print(f" Subject: [Suppl-AI] Registrazione utente")
-        print(f" Body: Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!")
-        print("  Error: Failed to send email to user")
+    except Exception as e:
+        raise HTTPException(
+        	status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        	detail=f"Failed to send email to user: {e}",
+        )
+        # print(f"  Error: Failed to send to user the password: {e}")
 
     return {"message": "User registered successfully", "password": password}
 
@@ -178,9 +174,17 @@ async def update_user(
     * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante l'aggiornamento dell'utente.
     * **HTTPException.HTTP_304_NOT_MODIFIED**: Se i dati forniti corrispondono a quelli esistenti.
     """
-    # Rimove il campo password (usa /password per cambiarla)
     user_new_data.password = None
-
+    # Verifica che l'admin esista e che la password sia corretta
+    valid_user = await authenticate_user(
+        current_user.get("sub"), user_new_data.admin_password, user_repo
+    )
+    if not valid_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid admin password",
+        )
+    
     # Aggiorna i dati dell'utente nel database
     result = await user_repo.update_user(
         user_id=user_new_data.id,
@@ -360,16 +364,13 @@ async def reset_password(
                 subject="[Suppl-AI] Password Reset",
                 body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
             )
-        except Exception:
+        except Exception as e:
             # raise HTTPException(
             #     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             #     detail=f"Failed to send email to user: {e}",
             # )
             print("  Error: Failed to send to user the password")
-            print(f" To: {user_data.email}")
-            print(f" Subject: [Suppl-AI] Password Reset")
-            print(f" Body: Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!")
-            print("  Error: Failed to send email to user")
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -63,13 +63,13 @@ class UserUpdatePassword(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    id: Optional[EmailStr] = Field(alias="_id")
+    id: EmailStr = Field(alias="_id")
     name: Optional[str] = None
     password: Optional[str] = None
     is_initialized: Optional[bool] = None
     remember_me: Optional[bool] = None
     scopes: Optional[List[str]] = None
-
+    admin_password: Optional[str] = None
 
 class UserDelete(BaseModel):
     id: EmailStr = Field(alias="_id")

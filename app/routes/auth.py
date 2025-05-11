@@ -181,8 +181,8 @@ async def login_for_access_token(
 
     # Crea il token di accesso
     if remember_me:
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        expires_in = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
+        expires_in = int(ACCESS_TOKEN_EXPIRE_MINUTES) * 60
     else:
         # se access_token_expires è None, il token dura 24 ore ma il cookie che lo contiene scade alla chiusura del browser
         access_token_expires = None

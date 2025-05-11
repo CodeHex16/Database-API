@@ -35,6 +35,11 @@ jobs:
           coverage run -m pytest
           coverage report
           coverage html
+        env:
+            MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+            MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+            MAIL_ADDRESS: ${{ secrets.MAIL_ADDRESS }}
+
 
       # Upload coverage data to Coveralls
       - name: Upload coverage to Coveralls

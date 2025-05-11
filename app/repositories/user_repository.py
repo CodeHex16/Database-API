@@ -28,7 +28,6 @@ class UserRepository:
         try:
             return await self.collection.insert_one(
                 {
-                    # "_id": get_uuid3("test@test.it"),
                     "_id": "test@test.it",
                     "name": "Test User",
                     "hashed_password": get_password_hash("testtest"),
@@ -46,7 +45,6 @@ class UserRepository:
         try:
             return await self.collection.insert_one(
                 {
-                    # "_id": get_uuid3("admin@test.it"),
                     "_id": os.getenv("ADMIN_EMAIL") or "admin@test.it",
                     "name": "Test Admin",
                     "hashed_password": get_password_hash(os.getenv("ADMIN_PASSWORD") or "admin"),
