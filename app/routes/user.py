@@ -87,10 +87,15 @@ async def register_user(
             body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
         )
     except Exception as e:
-        raise HTTPException(
-			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-			detail=f"Failed to send email to user: {e}",
-		)
+        # raise HTTPException(
+        # 	status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        # 	detail=f"Failed to send email to user: {e}",
+        # )
+        print(f"  Error: Failed to send to user the password: {e}")
+        print(f" To: {user_data.email}")
+        print(f" Subject: [Suppl-AI] Password Reset")
+        print(f" Body: Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!")
+        print("  Error: Failed to send email to user")
 
     return {"message": "User registered successfully", "password": password}
 
