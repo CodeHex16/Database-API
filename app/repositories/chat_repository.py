@@ -170,6 +170,7 @@ class ChatRepository:
             "total_chats": total_chats,
             "total_messages": total_messages,
             "total_chatbot_messages": total_chatbot_messages,
+            "total_rated_messages": rated_messages_count,
             "total_user_messages": total_user_messages,
             "average_messages_per_user": round(average_messages_per_user, 2),
             "average_messages_per_chat": round(average_messages_per_chat, 2),
