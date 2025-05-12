@@ -284,11 +284,22 @@ async def rate_message(
 
 @router.get("/stats", response_model=schemas.Stats)
 async def get_global_stats(
-    current_user=Depends(verify_admin),  # Usa verify_user se non ti serve il controllo admin
+    current_user=Depends(verify_admin),
     startDate: Optional[str] = Query(None, description="Data di inizio in formato ISO (YYYY-MM-DD)"),
     endDate: Optional[str] = Query(None, description="Data di fine in formato ISO (YYYY-MM-DD)"),
     chat_repository=Depends(get_chat_repository),
 ):
+    """
+    Ritorna le statistiche filtrate in base alla data di inizio e fine.
+
+    ### Args:
+    * **start_date**: data di inizio ricerca (opzionale).
+    * **end_date**: data di fine ricerca (opzionale).
+
+    ### Raises:
+    * **HTTPException.HTTP_400_BAD_REQUEST**: Se l'utente non è autenticato o se si verifica un errore durante il recupero delle statistiche.
+    * **HTTPException.HTTP_500_INTERNAL_SERVER_ERROR**: Se si verifica un errore durante il recupero delle statistiche.
+    """
     stats = await chat_repository.get_chat_stats(start_date=startDate, end_date=endDate)
     return stats
 
