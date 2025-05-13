@@ -7,7 +7,7 @@ import app.schemas as schemas
 from typing import List
 from app.repositories.faq_repository import FaqRepository, get_faq_repository
 from app.repositories.user_repository import UserRepository, get_user_repository
-from app.routes.auth import verify_admin, authenticate_user
+from app.routes.auth import verify_admin, authenticate_user, verify_user
 
 router = APIRouter(prefix="/faqs", tags=["faq"])
 
@@ -55,7 +55,7 @@ async def create_faq(
 
 @router.get("", response_model=List[schemas.FAQResponse])
 async def get_faqs(
-    current_user=Depends(verify_admin),
+    current_user=Depends(verify_user),
     faq_repo: FaqRepository = Depends(get_faq_repository),
 ):
     """
