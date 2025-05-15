@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 from app.routes.auth import router as auth_router
 from app.repositories.user_repository import UserRepository
 from app.schemas import UserUpdate
-from app.service.auth_service import AccessRoles
+from app.auth_roles import AccessRoles
 from app.utils import verify_password
 from fastapi import APIRouter, Depends, HTTPException, status
 

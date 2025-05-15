@@ -9,7 +9,7 @@ from app.schemas import (
     UserUpdatePassword,
     UserForgotPassword,
 )
-from app.service.auth_service import AccessRoles
+from app.auth_roles import AccessRoles
 from pymongo.errors import DuplicateKeyError
 from jose import jwt, JWTError
 from app.routes.user import (
