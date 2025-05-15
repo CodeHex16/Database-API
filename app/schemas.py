@@ -51,9 +51,8 @@ class UserForgotPassword(BaseModel):
     email: EmailStr
 
 
-class UserUpdatePassword(BaseModel):
+class UserUpdatePassword(UserAuth):
     password: str
-    current_password: str
 
     @field_validator("password")
     def check_password_complexity(cls, value: str):

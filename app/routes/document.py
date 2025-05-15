@@ -3,8 +3,6 @@ from typing import List
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
 
-from app.database import get_db
-from app.repositories.document_repository import DocumentRepository
 from app.repositories.user_repository import UserRepository
 import app.schemas as schemas
 from app.routes.auth import (
@@ -124,9 +122,6 @@ async def delete_document(
         )
 
     try:
-        print("Deleting document:", file)
-        print("AAAAAAAAAAAAAAAAAAAAA")
-        print("ObjectId:", ObjectId(file.id))
         result = await document_repository.delete_document(file_id=ObjectId(file.id))
         if result.deleted_count == 0:
             raise HTTPException(
