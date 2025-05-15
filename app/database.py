@@ -10,8 +10,8 @@ MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
 if MONGODB_URL and regex.match(r"^mongodb://.*:.*@.*:.*", MONGODB_URL):
     MONGODB_URL = MONGODB_URL
 # Se l'MONGODB_URL non contiene username e password, allora usa MONGO_USERNAME e MONGO_PASSWORD
-elif MONGO_USERNAME and MONGO_PASSWORD:
-    MONGODB_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@localhost:27017"
+elif MONGO_USERNAME and MONGO_PASSWORD and regex.match(r"^.*:.*", MONGODB_URL):
+    MONGODB_URL = f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGODB_URL}"
 else:
     # Se non sono presenti username e password, usa l'URL di default
     MONGODB_URL = "mongodb://root:example@localhost:27017"
