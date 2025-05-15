@@ -23,6 +23,85 @@ router = APIRouter(
     tags=["user"],
 )
 
+style = """<style>
+                        body {
+                        background-color: #f8f9fa;
+                        font-family: 'Roboto', sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        color: #212121;
+                        }
+                        .container {
+                        max-width: 600px;
+                        margin: 2rem auto;
+                        background: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                        padding: 2rem;
+                        }
+                        .header {
+                        text-align: center;
+                        margin-bottom: 1rem;
+                        }
+                        .title {
+                        font-size: 1.5rem;
+                        font-weight: 500;
+                        }
+                        .content {
+                        margin: 1rem 0;
+                        line-height: 1.6;
+                        }
+                        .password-box {
+                        background-color: #e3f2fd;
+                        padding: 1rem;
+                        font-size: 1.25rem;
+                        font-weight: bold;
+                        border-radius: 6px;
+                        text-align: center;
+                        color: #0d47a1;
+                        letter-spacing: 0.5px;
+                        }
+                        .btn {
+                        display: inline-block;
+                        background-color: #1976d2;
+                        color: #fff !important;
+                        padding: 0.75rem 1.5rem;
+                        text-decoration: none;
+                        border-radius: 24px;
+                        font-weight: 500;
+                        transition: background 0.3s ease;
+                        }
+                        .btn:hover {
+                        background-color: #1565c0;
+                        }
+                        .footer {
+                        text-align: center;
+                        font-size: 0.875rem;
+                        margin-top: 2rem;
+                        color: #666;
+                        }
+                        .icon-links {
+                        margin-top: 1rem;
+                        text-align: center;
+                        }
+                        .icon-links a {
+                        margin: 0 0.5rem;
+                        display: inline-block;
+                        text-decoration: none;
+                        }
+                        .icon-links img {
+                        width: 24px;
+                        height: 24px;
+                        vertical-align: middle;
+                        filter: grayscale(100%);
+                        transition: filter 0.3s;
+                        }
+                        .icon-links img:hover {
+                        filter: grayscale(0%);
+                        }
+                    </style>
+"""
+
 SECRET_KEY_JWT = os.getenv("SECRET_KEY_JWT") or "$2b$12$zqt9Rgv1PzORjG5ghJSb6OSdYrt7f7cLc38a21DgX/DMyqt80AUCi"
 ALGORITHM = "HS256"
 
@@ -91,83 +170,7 @@ async def register_user(
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>Password Reset</title>
-                <style>
-                    body {
-                    background-color: #f8f9fa;
-                    font-family: 'Roboto', sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    color: #212121;
-                    }
-                    .container {
-                    max-width: 600px;
-                    margin: 2rem auto;
-                    background: #fff;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-                    padding: 2rem;
-                    }
-                    .header {
-                    text-align: center;
-                    margin-bottom: 1rem;
-                    }
-                    .title {
-                    font-size: 1.5rem;
-                    font-weight: 500;
-                    }
-                    .content {
-                    margin: 1rem 0;
-                    line-height: 1.6;
-                    }
-                    .password-box {
-                    background-color: #e3f2fd;
-                    padding: 1rem;
-                    font-size: 1.25rem;
-                    font-weight: bold;
-                    border-radius: 6px;
-                    text-align: center;
-                    color: #0d47a1;
-                    letter-spacing: 0.5px;
-                    }
-                    .btn {
-                    display: inline-block;
-                    background-color: #1976d2;
-                    color: #fff !important;
-                    padding: 0.75rem 1.5rem;
-                    text-decoration: none;
-                    border-radius: 24px;
-                    font-weight: 500;
-                    transition: background 0.3s ease;
-                    }
-                    .btn:hover {
-                    background-color: #1565c0;
-                    }
-                    .footer {
-                    text-align: center;
-                    font-size: 0.875rem;
-                    margin-top: 2rem;
-                    color: #666;
-                    }
-                    .icon-links {
-                    margin-top: 1rem;
-                    text-align: center;
-                    }
-                    .icon-links a {
-                    margin: 0 0.5rem;
-                    display: inline-block;
-                    text-decoration: none;
-                    }
-                    .icon-links img {
-                    width: 24px;
-                    height: 24px;
-                    vertical-align: middle;
-                    filter: grayscale(100%);
-                    transition: filter 0.3s;
-                    }
-                    .icon-links img:hover {
-                    filter: grayscale(0%);
-                    }
-                </style>
+               {style}
                 </head>
                 <body>
                 <div class="container">
@@ -482,83 +485,7 @@ async def reset_password(
                     <meta charset="UTF-8" />
                     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                     <title>Password Reset</title>
-                    <style>
-                        body {
-                        background-color: #f8f9fa;
-                        font-family: 'Roboto', sans-serif;
-                        margin: 0;
-                        padding: 0;
-                        color: #212121;
-                        }
-                        .container {
-                        max-width: 600px;
-                        margin: 2rem auto;
-                        background: #fff;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-                        padding: 2rem;
-                        }
-                        .header {
-                        text-align: center;
-                        margin-bottom: 1rem;
-                        }
-                        .title {
-                        font-size: 1.5rem;
-                        font-weight: 500;
-                        }
-                        .content {
-                        margin: 1rem 0;
-                        line-height: 1.6;
-                        }
-                        .password-box {
-                        background-color: #e3f2fd;
-                        padding: 1rem;
-                        font-size: 1.25rem;
-                        font-weight: bold;
-                        border-radius: 6px;
-                        text-align: center;
-                        color: #0d47a1;
-                        letter-spacing: 0.5px;
-                        }
-                        .btn {
-                        display: inline-block;
-                        background-color: #1976d2;
-                        color: #fff !important;
-                        padding: 0.75rem 1.5rem;
-                        text-decoration: none;
-                        border-radius: 24px;
-                        font-weight: 500;
-                        transition: background 0.3s ease;
-                        }
-                        .btn:hover {
-                        background-color: #1565c0;
-                        }
-                        .footer {
-                        text-align: center;
-                        font-size: 0.875rem;
-                        margin-top: 2rem;
-                        color: #666;
-                        }
-                        .icon-links {
-                        margin-top: 1rem;
-                        text-align: center;
-                        }
-                        .icon-links a {
-                        margin: 0 0.5rem;
-                        display: inline-block;
-                        text-decoration: none;
-                        }
-                        .icon-links img {
-                        width: 24px;
-                        height: 24px;
-                        vertical-align: middle;
-                        filter: grayscale(100%);
-                        transition: filter 0.3s;
-                        }
-                        .icon-links img:hover {
-                        filter: grayscale(0%);
-                        }
-                    </style>
+                    {style}
                     </head>
                     <body>
                     <div class="container">
