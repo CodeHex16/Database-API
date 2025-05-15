@@ -17,6 +17,13 @@ async def lifespan(app: FastAPI):
     # Startup
     app.mongodb_client = AsyncIOMotorClient(MONGODB_URL + "/supplai?authSource=admin")
     app.database = app.mongodb_client.get_default_database()
+
+    if not app.database:
+        raise Exception("Database connection failed")
+    
+    if not app.mongodb_client:
+        raise Exception("MongoDB client connection failed")
+    
     info("Connected to the MongoDB database!")
     init_db(app.database)
 

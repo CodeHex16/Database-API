@@ -76,11 +76,11 @@ async def get_documents(
 
     documents = await document_repository.get_documents()
 
-    if not documents:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Nessun documento trovato",
-        )
+    # if not documents:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail="Nessun documento trovato",
+    #     )
 
     return documents
 
