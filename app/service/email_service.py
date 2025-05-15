@@ -31,7 +31,7 @@ class EmailService:
           raise ValueError("Email configuration is not valid. Please check your environment variables.")
         else:
             message = MessageSchema(
-                subject=subject, recipients=to, body=body, subtype=MessageType.plain #or MessageType.html        
+                subject=subject, recipients=to, body=body, subtype=MessageType.html #or MessageType.plain        
             )
             await self.mail.send_message(message)
     

@@ -84,7 +84,120 @@ async def register_user(
         await EmailService().send_email(
             to=[user_data.email],
             subject=f"[Suppl-AI] Registrazione utente",
-            body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
+            body=f"""
+            <!DOCTYPE html>
+                <html lang="it">
+                <head>
+                <meta charset="UTF-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <title>Password Reset</title>
+                <style>
+                    body {
+                    background-color: #f8f9fa;
+                    font-family: 'Roboto', sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    color: #212121;
+                    }
+                    .container {
+                    max-width: 600px;
+                    margin: 2rem auto;
+                    background: #fff;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                    padding: 2rem;
+                    }
+                    .header {
+                    text-align: center;
+                    margin-bottom: 1rem;
+                    }
+                    .title {
+                    font-size: 1.5rem;
+                    font-weight: 500;
+                    }
+                    .content {
+                    margin: 1rem 0;
+                    line-height: 1.6;
+                    }
+                    .password-box {
+                    background-color: #e3f2fd;
+                    padding: 1rem;
+                    font-size: 1.25rem;
+                    font-weight: bold;
+                    border-radius: 6px;
+                    text-align: center;
+                    color: #0d47a1;
+                    letter-spacing: 0.5px;
+                    }
+                    .btn {
+                    display: inline-block;
+                    background-color: #1976d2;
+                    color: #fff !important;
+                    padding: 0.75rem 1.5rem;
+                    text-decoration: none;
+                    border-radius: 24px;
+                    font-weight: 500;
+                    transition: background 0.3s ease;
+                    }
+                    .btn:hover {
+                    background-color: #1565c0;
+                    }
+                    .footer {
+                    text-align: center;
+                    font-size: 0.875rem;
+                    margin-top: 2rem;
+                    color: #666;
+                    }
+                    .icon-links {
+                    margin-top: 1rem;
+                    text-align: center;
+                    }
+                    .icon-links a {
+                    margin: 0 0.5rem;
+                    display: inline-block;
+                    text-decoration: none;
+                    }
+                    .icon-links img {
+                    width: 24px;
+                    height: 24px;
+                    vertical-align: middle;
+                    filter: grayscale(100%);
+                    transition: filter 0.3s;
+                    }
+                    .icon-links img:hover {
+                    filter: grayscale(0%);
+                    }
+                </style>
+                </head>
+                <body>
+                <div class="container">
+                    <div class="header">
+                    <div class="title" style="font-size: 2rem; font-weight: 700; color: #1976d2;">SUPPL-AI</div>
+                    </div>
+                    <div class="content">
+                    <p><strong>Benvenuto in Suppl-AI!</strong></p>
+                    <p>Ecco la tua password temporanea:</p>
+                    <div class="password-box">{password}</div>
+                    <p>Accedi e cambiala subito!</p>
+                    </div>
+
+                    <div class="icon-links">
+                    <a href="https://codehex16.github.io/" title="Sito Web">
+                        <img src="https://img.icons8.com/ios-filled/50/000000/domain.png" alt="Sito">
+                    </a>
+                    <a href="https://github.com/codehex16" title="GitHub">
+                        <img src="https://img.icons8.com/ios-filled/50/000000/github.png" alt="GitHub">
+                    </a>
+                    </div>
+
+                    <div class="footer">
+                    Questo progetto &egrave; realizzato da <strong>CodeHex16</strong>, gruppo 16 del Progetto di SWE dell'Universit&agrave; degli Studi di Padova.
+                    </div>
+                </div>
+                </body>
+                </html>
+                """
+            # body=f"Benvenuto in Suppl-AI!\nEcco la tua password temporanea\n\n{password}\n\n Accedi e cambiala subito!",
         )
     except Exception as e:
         raise HTTPException(
@@ -362,7 +475,120 @@ async def reset_password(
             await EmailService().send_email(
                 to=[user.get("_id")],
                 subject="[Suppl-AI] Password Reset",
-                body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
+                body=f"""
+                <!DOCTYPE html>
+                    <html lang="it">
+                    <head>
+                    <meta charset="UTF-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <title>Password Reset</title>
+                    <style>
+                        body {
+                        background-color: #f8f9fa;
+                        font-family: 'Roboto', sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        color: #212121;
+                        }
+                        .container {
+                        max-width: 600px;
+                        margin: 2rem auto;
+                        background: #fff;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                        padding: 2rem;
+                        }
+                        .header {
+                        text-align: center;
+                        margin-bottom: 1rem;
+                        }
+                        .title {
+                        font-size: 1.5rem;
+                        font-weight: 500;
+                        }
+                        .content {
+                        margin: 1rem 0;
+                        line-height: 1.6;
+                        }
+                        .password-box {
+                        background-color: #e3f2fd;
+                        padding: 1rem;
+                        font-size: 1.25rem;
+                        font-weight: bold;
+                        border-radius: 6px;
+                        text-align: center;
+                        color: #0d47a1;
+                        letter-spacing: 0.5px;
+                        }
+                        .btn {
+                        display: inline-block;
+                        background-color: #1976d2;
+                        color: #fff !important;
+                        padding: 0.75rem 1.5rem;
+                        text-decoration: none;
+                        border-radius: 24px;
+                        font-weight: 500;
+                        transition: background 0.3s ease;
+                        }
+                        .btn:hover {
+                        background-color: #1565c0;
+                        }
+                        .footer {
+                        text-align: center;
+                        font-size: 0.875rem;
+                        margin-top: 2rem;
+                        color: #666;
+                        }
+                        .icon-links {
+                        margin-top: 1rem;
+                        text-align: center;
+                        }
+                        .icon-links a {
+                        margin: 0 0.5rem;
+                        display: inline-block;
+                        text-decoration: none;
+                        }
+                        .icon-links img {
+                        width: 24px;
+                        height: 24px;
+                        vertical-align: middle;
+                        filter: grayscale(100%);
+                        transition: filter 0.3s;
+                        }
+                        .icon-links img:hover {
+                        filter: grayscale(0%);
+                        }
+                    </style>
+                    </head>
+                    <body>
+                    <div class="container">
+                        <div class="header">
+                        <div class="title" style="font-size: 2rem; font-weight: 700; color: #1976d2;">SUPPL-AI</div>
+                        <div class="title">Ciao {user.get('name')},</div>
+                        </div>
+                        <div class="content">
+                        Ecco la tua nuova password temporanea:
+                        <div class="password-box">{password}</div>
+                        <p>Accedi e cambiala subito per mantenere il tuo account sicuro.</p>
+                        </div>
+
+                        <div class="icon-links">
+                        <a href="https://codehex16.github.io/" title="Sito Web">
+                            <img src="https://img.icons8.com/ios-filled/50/000000/domain.png" alt="Sito">
+                        </a>
+                        <a href="https://github.com/codehex16" title="GitHub">
+                            <img src="https://img.icons8.com/ios-filled/50/000000/github.png" alt="GitHub">
+                        </a>
+                        </div>
+
+                        <div class="footer">
+                        Questo progetto &egrave; realizzato da <strong>CodeHex16</strong>, gruppo 16 del Progetto di SWE dell'Universit&agrave; degli Studi di Padova.
+                        </div>
+                    </div>
+                    </body>
+                    </html>
+                """
+                # body=f"Ciao {user.get('name')},\n\nEcco la tua nuova password temporanea:\n\n{password}\n\nAccedi e cambiala subito!",
             )
         except Exception as e:
             # raise HTTPException(
