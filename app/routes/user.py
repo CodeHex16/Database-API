@@ -491,7 +491,7 @@ async def reset_password(
                     <div class="container">
                         <div class="header">
                         <div class="title" style="font-size: 2rem; font-weight: 700; color: #1976d2;">SUPPL-AI</div>
-                        <div class="title">Ciao {user.get('name')},</div>
+                        <div class="title">Ciao {html.escape(user.get('name'))},</div>
                         </div>
                         <div class="content">
                         Ecco la tua nuova password temporanea:
