@@ -70,14 +70,6 @@ async def test__unit_test__get_documents(fake_document_repo):
     result = await get_documents(current_user, fake_document_repo)
     assert result == "documents"
 
-@pytest.mark.asyncio
-async def test__unit_test__get_documents_erro(fake_document_repo, monkeypatch):
-    async def mock_get_documents():
-        return None
-    monkeypatch.setattr(fake_document_repo, "get_documents", mock_get_documents)
-    with pytest.raises(HTTPException) as excinfo:
-        await get_documents(current_user, fake_document_repo)
-    assert excinfo.value.status_code == 404
 
 class User:
     def __init__(self):

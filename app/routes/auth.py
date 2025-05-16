@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from app.repositories.user_repository import UserRepository, get_user_repository
 import app.schemas as schemas
 from app.utils import verify_password
-from app.service.auth_service import AccessRoles
+from app.auth_roles import AccessRoles
 
 load_dotenv()
 

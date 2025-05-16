@@ -4,14 +4,12 @@ from bson import ObjectId
 from fastapi import Query
 from typing import Optional
 
-from app.database import get_db
-from app.repositories.chat_repository import ChatRepository
+from app.repositories.chat_repository import ChatRepository, get_chat_repository
 import app.schemas as schemas
 from app.routes.auth import (
     verify_user,
     verify_admin,
 )
-from app.repositories.chat_repository import get_chat_repository
 
 router = APIRouter(
     prefix="/chats",
