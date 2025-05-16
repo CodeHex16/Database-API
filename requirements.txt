@@ -19,3 +19,4 @@ pytest-cov==6.1.1
 httpx==0.28.1
 coverage==7.8.0
 coveralls==4.0.1
+regex==2024.11.6
