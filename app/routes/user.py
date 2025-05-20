@@ -476,7 +476,7 @@ async def reset_password(
         try:
             # Invia l'email con il token
             await EmailService().send_email(
-                to=[user.get("_id")],
+                to=[user_data.email],
                 subject="[Suppl-AI] Password Reset",
                 body=f"""
                 <!DOCTYPE html>
@@ -491,7 +491,7 @@ async def reset_password(
                     <div class="container">
                         <div class="header">
                         <div class="title" style="font-size: 2rem; font-weight: 700; color: #1976d2;">SUPPL-AI</div>
-                        <div class="title">Ciao {html.escape(user.get('name'))},</div>
+                        <div class="title">Ciao {user.get('name')},</div>
                         </div>
                         <div class="content">
                         Ecco la tua nuova password temporanea:
